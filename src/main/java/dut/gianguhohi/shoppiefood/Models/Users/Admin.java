@@ -1,5 +1,4 @@
 package dut.gianguhohi.shoppiefood.Models.Users;
 
-public class Admin {
-    
+public class Admin extends Users{
 }
