@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div th:replace="fragments :: header('Đăng nhập')"></div>
+    <div th:replace="~{fragments :: header('Đăng nhập')}"></div>
 
     <main>
         <form action="/auth/login" method="post">
@@ -14,10 +14,12 @@
                 <input type="password" name="password" class="form-control" placeholder="Mật khẩu">
             </div>
             <button type="submit" class="btn btn-primary">Đăng nhập</button>
+            <a href="/auth/register" class="btn btn-secondary">Đăng ký</a>
 
+            <p th:text="${message}"></p>
         </form>
     </main>
 
-    <div th:replace="fragments :: footer"></div>
+    <div th:replace="~{fragments :: footer}"></div>
 </body>
 </html>
