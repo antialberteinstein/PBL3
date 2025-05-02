@@ -1,5 +1,29 @@
-package dut.gianguhohi.shoppiefood.Models.Feedback;
+package dut.gianguhohi.shoppiefood.models.Feedback;
 
-public class UserFeedback extends Feedback{
-    private int user_id;
+import jakarta.persistence.*;
+import dut.gianguhohi.shoppiefood.models.Users.Users;
+
+@Entity
+@DiscriminatorValue("USER")
+public class UserFeedback extends Feedback {
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
+    public UserFeedback() {
+        super();
+    }
+
+    public UserFeedback(int type, String content, Users user) {
+        super(type, content);
+        this.user = user;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
 }

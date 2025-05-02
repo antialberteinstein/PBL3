@@ -43,6 +43,8 @@ public class AuthController {
     @PostMapping("/register")
     public String register(
         @RequestParam("username") String username,
-        @RequestParam
-    )
+        @RequestParam("password") String password
+    ) {
+        return "";
+    }
 }
