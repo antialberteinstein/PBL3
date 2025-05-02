@@ -1,7 +1,6 @@
 package dut.gianguhohi.shoppiefood.models.Users;
 
 import jakarta.persistence.*;
-import dut.gianguhohi.shoppiefood.models.misc.Address;
 
 @Entity
 @DiscriminatorValue("SELLER")
