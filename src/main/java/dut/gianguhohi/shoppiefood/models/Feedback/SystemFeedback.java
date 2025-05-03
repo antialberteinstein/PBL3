@@ -1,7 +1,7 @@
 package dut.gianguhohi.shoppiefood.models.Feedback;
 
 import jakarta.persistence.*;
-
+import dut.gianguhohi.shoppiefood.models.Users.User;
 @Entity
 @DiscriminatorValue("SYSTEM")
 public class SystemFeedback extends Feedback {
@@ -9,7 +9,7 @@ public class SystemFeedback extends Feedback {
         super();
     }
 
-    public SystemFeedback(int type, String content) {
-        super(type, content);
+    public SystemFeedback(String content, User whoFeedback) {
+        super(content, whoFeedback);
     }
 }

@@ -2,7 +2,7 @@ package dut.gianguhohi.shoppiefood.models.Discounts;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import dut.gianguhohi.shoppiefood.models.Users.Customers;
+import dut.gianguhohi.shoppiefood.models.Users.User;
 import java.util.Set;
 
 @Entity
@@ -17,7 +17,7 @@ public class FreeShip extends Discount {
         joinColumns = @JoinColumn(name = "discount_id"),
         inverseJoinColumns = @JoinColumn(name = "customer_id")
     )
-    private Set<Customers> customers;
+    private Set<User> customers;
 
     public FreeShip() {
         super();
@@ -26,7 +26,7 @@ public class FreeShip extends Discount {
     public FreeShip(String type, LocalDateTime timeStart, LocalDateTime timeFinish, 
                    int status, int discountValue, boolean isPercentage, 
                    int maxDiscountValue, int minOrderValue, int quantityLimit,
-                   Set<Customers> customers) {
+                   Set<User> customers) {
         super(type, timeStart, timeFinish, status, discountValue, isPercentage, 
               maxDiscountValue, minOrderValue, quantityLimit);
         this.minOrderValue = minOrderValue;
@@ -41,11 +41,11 @@ public class FreeShip extends Discount {
         this.minOrderValue = minOrderValue;
     }
 
-    public Set<Customers> getCustomers() {
+    public Set<User> getCustomers() {
         return customers;
     }
 
-    public void setCustomers(Set<Customers> customers) {
+    public void setCustomers(Set<User> customers) {
         this.customers = customers;
     }
 }

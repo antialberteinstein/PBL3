@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+**/firebase.json
+**/shoppiefood-10395-firebase-adminsdk-fbsvc-f2970f4da7.json

@@ -1,39 +1,35 @@
 package dut.gianguhohi.shoppiefood.models.Users;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@DiscriminatorValue("SHIPPER")
-public class Shipper extends Users {
+@Table(name = "shippers")
+public class Shipper{
+    @Id
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @NotBlank(message = "Giấy phép lái xe không được để trống")
     @Column(name = "driver_license")
     private String driverLicense;
 
+    @NotBlank(message = "Biển số xe không được để trống")
     @Column(name = "plate_number")
     private String plateNumber;
 
+    @NotBlank(message = "Loại xe không được để trống")
     @Column(name = "vehicle_type")
     private int vehicleType;
 
-    @Column(name = "bank_number")
-    private String bankNumber;
-
-    @Column(name = "bank_name")
-    private String bankName;
-
     public Shipper() {
-        super();
     }
 
-    public Shipper(String userName, String password, String name, 
-                  String phoneNumber, String role, boolean gender,
-                  String driverLicense, String plateNumber, int vehicleType,
-                  String bankNumber, String bankName) {
-        super(userName, password, name, phoneNumber, role, gender);
+    public Shipper(String driverLicense, String plateNumber, int vehicleType) {
         this.driverLicense = driverLicense;
         this.plateNumber = plateNumber;
         this.vehicleType = vehicleType;
-        this.bankNumber = bankNumber;
-        this.bankName = bankName;
     }
 
     public String getDriverLicense() {
@@ -60,19 +56,11 @@ public class Shipper extends Users {
         this.vehicleType = vehicleType;
     }
 
-    public String getBankNumber() {
-        return bankNumber;
+    public User getUser() {
+        return user;
     }
 
-    public void setBankNumber(String bankNumber) {
-        this.bankNumber = bankNumber;
-    }
-
-    public String getBankName() {
-        return bankName;
-    }
-
-    public void setBankName(String bankName) {
-        this.bankName = bankName;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

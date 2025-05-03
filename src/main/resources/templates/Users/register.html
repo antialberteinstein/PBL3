@@ -4,10 +4,14 @@
     <div th:replace="~{fragments :: header('Đăng ký')}"></div>
 
     <main>
-        <form action="/auth/register" method="post">
+        <form id="registerForm" method="post">
             <div class="mb-3">
-                <label for="username" class="form-label">Tên đăng nhập</label>
-                <input type="text" name="username" class="form-control" placeholder="Tên đăng nhập">
+                <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                <input type="text" name="phoneNumber" class="form-control" placeholder="Số điện thoại">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Email">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Mật khẩu</label>
@@ -20,10 +24,6 @@
             <div class="mb-3">
                 <label for="name" class="form-label">Họ tên</label>
                 <input type="text" name="name" class="form-control" placeholder="Họ tên">
-            </div>
-            <div class="mb-3">
-                <label for="phoneNumber" class="form-label">Số điện thoại</label>
-                <input type="tel" name="phoneNumber" class="form-control" placeholder="Số điện thoại">
             </div>
             <div class="mb-3">
                 <label for="dob" class="form-label">Ngày sinh</label>
@@ -40,14 +40,6 @@
                     <label class="form-check-label" for="female">Nữ</label>
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="role" class="form-label">Vai trò</label>
-                <select name="role" class="form-select">
-                    <option value="customer">Khách hàng</option>
-                    <option value="shipper">Người giao hàng</option>
-                    <option value="seller">Người bán</option>
-                </select>
-            </div>
             
 
             <button type="submit" class="btn btn-primary">Đăng ký</button>
@@ -55,8 +47,61 @@
 
             <p th:text="${message}"></p>
         </form>
+
+        <form id="fakeRegisterForm" method="post" action="/auth/register">
+            <input type="hidden" name="phoneNumber" id="phoneNumber">
+            <input type="hidden" name="email" id="email">
+            <input type="hidden" name="password" id="password">
+            <input type="hidden" name="name" id="name">
+            <input type="hidden" name="gender" id="gender">
+            <input type="hidden" name="dateOfBirth" id="dateOfBirth">
+            <input type="hidden" name="avatarUrl" id="avatarUrl" value="">
+        </form>
+
+        <p id="errorMessage" style="color: red;"></p>
+            
     </main>
 
     <div th:replace="~{fragments :: footer}"></div>
+
+    <script>
+        let registerForm = document.getElementById("registerForm");
+        let fakeRegisterForm = document.getElementById("fakeRegisterForm");
+        let errorMessage = document.getElementById("errorMessage");
+
+        
+        registerForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const phoneNumber = registerForm.querySelector("input[name='phoneNumber']").value;
+            const email = registerForm.querySelector("input[name='email']").value;
+            const password = registerForm.querySelector("input[name='password']").value;
+            const confirmPassword = registerForm.querySelector("input[name='confirmPassword']").value;
+            const name = registerForm.querySelector("input[name='name']").value;
+            const gender = registerForm.querySelector("input[name='gender']:checked")?.value; // Added ? to handle unchecked case
+            const dateOfBirth = registerForm.querySelector("input[name='dob']").value;
+
+            if (!phoneNumber || !email || !password || !confirmPassword || !name || !gender || !dateOfBirth) { // Removed !role as it's not defined
+                errorMessage.textContent = "Vui lòng điền đầy đủ thông tin";
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorMessage.textContent = "Mật khẩu không khớp";
+                return;
+            }
+
+            const newGender = gender === "male" ? true : false;
+
+            fakeRegisterForm.querySelector("#phoneNumber").value = phoneNumber;
+            fakeRegisterForm.querySelector("#email").value = email;
+            fakeRegisterForm.querySelector("#password").value = password;
+            fakeRegisterForm.querySelector("#name").value = name;
+            fakeRegisterForm.querySelector("#gender").value = newGender;
+            fakeRegisterForm.querySelector("#dateOfBirth").value = dateOfBirth;
+
+            fakeRegisterForm.submit();
+        });
+    </script>
 </body>
 </html>

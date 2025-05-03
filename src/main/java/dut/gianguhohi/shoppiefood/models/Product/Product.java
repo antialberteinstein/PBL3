@@ -3,7 +3,7 @@ package dut.gianguhohi.shoppiefood.models.Product;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import dut.gianguhohi.shoppiefood.models.Users.Seller;
+import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import dut.gianguhohi.shoppiefood.models.Orders.OrderItem;
 
 @Entity
@@ -15,8 +15,8 @@ public class Product {
     private int productId;
 
     @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
-    private Seller seller;
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
@@ -51,9 +51,9 @@ public class Product {
         this.isAvailable = true;
     }
 
-    public Product(Seller seller, Category category, String imageUrl, String name, 
+    public Product(Restaurant restaurant, Category category, String imageUrl, String name, 
                   String description, long price, float rating) {
-        this.seller = seller;
+        this.restaurant = restaurant;
         this.category = category;
         this.imageUrl = imageUrl;
         this.name = name;
@@ -73,12 +73,12 @@ public class Product {
         this.productId = productId;
     }
 
-    public Seller getSeller() {
-        return seller;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
-    public void setSeller(Seller seller) {
-        this.seller = seller;
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public Category getCategory() {

@@ -3,6 +3,7 @@ package dut.gianguhohi.shoppiefood;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import dut.gianguhohi.shoppiefood.utils.AddressManager;
+
 @SpringBootApplication
 public class ShoppiefoodApplication {
 

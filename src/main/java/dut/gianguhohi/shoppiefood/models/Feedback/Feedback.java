@@ -2,6 +2,8 @@ package dut.gianguhohi.shoppiefood.models.Feedback;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import dut.gianguhohi.shoppiefood.models.Users.User;
+
 
 @Entity
 @Table(name = "feedbacks")
@@ -13,8 +15,9 @@ public class Feedback {
     @Column(name = "feedback_id")
     private int feedbackId;
 
-    @Column(nullable = false)
-    private int type;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User whoFeedback;
 
     @Column(nullable = false, length = 1000)
     private String content;
@@ -26,9 +29,9 @@ public class Feedback {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Feedback(int type, String content) {
-        this.type = type;
+    public Feedback(String content, User whoFeedback) {
         this.content = content;
+        this.whoFeedback = whoFeedback;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -38,14 +41,6 @@ public class Feedback {
 
     public void setFeedbackId(int feedbackId) {
         this.feedbackId = feedbackId;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getContent() {
@@ -62,5 +57,13 @@ public class Feedback {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public User getWhoFeedback() {
+        return whoFeedback;
+    }
+
+    public void setWhoFeedback(User whoFeedback) {
+        this.whoFeedback = whoFeedback;
     }
 }

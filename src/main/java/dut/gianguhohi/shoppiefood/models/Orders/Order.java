@@ -3,7 +3,9 @@ package dut.gianguhohi.shoppiefood.models.Orders;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import dut.gianguhohi.shoppiefood.models.Users.Users;
+import dut.gianguhohi.shoppiefood.models.Users.User;
+import dut.gianguhohi.shoppiefood.models.Users.Shipper;
+import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 
 @Entity
 @Table(name = "orders")
@@ -15,7 +17,15 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "shipper_id", nullable = false)
+    private Shipper shipper;
+
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -42,9 +52,11 @@ public class Order {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Order(Users user, LocalDateTime timeStart, LocalDateTime timeDelivered, 
+    public Order(User user, Shipper shipper, Restaurant restaurant, LocalDateTime timeStart, LocalDateTime timeDelivered, 
                 int status, long totalAmount, String shippingAddress) {
         this.user = user;
+        this.shipper = shipper;
+        this.restaurant = restaurant;
         this.timeStart = timeStart;
         this.timeDelivered = timeDelivered;
         this.status = status;
@@ -62,11 +74,11 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public Users getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -124,5 +136,21 @@ public class Order {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public Shipper getShipper() {
+        return shipper;
+    }
+
+    public void setShipper(Shipper shipper) {
+        this.shipper = shipper;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 }

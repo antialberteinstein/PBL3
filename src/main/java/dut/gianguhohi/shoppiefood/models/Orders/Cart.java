@@ -2,7 +2,7 @@ package dut.gianguhohi.shoppiefood.models.Orders;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import dut.gianguhohi.shoppiefood.models.Users.Users;
+import dut.gianguhohi.shoppiefood.models.Users.User;
 
 @Entity
 @Table(name = "carts")
@@ -14,7 +14,7 @@ public class Cart {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private User user;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -23,7 +23,7 @@ public class Cart {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Cart(Users user) {
+    public Cart(User user) {
         this.user = user;
         this.createdAt = LocalDateTime.now();
     }
@@ -36,11 +36,11 @@ public class Cart {
         this.cartId = cartId;
     }
 
-    public Users getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

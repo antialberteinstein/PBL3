@@ -1,8 +1,7 @@
 package dut.gianguhohi.shoppiefood.models.misc;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import dut.gianguhohi.shoppiefood.models.Users.Seller;
+import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 
 @Entity
 @Table(name = "branches")
@@ -13,8 +12,8 @@ public class Branch {
     private int branchId;
 
     @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
-    private Seller seller;
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 
     @OneToOne
     @JoinColumn(name = "address_id", nullable = false)
@@ -23,18 +22,13 @@ public class Branch {
     @Column(name = "branch_name", nullable = false)
     private String branchName;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     public Branch() {
-        this.createdAt = LocalDateTime.now();
     }
 
-    public Branch(Seller seller, Address address, String branchName) {
-        this.seller = seller;
+    public Branch(Restaurant restaurant, Address address, String branchName) {
+        this.restaurant = restaurant;
         this.address = address;
         this.branchName = branchName;
-        this.createdAt = LocalDateTime.now();
     }
 
     public int getBranchId() {
@@ -45,12 +39,12 @@ public class Branch {
         this.branchId = branchId;
     }
 
-    public Seller getSeller() {
-        return seller;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
-    public void setSeller(Seller seller) {
-        this.seller = seller;
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public Address getAddress() {
@@ -67,13 +61,5 @@ public class Branch {
 
     public void setBranchName(String branchName) {
         this.branchName = branchName;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }
