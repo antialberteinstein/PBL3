@@ -2,7 +2,6 @@ package dut.gianguhohi.shoppiefood.models.Product;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "categories")
@@ -12,7 +11,7 @@ public class Category {
     @Column(name = "category_id")
     private int categoryId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column
@@ -20,9 +19,6 @@ public class Category {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
 
     public Category() {
         this.createdAt = LocalDateTime.now();
@@ -64,13 +60,5 @@ public class Category {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
     }
 }
