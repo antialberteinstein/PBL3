@@ -1,0 +1,169 @@
+.cart-sidebar, .order-list {
+    background: #fff;
+    border: 2px solid #b96eff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px #b96eff22;
+    padding: 32px 24px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+    min-width: 320px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cart-title, .order-title {
+    color: #e6007a;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+    font-size: 2rem;
+}
+
+.cart-item, .order-item {
+    border: 1.5px solid #FFD43B;
+    border-radius: 10px;
+    padding: 18px 16px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fffbe7;
+    transition: box-shadow 0.2s;
+}
+.cart-item:hover, .order-item:hover {
+    box-shadow: 0 2px 8px #b96eff33;
+}
+
+.cart-item-name, .order-name {
+    font-weight: 600;
+    color: #222;
+    font-size: 1.1rem;
+}
+.cart-item-price, .order-price {
+    color: #e6007a;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-left: 12px;
+}
+
+.cart-item-actions button, .order-actions button {
+    margin-left: 8px;
+    min-width: 90px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.cart-actions, .order-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-warning {
+    background: #FFD43B;
+    color: #222;
+    border: none;
+}
+.btn-warning:hover {
+    background: #ffe066;
+    color: #222;
+}
+.btn-danger {
+    background: #e6007a;
+    color: #fff;
+    border: none;
+}
+.btn-danger:hover {
+    background: #b6005a;
+    color: #fff;
+}
+.btn-primary {
+    background: #00e6c3;
+    color: #fff;
+    border: none;
+}
+.btn-primary:hover {
+    background: #00bfa3;
+    color: #fff;
+}
+.btn-dark {
+    background: #222;
+    color: #fff;
+    border: none;
+}
+.btn-dark:hover {
+    background: #444;
+    color: #fff;
+}
+
+/* Bỏ gạch chân dưới các link trong cart và order */
+.cart-sidebar a,
+.order-list a {
+    text-decoration: none !important;
+    box-shadow: none;
+}
+
+/* Nếu muốn link giống nút hơn, có thể thêm: */
+.cart-actions a, .order-actions a {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+.cart-actions a.btn-warning {
+    background: #FFD43B;
+    color: #222;
+    border: none;
+}
+.cart-actions a.btn-dark {
+    background: #222;
+    color: #fff;
+    border: none;
+}
+
+.cart-actions a.btn-warning:hover {
+    background: #ffe066;
+    color: #222;
+}
+.cart-actions a.btn-dark:hover {
+    background: #444;
+    color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .cart-sidebar, .order-list {
+        padding: 16px 4px;
+        min-width: unset;
+        max-width: 100%;
+    }
+    .cart-item, .order-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+a, .nav-link {
+    text-decoration: none !important;
+    box-shadow: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #f6f6f6;
+}
+nav.navbar {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw;
+    left: 0;
+    right: 0;
+    border-radius: 0;
+}

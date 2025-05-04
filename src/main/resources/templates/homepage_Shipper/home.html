@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HomePage-Shipper</title>
+    <link rel="stylesheet" th:href="@{/css/shipper/home.css}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
+        <div class="container-fluid">
+            <div class="d-flex ms-auto align-items-center gap-4">
+                <a class="nav-link" href="#">Trang Chủ</a>
+                <a class="nav-link" href="#">Điều Khoản</a>
+                <a class="nav-link" href="#">Tài Khoản</a>
+                <a class="nav-link" href="#">Đăng Xuất</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container shipper-main">
+        <!-- Danh sách đơn giao hàng mới -->
+        <div class="shipper-orders">
+            <div class="order-shipper-item">
+                <div class="order-shipper-info">
+                    <div class="order-shipper-name">Bún đậu mắm tôm</div>
+                    <div class="order-shipper-price">162,000 VNĐ</div>
+                </div>
+                <div class="order-shipper-actions">
+                    <button class="btn btn-warning">Xem thông tin</button>
+                    <button class="btn btn-primary">Nhận giao</button>
+                </div>
+            </div>
+            <div class="order-shipper-item">
+                <div class="order-shipper-info">
+                    <div class="order-shipper-name">Bún bò Huế</div>
+                    <div class="order-shipper-price">120,000 VNĐ</div>
+                </div>
+                <div class="order-shipper-actions">
+                    <button class="btn btn-warning">Xem thông tin</button>
+                    <button class="btn btn-primary">Nhận giao</button>
+                </div>
+            </div>
+            <div class="order-shipper-item">
+                <div class="order-shipper-info">
+                    <div class="order-shipper-name">Bún măng gà</div>
+                    <div class="order-shipper-price">100,000 VNĐ</div>
+                </div>
+                <div class="order-shipper-actions">
+                    <button class="btn btn-warning">Xem thông tin</button>
+                    <button class="btn btn-primary">Nhận giao</button>
+                </div>
+            </div>
+            <div class="order-shipper-item">
+                <div class="order-shipper-info">
+                    <div class="order-shipper-name">Bún ốc</div>
+                    <div class="order-shipper-price">150,000 VNĐ</div>
+                </div>
+                <div class="order-shipper-actions">
+                    <button class="btn btn-warning">Xem thông tin</button>
+                    <button class="btn btn-primary">Nhận giao</button>
+                </div>
+            </div>
+            <div class="order-shipper-item">
+                <div class="order-shipper-info">
+                    <div class="order-shipper-name">Bún mắm</div>
+                    <div class="order-shipper-price">75,000 VNĐ</div>
+                </div>
+                <div class="order-shipper-actions">
+                    <button class="btn btn-warning">Xem thông tin</button>
+                    <button class="btn btn-primary">Nhận giao</button>
+                </div>
+            </div>
+            <!-- Thêm các đơn khác nếu muốn -->
+        </div>
+        <!-- Sidebar thông tin shipper -->
+        <div class="shipper-sidebar">
+            <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar">
+            <div class="shipper-name">Anh shipper thân thiện</div>
+            <div style="font-size: 0.95rem; color: #888;">SĐT: 0123 456 789</div>
+            <ul>
+                <li>Thông tin tài khoản</li>
+                <li>Hiển thị các đơn hàng mới</li>
+                <li>Lịch sử giao hàng</li>
+                <li>Đăng xuất</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
