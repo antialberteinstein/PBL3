@@ -1,5 +1,6 @@
 body {
-    background: #f6f6f6;
+    background: #f7f7fa;
+    font-family: 'Montserrat', sans-serif;
 }
 .navbar-custom {
     background-color: #FFD43B;
@@ -48,11 +49,11 @@ body {
     margin-left: -100px;
 }
 .login-title {
-    color: #e6007a;
-    font-size: 1.6rem;
-    font-weight: bold;
+    color: #e60073;
+    font-size: 2rem;
+    font-weight: 700;
     text-align: center;
-    margin-bottom: 18px;
+    margin-bottom: 28px;
     letter-spacing: 2px;
 }
 .form-label {
@@ -64,22 +65,37 @@ body {
     border-radius: 6px;
     margin-bottom: 16px;
 }
+.form-control::placeholder {
+    color: #bdbdbd !important;
+    opacity: 1;
+}
 .btn-login {
-    background: #FFD43B;
+    background: #ffd43b;
     color: #222;
     font-weight: 600;
     border: none;
-    margin-top: 10px;
-    margin-right: 10px;
-    min-width: 100px;
+    border-radius: 8px;
+    padding: 10px 28px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-login:hover {
+    background: #ffe066;
+    box-shadow: 0 2px 8px rgba(255, 212, 67, 0.2);
 }
 .btn-register {
-    background: #00e6c3;
+    background: #00e6e6;
     color: #fff;
     font-weight: 600;
     border: none;
-    min-width: 100px;
-    margin-top: 10px;
+    border-radius: 8px;
+    padding: 10px 28px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-register:hover {
+    background: #00b3b3;
+    box-shadow: 0 2px 8px rgba(0, 230, 230, 0.2);
 }
 .register-container {
     display: flex;
@@ -112,4 +128,78 @@ body {
         width: 100%;
         margin-bottom: 30px;
     }
+}
+.header {
+    background: #ffd43b;
+    border-bottom: 2px solid #222;
+    padding: 16px 32px;
+    font-weight: 600;
+    font-size: 20px;
+    color: #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+}
+.login-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    padding: 40px 36px;
+    min-width: 350px;
+    border: 2px solid #e0aaff;
+    transition: box-shadow 0.2s;
+}
+.login-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.13);
+}
+.input-group label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+}
+.input-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #ffe5ec;
+    background: #fff8f0;
+    margin-bottom: 18px;
+    font-size: 1rem;
+    transition: border 0.2s;
+}
+.input-group input:focus {
+    border: 1.5px solid #e60073;
+    outline: none;
+}
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chef-img {
+    width: 320px;
+    height: 320px;
+    object-fit: contain;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    background: #fff;
+    padding: 18px;
+}
+.input-group-text {
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+.input-group-text .fas {
+    font-size: 1rem;
+    line-height: 2.8;
 }
