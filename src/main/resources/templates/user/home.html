@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html layout:decorate="~{shared/layout/base}">
+<head layout:title="Trang Chủ - Người dùng">
+    <style>
+        .custom-define-container {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+        }
+
+        .custom-left, .custom-right {
+            flex: 1;
+            display: flex;
+        }
+
+        .custom-left {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-left: 80px;
+        }
+
+    </style>
+</head>
+<div layout:fragment="content">
+
+    <div class="mt-4 custom-define-container">
+        <div class="custom-left">
+            <div class="container">
+                <!-- Logo và tiêu đề -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h1 class="text-warning fw-bold">Shoppie Food</h1>
+                    </div>
+                </div>
+
+                <!-- Lời chào -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="fs-4">Hôm Nay Bạn Muốn Ăn Gì?</h2>
+                    </div>
+                </div>
+
+                <!-- Ô tìm kiếm -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control nform-control" placeholder="Tìm món ăn...">
+                            <button class="btn" style="background-color: #FFD43B; color: #212121; font-weight: 600;">Tìm kiếm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="custom-right">
+            <!-- Danh sách món ăn - Chỉ 1 món -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="food-card">
+                            <img src="/api/placeholder/400/320" class="card-img-top" alt="Cơm tấm sườn">
+                            <div class="card-body">
+                                <h5 class="card-title">Cơm tấm sườn bì chả</h5>
+                                <p class="card-text">Cơm tấm với sườn nướng, bì heo và chả trứng đặc biệt</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="price">55,000 VND</span>
+                                    <button class="btn btn-outline-primary nbtn-outline-primary">Đặt ngay</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+</html>

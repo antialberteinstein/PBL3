@@ -9,7 +9,7 @@ package dut.gianguhohi.shoppiefood.utils;
  * - OTHER: Represented by the value 2
  */
 public class Gender {
-    public static final int FEMALE = 0;
-    public static final int MALE = 1;
-    public static final int OTHER = 2;
+    public static final String FEMALE = "Nữ";
+    public static final String MALE = "Nam";
+    public static final String OTHER = "Khác";
 }

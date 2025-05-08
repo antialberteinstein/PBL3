@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html layout:decorate="~{shared/layout/base}">
+<head layout:title="Đăng Ký">
+</head>
+<div layout:fragment="content">
+    <!-- Main content -->
+    <div class="container-fluid register-container">
+        
+        <!-- Register form - now only one real form -->
+        <div class="login-form">
+
+            <form class="login-box" id="register-form" th:action="@{/auth/register}" method="post">
+                <div class="login-title">ĐĂNG KÝ</div>
+                
+                <div class="input-field">
+                    <label for="phoneNumber" class="form-label">Số điện thoại <span class="required-star">*</span></label>
+                    <input type="tel" class="form-control nform-control" id="phoneNumber" name="phoneNumber" required pattern="^(0|\+84)[0-9]{9}$">
+                </div>
+                <div class="feedback-container mb-2">
+                    <div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ (VD: 0901234567)</div>
+                    <div class="valid-feedback">Số điện thoại hợp lệ</div>
+                </div>
+                
+                <div class="input-field">
+                    <label for="email" class="form-label">Email <span class="required-star">*</span></label>
+                    <input type="email" class="form-control nform-control" id="email" name="email" required>
+                </div>
+                <div class="feedback-container mb-2">
+                    <div class="invalid-feedback">Vui lòng nhập địa chỉ email hợp lệ</div>
+                    <div class="valid-feedback">Email hợp lệ</div>
+                </div>
+                
+                <div class="input-field">
+                    <label for="password" class="form-label">Mật Khẩu <span class="required-star">*</span></label>
+                    <div class="input-with-icon" style="flex: 1;">
+                        <input type="password" class="form-control nform-control" id="password" name="password" required minlength="8">
+                        <span class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</span>
+                    </div>
+                </div>
+        
+                <div class="input-field">
+                    <label for="nothing" class="form-label"></label>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                </div>
+                
+                <div class="feedback-container mb-2">
+                    <div class="invalid-feedback">Mật khẩu phải có ít nhất 8 ký tự</div>
+                    <div class="password-feedback" id="passwordFeedback"></div>
+                </div>
+                
+                <div class="input-field">
+                    <label for="confirmPassword" class="form-label">Nhập Lại Mật Khẩu <span class="required-star">*</span></label>
+                    <div class="input-with-icon" style="flex: 1;">
+                        <input type="password" class="form-control nform-control" id="confirmPassword" name="confirmPassword" required>
+                        <span class="toggle-password" onclick="togglePasswordVisibility('confirmPassword')">👁️</span>
+                    </div>
+                </div>
+                
+                <div class="feedback-container mb-2">
+                    <div class="invalid-feedback">Mật khẩu không khớp</div>
+                    <div class="valid-feedback">Mật khẩu khớp</div>
+                </div>
+                
+                <div class="input-field">
+                    <label for="name" class="form-label">Họ Và Tên <span class="required-star">*</span></label>
+                    <input type="text" class="form-control nform-control" id="name" name="name" required>
+                </div>
+        
+                <div class="feedback-container mb-2">
+                    <div class="invalid-feedback">Vui lòng nhập tên đầy đủ</div>
+                    <div class="valid-feedback">Tên hợp lệ</div>
+                </div>
+                
+                <div class="input-field">
+                    <label for="dateOfBirth" class="form-label">Ngày Sinh <span class="required-star">*</span></label>
+                    <input type="date" class="form-control nform-control" id="dateOfBirth" name="dateOfBirth" required>
+                </div>
+        
+                <div class="feedback-container mb-2">
+                    <div class="invalid-feedback">Vui lòng chọn ngày sinh</div>
+                    <div class="valid-feedback">Ngày sinh hợp lệ</div>
+                </div>
+                
+                <div class="input-field">
+                    <label for="gender" class="form-label">Giới Tính <span class="required-star">*</span></label>
+                    <select class="form-control nform-control" id="gender" name="gender" required>
+                        <option value="">Chọn giới tính</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+        
+                <div class="feedback-container mb-2">
+                    <div class="invalid-feedback">Vui lòng chọn giới tính</div>
+                </div>
+        
+                <div class="mb-3" style="margin-left: 160px; margin-top: 10px;">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="termsCheck" name="termsCheck" required>
+                        <label class="form-check-label" for="termsCheck">
+                            Tôi đồng ý với <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Điều khoản dịch vụ</a>
+                        </label>
+                    </div>
+                </div>
+        
+                <div class="feedback-container">
+                    <div class="invalid-feedback">Bạn phải đồng ý với điều khoản dịch vụ</div>
+                </div>
+        
+                <div class="d-flex justify-content-between">
+                    <a href="/auth/login" class="btn btn-secondary nbtn-secondary">Đăng Nhập</a>
+                    <button type="submit" class="btn btn-primary nbtn-primary" id="registerBtn">Đăng Ký</button>
+                </div>
+                <p id="formMessage" class="text-danger mt-3 text-center" th:text="${message}"></p>
+            </form>  
+        </div>
+        <div class="left-img">
+            <img src="/images/chef.png" alt="Registration" />
+        </div>
+    </div>
+    
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">Điều khoản dịch vụ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Terms content here -->
+                    <p>Đây là điều khoản dịch vụ của chúng tôi. Vui lòng đọc kỹ trước khi đăng ký.</p>
+                    <!-- Add your terms content here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn nbtn-primary" data-bs-dismiss="modal">Đồng ý</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="misc">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById("register-form");
+            const formMessage = document.getElementById("formMessage");
+            const passwordInput = document.getElementById("password");
+            const confirmPasswordInput = document.getElementById("confirmPassword");
+            const strengthBar = document.getElementById("passwordStrengthBar");
+            const passwordFeedback = document.getElementById("passwordFeedback");
+            
+            // Function to validate email format
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+            
+            // Function to validate phone number format
+            function isValidPhone(phone) {
+                const phoneRegex = /^(0|\+84)[0-9]{9}$/;
+                return phoneRegex.test(phone);
+            }
+            
+            // Function to validate name (not empty)
+            function isValidName(name) {
+                return name.trim().length > 0;
+            }
+            
+            // Function to validate date of birth (not empty)
+            function isValidDateOfBirth(dob) {
+                return dob.trim().length > 0;
+            }
+            
+            // Function to validate gender (selected)
+            function isValidGender(gender) {
+                return gender.trim().length > 0;
+            }
+            
+            // Real-time validation for phone number
+            const phoneNumberInput = document.getElementById("phoneNumber");
+            phoneNumberInput.addEventListener('input', function() {
+                validateField(phoneNumberInput, isValidPhone(phoneNumberInput.value));
+            });
+            
+            // Real-time validation for email
+            const emailInput = document.getElementById("email");
+            emailInput.addEventListener('input', function() {
+                validateField(emailInput, isValidEmail(emailInput.value));
+            });
+            
+            // Real-time validation for name
+            const nameInput = document.getElementById("name");
+            nameInput.addEventListener('input', function() {
+                validateField(nameInput, isValidName(nameInput.value));
+            });
+            
+            // Real-time validation for date of birth
+            const dobInput = document.getElementById("dateOfBirth");
+            dobInput.addEventListener('change', function() {
+                validateField(dobInput, isValidDateOfBirth(dobInput.value));
+            });
+            
+            // Real-time validation for gender
+            const genderInput = document.getElementById("gender");
+            genderInput.addEventListener('change', function() {
+                validateField(genderInput, isValidGender(genderInput.value));
+            });
+            
+            // Password strength meter
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                const strength = calculatePasswordStrength(password);
+                
+                // Update strength bar
+                strengthBar.style.width = `${strength.score * 25}%`;
+                strengthBar.className = 'password-strength-bar';
+                
+                if (password.length < 8) {
+                    // Invalid password length
+                    validateField(passwordInput, false);
+                } else {
+                    // Valid password length, remove invalid state
+                    passwordInput.classList.remove("is-invalid");
+                    
+                    // But don't mark as valid until it's strong enough
+                    if (strength.score >= 3) {
+                        passwordInput.classList.add("field-valid");
+                    } else {
+                        passwordInput.classList.remove("field-valid");
+                    }
+                }
+                
+                // Update strength indicator
+                if (strength.score === 0) {
+                    strengthBar.classList.add('weak');
+                    passwordFeedback.textContent = 'Mật khẩu quá yếu';
+                    passwordFeedback.className = 'password-feedback text-danger';
+                } else if (strength.score < 3) {
+                    strengthBar.classList.add('medium');
+                    passwordFeedback.textContent = strength.feedback;
+                    passwordFeedback.className = 'password-feedback text-warning';
+                } else {
+                    strengthBar.classList.add('strong');
+                    passwordFeedback.textContent = 'Mật khẩu mạnh';
+                    passwordFeedback.className = 'password-feedback text-success';
+                }
+                
+                // If confirm password is already filled, check match
+                if (confirmPasswordInput.value) {
+                    validateConfirmPassword();
+                }
+            });
+            
+            // Confirm password validation
+            confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+            
+            function validateConfirmPassword() {
+                const isMatch = passwordInput.value === confirmPasswordInput.value;
+                validateField(confirmPasswordInput, isMatch && confirmPasswordInput.value.length > 0);
+            }
+            
+            // Terms checkbox validation
+            const termsCheck = document.getElementById("termsCheck");
+            termsCheck.addEventListener('change', function() {
+                if (termsCheck.checked) {
+                    termsCheck.classList.remove("is-invalid");
+                    // Tìm feedback-container gần nhất sau checkbox
+                    const feedbackContainer = termsCheck.closest('.form-check').parentElement.nextElementSibling;
+                    if (feedbackContainer && feedbackContainer.classList.contains('feedback-container')) {
+                        feedbackContainer.querySelector('.invalid-feedback').style.display = 'none';
+                    }
+                }
+            });
+            
+            // Generic field validation function
+            function validateField(field, isValid) {
+                if (isValid) {
+                    field.classList.remove("is-invalid");
+                    field.classList.add("field-valid");
+                    
+                    // Tìm feedback-container gần nhất sau field
+                    const feedbackContainer = field.closest('.input-field').nextElementSibling;
+                    if (feedbackContainer && feedbackContainer.classList.contains('feedback-container')) {
+                        feedbackContainer.querySelector('.invalid-feedback').style.display = 'none';
+                        feedbackContainer.querySelector('.valid-feedback').style.display = 'block';
+                    }
+                } else {
+                    field.classList.remove("field-valid");
+                    if (field.value) {
+                        field.classList.add("is-invalid");
+                        
+                        // Tìm feedback-container gần nhất sau field
+                        const feedbackContainer = field.closest('.input-field').nextElementSibling;
+                        if (feedbackContainer && feedbackContainer.classList.contains('feedback-container')) {
+                            feedbackContainer.querySelector('.invalid-feedback').style.display = 'block';
+                            feedbackContainer.querySelector('.valid-feedback').style.display = 'none';
+                        }
+                    } else {
+                        field.classList.remove("is-invalid");
+                        
+                        // Tìm feedback-container gần nhất sau field
+                        const feedbackContainer = field.closest('.input-field').nextElementSibling;
+                        if (feedbackContainer && feedbackContainer.classList.contains('feedback-container')) {
+                            feedbackContainer.querySelector('.invalid-feedback').style.display = 'none';
+                            feedbackContainer.querySelector('.valid-feedback').style.display = 'none';
+                        }
+                    }
+                }
+            }
+            
+            // Form submission
+            registerForm.addEventListener("submit", function(event) {
+                event.preventDefault();
+                
+                const phoneNumber = phoneNumberInput.value;
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const name = nameInput.value;
+                const dateOfBirth = dobInput.value;
+                const gender = genderInput.value;
+                
+                // Reset validation state
+                resetValidationState();
+                
+                // Validate form
+                let isValid = true;
+                
+                // Check required fields
+                if (!isValidPhone(phoneNumber)) {
+                    validateField(phoneNumberInput, false);
+                    isValid = false;
+                }
+                
+                if (!isValidEmail(email)) {
+                    validateField(emailInput, false);
+                    isValid = false;
+                }
+                
+                if (password.length < 8) {
+                    validateField(passwordInput, false);
+                    isValid = false;
+                }
+                
+                if (password !== confirmPassword) {
+                    validateField(confirmPasswordInput, false);
+                    formMessage.textContent = "Nhập lại mật khẩu không khớp";
+                    isValid = false;
+                }
+                
+                if (!isValidName(name)) {
+                    validateField(nameInput, false);
+                    isValid = false;
+                }
+                
+                if (!isValidDateOfBirth(dateOfBirth)) {
+                    validateField(dobInput, false);
+                    isValid = false;
+                }
+                
+                if (!isValidGender(gender)) {
+                    validateField(genderInput, false);
+                    isValid = false;
+                }
+                
+                if (!termsCheck.checked) {
+                    termsCheck.classList.add("is-invalid");
+                    // Hiển thị feedback cho checkbox
+                    const feedbackContainer = termsCheck.closest('.form-check').parentElement.nextElementSibling;
+                    if (feedbackContainer && feedbackContainer.classList.contains('feedback-container')) {
+                        feedbackContainer.querySelector('.invalid-feedback').style.display = 'block';
+                    }
+                    formMessage.textContent = "Bạn phải đồng ý với điều khoản dịch vụ";
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    return;
+                }
+                
+                // Disable the submit button to prevent double submission
+                document.getElementById("registerBtn").disabled = true;
+                
+                // Submit the form
+                this.submit();
+            });
+            
+            // Reset validation state
+            function resetValidationState() {
+                formMessage.textContent = "";
+                const invalidFields = document.querySelectorAll(".is-invalid");
+                invalidFields.forEach(field => field.classList.remove("is-invalid"));
+                
+                // Ẩn tất cả các feedback
+                document.querySelectorAll('.invalid-feedback, .valid-feedback').forEach(feedback => {
+                    feedback.style.display = 'none';
+                });
+            }
+            
+            // Calculate password strength
+            function calculatePasswordStrength(password) {
+                if (!password) {
+                    return { score: 0, feedback: "Mật khẩu quá yếu" };
+                }
+                
+                let score = 0;
+                let feedback = "";
+                
+                // Length check
+                if (password.length >= 8) {
+                    score += 1;
+                } else {
+                    feedback = "Mật khẩu nên có ít nhất 8 ký tự";
+                    return { score, feedback };
+                }
+                
+                // Complexity checks
+                const hasLower = /[a-z]/.test(password);
+                const hasUpper = /[A-Z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+                
+                // Score based on complexity
+                if (hasLower) score += 0.5;
+                if (hasUpper) score += 0.5;
+                if (hasNumber) score += 1;
+                if (hasSpecial) score += 1;
+                
+                // Feedback based on missing complexity
+                if (score < 4) {
+                    feedback = "Nên bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt";
+                    if (!hasLower || !hasUpper) feedback += ": chữ hoa và thường";
+                    if (!hasNumber) feedback += ", số";
+                    if (!hasSpecial) feedback += ", ký tự đặc biệt";
+                }
+                
+                return { score, feedback };
+            }
+        });
+
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+        }
+    </script>
+</div>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html layout:decorate="~{shared/layout/base}">
+<head layout:title="Trang Chủ - Shipper">
+</head>
+<div layout:fragment="content">
+    <div class="container user-main">
+        <!-- Danh sách đơn giao hàng mới -->
+        <div class="user-orders">
+            <div class="order-item">
+                <div class="order-info">
+                    <div class="order-name">Bún đậu mắm tôm</div>
+                    <div class="order-price">162,000 VNĐ</div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-warning">Xem thông tin</button>
+                    <button class="btn btn-primary nbtn-primary">Nhận giao</button>
+                </div>
+            </div>
+        </div>
+        <!-- Sidebar thông tin shipper -->
+        <div class="user-sidebar">
+            <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar">
+            <div class="user-name">Anh shipper thân thiện</div>
+            <div style="font-size: 0.95rem; color: #888;">SĐT: 0123 456 789</div>
+            <ul>
+                <li>Thông tin tài khoản</li>
+                <li>Hiển thị các đơn hàng mới</li>
+                <li>Lịch sử giao hàng</li>
+                <li>Đăng xuất</li>
+            </ul>
+        </div>
+    </div>
+</div>
+</html>

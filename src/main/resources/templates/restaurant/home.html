@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html layout:decorate="~{shared/layout/base}">
+<head layout:title="Trang Chủ - Seller">
+</head>
+<div layout:fragment="content">
+    <div class="container user-main">
+        <!-- Danh sách đơn hàng mới -->
+        <div class="user-orders">
+            <div class="order-item">
+                <div class="order-info">
+                    <div class="order-name">Bún đậu mắm tôm</div>
+                    <div class="order-price">162,000 VNĐ</div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-warning">Xem thông tin</button>
+                    <button class="btn btn-primary nbtn-primary">Nhận đơn</button>
+                    <button class="btn btn-danger">Từ chối</button>
+                </div>
+            </div>
+        </div>
+        <!-- Sidebar thông tin seller -->
+        <div class="user-sidebar">
+            <img class="avatar" src="/images/Avatar/seller.png" alt="avatar">
+            <div class="user-name">Anh bán hàng may mắn</div>
+            <div style="font-size: 0.95rem; color: #888;">172/08/12 Trần Cao Vân</div>
+            <ul>
+                <li>Thông tin tài khoản</li>
+                <li>Hiển thị các đơn hàng mới</li>
+                <li>Doanh thu</li>
+                <li>Thêm mã khuyến mãi</li>
+                <li>Đăng sản phẩm</li>
+                <li>Đăng xuất</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        // Hiệu ứng hoặc modal xác nhận có thể thêm ở đây
+        function showOrderInfo(id) {
+            alert('Xem thông tin đơn hàng: ' + id);
+        }
+        function acceptOrder(id) {
+            alert('Bạn đã nhận đơn: ' + id);
+        }
+        function rejectOrder(id) {
+            if (confirm('Bạn có chắc muốn từ chối đơn này?')) {
+                alert('Đã từ chối đơn: ' + id);
+            }
+        }
+    </script>
+</div>
+</html>

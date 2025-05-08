@@ -35,17 +35,11 @@ public class UserService {
 
     public User readByPhoneNumber(String phoneNumber) {
         User user = userRepository.findByPhoneNumber(phoneNumber);
-        if (user == null) {
-            throw new UserRelatedException("Số điện thoại không tồn tại");
-        }
         return user;
     }
 
     public User readByEmail(String email) {
         User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UserRelatedException("Email không tồn tại");
-        }
         return user;
     }
 

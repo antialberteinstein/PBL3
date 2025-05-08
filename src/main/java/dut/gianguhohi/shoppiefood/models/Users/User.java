@@ -28,7 +28,8 @@ public class User {
     @Column(name = "email", unique = true)
     private String email;
 
-    private boolean gender;
+    @Column(name = "gender")
+    private String gender;
 
     @Column(name = "date_of_birth")
     private String dateOfBirth;
@@ -48,7 +49,7 @@ public class User {
     public User() {
     }
 
-    public User(String name, String password, String phoneNumber, String email, boolean gender, String dateOfBirth, String avatarUrl) {
+    public User(String name, String password, String phoneNumber, String email, String gender, String dateOfBirth, String avatarUrl) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
@@ -66,11 +67,11 @@ public class User {
         this.name = name;
     }
 
-    public boolean isGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(boolean gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 

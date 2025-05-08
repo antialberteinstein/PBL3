@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html layout:decorate="~{shared/layout/base}">
+<head layout:title="Đơn hàng"></head>
+<div layout:fragment="content">
+    <div class="container user-main">
+        <div class="user-orders">
+            <h2 class="order-title">ĐƠN HÀNG CỦA BẠN</h2>
+            <div id="orderList">
+                <!-- Render danh sách đơn hàng ở đây -->
+                <!-- Ví dụ mẫu -->
+                
+                <div class="order-item">
+                    <span class="order-name">Bún đậu mắm tôm</span>
+                    <span class="order-price">30,000 VNĐ</span>
+                    <div class="order-actions">
+                        <button class="btn btn-warning">Xem thông tin</button>
+                        <button class="btn btn-danger">Hủy đơn</button>
+                    </div>
+                </div>
+               
+            </div>
+    
+            
+        </div>
+    
+        <div class="user-sidebar">
+            <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar">
+            <div class="user-name">Anh khách hàng kiêm shipper</div>
+            <div style="font-size: 0.95rem; color: #888;">SĐT: 0123 456 789</div>
+            <ul>
+                <li>Thông tin tài khoản</li>
+                <li>Hiển thị các đơn hàng đang giao</li>
+                <li>Lịch sử mua hàng</li>
+                <li>Giỏ hàng</li>
+                <li>Săn mã khuyến mãi</li>
+                <li>Đăng xuất</li>
+            </ul>
+        </div>
+    </div>
+</div>
+</html>

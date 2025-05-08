@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(title = 'Đăng Ký', css = '/css/login.css')}"></head>
+<body>
+    <div th:replace="~{fragments :: navbar(false)}"></div>
+    <!-- Main content -->
+    <div class="container-fluid register-container">
+        <!-- Register form -->
+        <div class="login-form">
+            <form class="register-box" th:action="@{/shipper/register}" method="post">
+                <div class="login-title">ĐĂNG KÝ</div>
+                <div class="mb-2">
+                    <label for="vehicleType" class="form-label">Loại Phương Tiện</label>
+                    <input type="text" class="form-control" id="vehicleType" name="vehicleType" required>
+                </div>
+                <div class="mb-2">
+                    <label for="licensePlate" class="form-label">Biển Số Xe</label>
+                    <input type="text" class="form-control" id="licensePlate" name="licensePlate" required>
+                </div>
+                <div class="mb-2">
+                    <label for="driverLicense" class="form-label">Bằng Lái Xe</label>
+                    <input type="text" class="form-control" id="driverLicense" name="driverLicense" required>
+                </div>
+                <div class="mb-4">
+                    <label for="cccd" class="form-label">Số CCCD</label>
+                    <input type="text" class="form-control" id="cccd" name="cccd" required>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-login">Đăng Ký</button>
+                    <a href="/register" class="btn btn-register">Quay Lại Trang Trước</a>
+                </div>
+            </form>
+        </div>
+        <!-- Right image -->
+        <div class="left-img">
+            <img th:src="@{/images/chef.png}" alt="Chef Image">
+        </div>
+    </div>
+    <div th:replace="~{fragments :: script}"></div>
+</body>
+</html>

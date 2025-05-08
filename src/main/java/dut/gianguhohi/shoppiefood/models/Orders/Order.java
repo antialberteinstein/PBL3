@@ -17,7 +17,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User customer;
 
     @ManyToOne
     @JoinColumn(name = "shipper_id", nullable = false)
@@ -52,9 +52,9 @@ public class Order {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Order(User user, Shipper shipper, Restaurant restaurant, LocalDateTime timeStart, LocalDateTime timeDelivered, 
+    public Order(User customer, Shipper shipper, Restaurant restaurant, LocalDateTime timeStart, LocalDateTime timeDelivered, 
                 int status, long totalAmount, String shippingAddress) {
-        this.user = user;
+        this.customer = customer;
         this.shipper = shipper;
         this.restaurant = restaurant;
         this.timeStart = timeStart;
@@ -74,12 +74,12 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public User getUser() {
-        return user;
+    public User getCustomer() {
+        return customer;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCustomer(User customer) {
+        this.customer = customer;
     }
 
     public LocalDateTime getCreatedAt() {
