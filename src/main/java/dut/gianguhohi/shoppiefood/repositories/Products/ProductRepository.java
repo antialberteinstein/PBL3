@@ -10,4 +10,8 @@ import dut.gianguhohi.shoppiefood.models.Product.Category;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCategory(Category category);
+
+
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :pattern, '%'))")
+    List<Product> findByNameContains(String pattern);
 }

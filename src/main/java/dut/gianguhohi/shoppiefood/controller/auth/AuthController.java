@@ -3,6 +3,7 @@ package dut.gianguhohi.shoppiefood.controller.auth;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import dut.gianguhohi.shoppiefood.services.Users.UserService;
+import jakarta.servlet.http.HttpSession;
 import dut.gianguhohi.shoppiefood.repositories.Users.AdminRepository;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,20 +39,16 @@ public class AuthController {
     public String login(
         @RequestParam("phoneNumber") String phoneNumber,
         @RequestParam("password") String password,
-        Model model
+        Model model,
+        HttpSession session
     ) {
         try {
-            User user = userService.readByPhoneNumber(phoneNumber);
-            if (user == null) {
-                user = userService.readByEmail(phoneNumber);
-            }
-            
-            if (user == null || !user.getPassword().equals(password)) {
-                model.addAttribute("message", "Sai số diện thoại, email hoặc mật khẩu");
-                return "auth/login";
-            }
-            model.addAttribute("message", "Đăng nhập thành công");
+            User user = userService.login(phoneNumber, password);
+            session.setAttribute("user", user);
             return "redirect:/user/home";
+        } catch (UserService.LoginRelatedException e) {
+            model.addAttribute("message", e.getMessage());
+            return "auth/login";
         } catch (UserService.UserRelatedException e) {
             model.addAttribute("message", e.getMessage());
             return "auth/login";
@@ -65,11 +62,16 @@ public class AuthController {
         Model model
     ) {
         try {
-            userService.create(user, result);
-
-            model.addAttribute("message", "Đăng ký thành công");
+            userService.register(user, result);
             return "redirect:/auth/login";
-        } catch (UserService.UserRelatedException e) {
+        } catch (UserService.UserExistsException e) {
+            model.addAttribute("message", e.getMessage());
+            return "auth/register";
+        } catch (UserService.RegisterRelatedException e) {
+            model.addAttribute("message", "Có lỗi xảy ra trong quá trình đăng ký");
+            return "auth/register";
+        }
+        catch (UserService.UserRelatedException e) {
             model.addAttribute("message", e.getMessage());
             return "auth/register";
         }

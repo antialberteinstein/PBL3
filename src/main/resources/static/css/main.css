@@ -390,20 +390,6 @@ input[type=password]::-ms-clear
 }
 
 /* Search Box Styles */
-.search-box {
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: 10px;
-    margin-bottom: 2rem;
-    border: 2px solid var(--accent1-color);
-    box-shadow: 4px 4px 8px rgba(185, 110, 255, 0.2);
-}
-
-.search-box h2 {
-    color: var(--accent1-color);
-    font-weight: 600;
-    letter-spacing: 1px;
-}
 
 .input-group {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);

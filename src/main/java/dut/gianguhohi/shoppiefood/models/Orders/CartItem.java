@@ -2,6 +2,7 @@ package dut.gianguhohi.shoppiefood.models.Orders;
 
 import jakarta.persistence.*;
 import dut.gianguhohi.shoppiefood.models.Product.Product;
+import dut.gianguhohi.shoppiefood.models.Users.User;
 
 @Entity
 @Table(name = "cart_items")
@@ -12,8 +13,8 @@ public class CartItem {
     private int cartItemId;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -25,8 +26,8 @@ public class CartItem {
     public CartItem() {
     }
 
-    public CartItem(Cart cart, Product product, int quantity) {
-        this.cart = cart;
+    public CartItem(User user, Product product, int quantity) {
+        this.user = user;
         this.product = product;
         this.quantity = quantity;
     }
@@ -40,12 +41,12 @@ public class CartItem {
         this.cartItemId = cartItemId;
     }
 
-    public Cart getCart() {
-        return cart;
+    public User getUser() {
+        return user;
     }
 
-    public void setCart(Cart cart) {
-        this.cart = cart;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Product getProduct() {

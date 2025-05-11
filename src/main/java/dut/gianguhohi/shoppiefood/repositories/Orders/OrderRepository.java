@@ -16,4 +16,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> findByRestaurant(Restaurant restaurant);
 
     List<Order> findByShipper(Shipper shipper);
+
+    Order findByOrderId(int orderId);
 }
