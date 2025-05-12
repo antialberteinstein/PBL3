@@ -13,14 +13,14 @@ public class OrderFeedback extends Feedback {
 
     // What do you want to feedback about?
     @Column(name = "order_feedback_type")
-    private int type;
+    private String type;
 
 
     public OrderFeedback() {
         super();
     }
 
-    public OrderFeedback(String content, User whoFeedback, Order order, int type) {
+    public OrderFeedback(String content, User whoFeedback, Order order, String type) {
         super(content, whoFeedback);
         this.order = order;
         this.type = type;
@@ -34,11 +34,11 @@ public class OrderFeedback extends Feedback {
         this.order = order;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 }

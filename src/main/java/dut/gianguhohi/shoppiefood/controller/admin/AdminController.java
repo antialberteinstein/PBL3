@@ -11,7 +11,7 @@ import dut.gianguhohi.shoppiefood.repositories.Users.AdminRepository;
 
 
 @Controller
-public class AdminLoginController {
+public class AdminController {
     @Autowired
     public AdminRepository adminRepository;
     

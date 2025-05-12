@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 @Controller
-public class RestaurantHomeController {
+public class RestaurantController {
 
     @GetMapping("/restaurant/home")
     public String home(Model model) {

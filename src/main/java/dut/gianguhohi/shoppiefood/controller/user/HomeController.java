@@ -7,14 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
 
-    
     @GetMapping("/user/home")
     public String home() {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/auth/login";
+        }
         return "user/home";
-    }
-    
-    @GetMapping("/user/order")
-    public String orders() {
-        return "user/order";
     }
 } 

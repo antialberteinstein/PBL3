@@ -1,9 +1,9 @@
 public class OrderStatusType {
-    public static final int PENDING = 1; // Đang chờ xác nhận
-    public static final int CONFIRMED = 2; // Đã xác nhận
-    public static final int IN_PROGRESS = 3; // Đang giao hàng
-    public static final int DELIVERED = 4; // Đã giao hàng
-    public static final int CANCELLED = 5; // Đã hủy
-    public static final int REFUNDED = 6; // Đã hoàn tiền
+    public static final String PENDING = "pending"; // Đang chờ xác nhận
+    public static final String CONFIRMED = "confirmed"; // Đã xác nhận
+    public static final String IN_PROGRESS = "in_progress"; // Đang giao hàng
+    public static final String DELIVERED = "delivered"; // Đã giao hàng
+    public static final String CANCELLED = "cancelled"; // Đã hủy
+    public static final String REFUNDED = "refunded"; // Đã hoàn tiền
     
 }

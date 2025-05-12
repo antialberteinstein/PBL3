@@ -21,7 +21,7 @@ public class Shipper{
 
     @NotBlank(message = "Loại xe không được để trống")
     @Column(name = "vehicle_type")
-    private int vehicleType;
+    private String vehicleType;
 
     public Shipper() {
     }

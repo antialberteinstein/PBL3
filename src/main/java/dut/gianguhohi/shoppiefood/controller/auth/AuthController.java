@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import jakarta.servlet.http.HttpSession;
 
 
 @Controller
@@ -21,17 +22,20 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private AdminRepository adminRepository;
-
 
     @GetMapping("/auth/login")
-    public String login() {
+    public String login(HttpSession session, Model model) {
+        if (session.getAttribute("user") != null) {
+            return "redirect:/user/home";
+        }
         return "auth/login";
     }
 
     @GetMapping("/auth/register")
-    public String register() {
+    public String register(HttpSession session, Model model) {
+        if (session.getAttribute("user") != null) {
+            return "redirect:/user/home";
+        }
         return "auth/register";
     }
     
@@ -75,6 +79,22 @@ public class AuthController {
             model.addAttribute("message", e.getMessage());
             return "auth/register";
         }
+    }
+
+    @GetMapping("/user/profile")
+    public String profile(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+        model.addAttribute("user", user);
+        return "user/profile";
+    }
+
+    @GetMapping("/auth/logout")
+    public String logout(HttpSession session) {
+        session.removeAttribute("user");
+        return "redirect:/auth/login";
     }
     
 }

@@ -7,27 +7,30 @@
     <div class="container-fluid register-container">
         <!-- Register form -->
         <div class="login-form">
-            <form class="register-box" th:action="@{/shipper/register}" method="post">
+            <form class="login-box" th:action="@{/shipper/register}" method="post">
                 <div class="login-title">ĐĂNG KÝ</div>
-                <div class="mb-2">
+                <div class="input-field mb-2">
                     <label for="vehicleType" class="form-label">Loại Phương Tiện</label>
-                    <input type="text" class="form-control" id="vehicleType" name="vehicleType" required>
+                    <select class="form-control nform-control" id="vehicleType" name="vehicleType" required>
+                        <option value="motorbike">Xe máy</option>
+                        <option value="car">Xe ô tô</option>
+                        <option value="truck">Xe tải</option>
                 </div>
-                <div class="mb-2">
+                <div class="input-field mb-2">
                     <label for="licensePlate" class="form-label">Biển Số Xe</label>
-                    <input type="text" class="form-control" id="licensePlate" name="licensePlate" required>
+                    <input type="text" class="form-control nform-control" id="licensePlate" name="licensePlate" required>
                 </div>
-                <div class="mb-2">
+                <div class="input-field mb-2">
                     <label for="driverLicense" class="form-label">Bằng Lái Xe</label>
-                    <input type="text" class="form-control" id="driverLicense" name="driverLicense" required>
+                    <input type="text" class="form-control nform-control" id="driverLicense" name="driverLicense" required>
                 </div>
-                <div class="mb-4">
+                <div class="input-field mb-4">
                     <label for="cccd" class="form-label">Số CCCD</label>
-                    <input type="text" class="form-control" id="cccd" name="cccd" required>
+                    <input type="text" class="form-control nform-control" id="cccd" name="cccd" required>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-login">Đăng Ký</button>
-                    <a href="/register" class="btn btn-register">Quay Lại Trang Trước</a>
+                    <button type="submit" class="btn btn-primary nbtn-primary">Đăng Ký</button>
+                    <a href="/register" class="btn btn-secondary nbtn-secondary">Quay Lại</a>
                 </div>
             </form>
         </div>
