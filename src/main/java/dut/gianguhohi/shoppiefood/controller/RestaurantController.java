@@ -1,4 +1,4 @@
-package dut.gianguhohi.shoppiefood.controllerThymeleaf;
+package dut.gianguhohi.shoppiefood.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 
 @Controller
-public class TRestaurantController {
+public class RestaurantController {
     
     @GetMapping("/restaurant/home")
     public String home(HttpSession session, Model model) {

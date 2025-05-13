@@ -1,4 +1,4 @@
-package dut.gianguhohi.shoppiefood.controllerThymeleaf;
+package dut.gianguhohi.shoppiefood.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import dut.gianguhohi.shoppiefood.services.OrderService;
 import java.util.List;
 
 @Controller
-public class TUserController {
+public class UserController {
 
     @Autowired
     private OrderService orderService;

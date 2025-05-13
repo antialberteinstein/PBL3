@@ -1,9 +1,11 @@
 package dut.gianguhohi.shoppiefood.services;
 
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.repositories.Users.UserRepository;
 import jakarta.validation.Valid;
@@ -11,109 +13,99 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 @Service
-public class UserService {
+@Transactional
+public class UserService extends BaseService<User, Integer> {
     
     @Autowired
     private UserRepository userRepository;
 
-    public User readByPhoneNumber(String phoneNumber) {
-        User user = userRepository.findByPhoneNumber(phoneNumber);
-        return user;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Override
+    protected UserRepository getRepository() {
+        return userRepository;
     }
 
-    public User readByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        return user;
+    public Optional<User> findByPhoneNumber(String phoneNumber) {
+        return Optional.ofNullable(userRepository.findByPhoneNumber(phoneNumber));
     }
 
-    public User readById(int id) {
-        User user = userRepository.findByUserId(id);
-        return user;
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(userRepository.findByEmail(email));
     }
 
-    /**
-     * Authenticates a user based on their phone number or email and password.
-     *
-     * @param loginString The user's phone number or email.
-     * @param password The user's password.
-     * @return The authenticated User object.
-     * @throws LoginRelatedException if the phone number, email, or password is incorrect.
-     */
     public User login(String loginString, String password) {
-        User user = readByPhoneNumber(loginString);
-        if (user == null) {
-            user = readByEmail(loginString);
-        }
-        if (user == null || !user.getPassword().equals(password)) {
-            throw new LoginRelatedException("Sai số diện thoại, email hoặc mật khẩu");
+        User user = findByPhoneNumber(loginString)
+            .orElseGet(() -> findByEmail(loginString).orElse(null));
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            throw new LoginRelatedException("Invalid phone number, email or password");
         }
         return user;
     }
 
-    /**
-     * Registers a new user in the system.
-     *
-     * @param user The User object containing user details to be registered.
-     * @param result The BindingResult object that holds the result of the validation and binding.
-     * @return The registered User object.
-     * @throws RegisterRelatedException if there are validation errors or if the phone number or email already exists.
-     */
     public User register(@Valid User user, BindingResult result) {
+        validateEntity(user);
+        
         if (result.hasErrors()) {
-            for (FieldError error : result.getFieldErrors()) {
-                throw new RegisterRelatedException(error.getDefaultMessage());
-            }
+            String errorMessage = result.getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .findFirst()
+                .orElse("Validation failed");
+            throw new RegisterRelatedException(errorMessage);
         }
 
         if (userRepository.existsByPhoneNumber(user.getPhoneNumber())) {
-            throw new UserExistsException("Số điện thoại đã có người sử dụng");
+            throw new UserExistsException("Phone number already in use");
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new UserExistsException("Email đã có người sử dụng");
+            throw new UserExistsException("Email already in use");
         }
 
-        return userRepository.save(user);
+        // Encode password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return save(user);
     }
 
     public User update(User user) {
-        User existingUser = readById(user.getUserId());
-        if (existingUser == null) {
-            throw new UpdateRelatedException("Người dùng không tồn tại");
-        }
-        return userRepository.save(user);
+        validateEntity(user);
+        User existingUser = findById(user.getUserId())
+            .orElseThrow(() -> new UpdateRelatedException("User not found"));
+        
+        // Don't update password here
+        user.setPassword(existingUser.getPassword());
+        return save(user);
     }
 
     public User changePassword(int id, String oldPassword, String newPassword) {
-        User user = readById(id);
-        if (user == null) {
-            throw new UpdateRelatedException("Người dùng không tồn tại");
+        User user = findById(id)
+            .orElseThrow(() -> new UpdateRelatedException("User not found"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new UpdateRelatedException("Current password is incorrect");
         }
-        if (!user.getPassword().equals(oldPassword)) {
-            throw new UpdateRelatedException("Mật khẩu cũ không đúng");
-        }
-        user.setPassword(newPassword);
-        return userRepository.save(user);
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return save(user);
     }
 
-    // Temporary delete method for testing purposes
-    // In a real application, you would want to implement a proper delete method that handles related data and constraints.
-    // Maybe need a deactivate method instead of delete
-    // to keep the data for future reference.
-    public void delete(int id) {
-        User user = readById(id);
-        if (user == null) {
-            throw new UpdateRelatedException("Người dùng không tồn tại");
-        }
-        userRepository.delete(user);
+    public void deactivate(int id) {
+        User user = findById(id)
+            .orElseThrow(() -> new UpdateRelatedException("User not found"));
+        user.setActive(false);
+        save(user);
     }
 
-    public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users;
+    public void activate(int id) {
+        User user = findById(id)
+            .orElseThrow(() -> new UpdateRelatedException("User not found"));
+        user.setActive(true);
+        save(user);
     }
 
-
+    // Exception classes
     public static class UserRelatedException extends RuntimeException {
         public UserRelatedException(String message) {
             super(message);
@@ -122,12 +114,6 @@ public class UserService {
 
     public static class UpdateRelatedException extends UserRelatedException {
         public UpdateRelatedException(String message) {
-            super(message);
-        }
-    }
-
-    public static class DeleteRelatedException extends UserRelatedException {
-        public DeleteRelatedException(String message) {
             super(message);
         }
     }

@@ -1,4 +1,4 @@
-package dut.gianguhohi.shoppiefood.controllerThymeleaf;
+package dut.gianguhohi.shoppiefood.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import dut.gianguhohi.shoppiefood.models.Users.Admin;
 
 @Controller
-public class TAdminController {
+public class AdminController {
     
     @GetMapping("/admin/login")
     public String login(HttpSession session, Model model) {

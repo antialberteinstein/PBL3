@@ -34,6 +34,9 @@ public class User {
     @Column(name = "date_of_birth")
     private String dateOfBirth;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
 
     @OneToMany
     @JoinTable(
@@ -57,6 +60,7 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.avatarUrl = avatarUrl;
         this.password = password;
+        this.isActive = true;
     }
 
     public String getName() {
@@ -129,5 +133,13 @@ public class User {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public boolean getIsActive() {
+        return isActive;
     }
 }
