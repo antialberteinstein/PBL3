@@ -69,3 +69,4 @@ public class ShipperController {
             return "redirect:/auth/login";
         }
     }
+}
