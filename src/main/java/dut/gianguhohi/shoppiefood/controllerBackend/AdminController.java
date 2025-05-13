@@ -1,37 +1,31 @@
-package dut.gianguhohi.shoppiefood.controller.admin;
+package dut.gianguhohi.shoppiefood.controllerBackend;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import dut.gianguhohi.shoppiefood.models.Users.Admin;
 import dut.gianguhohi.shoppiefood.repositories.Users.AdminRepository;
-
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class AdminController {
     @Autowired
     public AdminRepository adminRepository;
     
-    @GetMapping("/admin/login")
-    public String login(Model model) {
-        return "admin/login";
-    }
-
     @PostMapping("/admin/login")
-    public String login(
+    @ResponseBody
+    public Admin login(
         @RequestParam("loginName") String loginName,
         @RequestParam("password") String password,
-        Model model
+        HttpSession session
     ) {
         Admin admin = adminRepository.findByLoginName(loginName);
         if (admin == null || !admin.getPassword().equals(password)) {
-            model.addAttribute("message", "Sai tên đăng nhập hoặc mật khẩu");
-            return "admin/login";
+            throw new RuntimeException("Invalid login credentials");
         }
-        model.addAttribute("message", "Đăng nhập thành công");
-        return "redirect:/admin/home";
+        session.setAttribute("admin", admin);
+        return admin;
     }
 }

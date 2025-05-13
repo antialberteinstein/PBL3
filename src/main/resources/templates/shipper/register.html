@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: head(title = 'Đăng Ký', css = '/css/login.css')}"></head>
-<body>
-    <div th:replace="~{fragments :: navbar(false)}"></div>
-    <!-- Main content -->
+<html layout:decorate="~{shared/layout/base}">
+<head layout:title="Shipper - Đăng Ký"/>
+<div layout:fragment="content">
     <div class="container-fluid register-container">
         <!-- Register form -->
         <div class="login-form">
@@ -15,6 +13,7 @@
                         <option value="motorbike">Xe máy</option>
                         <option value="car">Xe ô tô</option>
                         <option value="truck">Xe tải</option>
+                    </select>
                 </div>
                 <div class="input-field mb-2">
                     <label for="licensePlate" class="form-label">Biển Số Xe</label>
@@ -24,13 +23,9 @@
                     <label for="driverLicense" class="form-label">Bằng Lái Xe</label>
                     <input type="text" class="form-control nform-control" id="driverLicense" name="driverLicense" required>
                 </div>
-                <div class="input-field mb-4">
-                    <label for="cccd" class="form-label">Số CCCD</label>
-                    <input type="text" class="form-control nform-control" id="cccd" name="cccd" required>
-                </div>
                 <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary nbtn-primary">Đăng Ký</button>
-                    <a href="/register" class="btn btn-secondary nbtn-secondary">Quay Lại</a>
+                    <button type="submit" class="btn btn-primary nbtn-primary">Đăng Ký Shipper</button>
+                    <a href="/user/home" class="btn btn-secondary nbtn-secondary">Quay Lại</a>
                 </div>
             </form>
         </div>
@@ -39,6 +34,5 @@
             <img th:src="@{/images/chef.png}" alt="Chef Image">
         </div>
     </div>
-    <div th:replace="~{fragments :: script}"></div>
-</body>
+</div>
 </html>

@@ -1,0 +1,75 @@
+/* Common Order Item Styles */
+.order-item {
+    border: 1.5px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 18px 16px;
+    margin-bottom: 18px;
+    background: #fffbe7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px #b96eff22;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.order-item:hover {
+    box-shadow: 0 4px 16px #b96eff44;
+    transform: translateY(-2px) scale(1.01);
+}
+
+.order-info {
+    flex: 1;
+}
+
+.order-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.order-price {
+    color: var(--accent1-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Order Actions */
+.order-actions button {
+    margin-left: 8px;
+    min-width: 90px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: box-shadow 0.2s, background 0.2s;
+}
+
+.order-actions .btn-warning {
+    background: var(--primary-color);
+    color: #222;
+    border: none;
+}
+
+.order-actions .btn-warning:hover {
+    background: #ffe066;
+    color: #222;
+}
+
+.order-actions .btn-primary {
+    background: #00e6c3;
+    color: #fff;
+    border: none;
+}
+
+.order-actions .btn-primary:hover {
+    background: #00bfa3;
+    color: #fff;
+}
+
+.order-actions .btn-danger {
+    background: var(--accent1-color);
+    color: #fff;
+    border: none;
+}
+
+.order-actions .btn-danger:hover {
+    background: #b6005a;
+    color: #fff;
+} 

@@ -1,43 +1,22 @@
-package dut.gianguhohi.shoppiefood.controller.auth;
+package dut.gianguhohi.shoppiefood.controllerBackend;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
-import dut.gianguhohi.shoppiefood.services.Users.UserService;
+import dut.gianguhohi.shoppiefood.services.UserService;
 import jakarta.servlet.http.HttpSession;
-import dut.gianguhohi.shoppiefood.repositories.Users.AdminRepository;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import jakarta.servlet.http.HttpSession;
-
 
 @Controller
 public class AuthController {
     
     @Autowired
     private UserService userService;
-
-
-    @GetMapping("/auth/login")
-    public String login(HttpSession session, Model model) {
-        if (session.getAttribute("user") != null) {
-            return "redirect:/user/home";
-        }
-        return "auth/login";
-    }
-
-    @GetMapping("/auth/register")
-    public String register(HttpSession session, Model model) {
-        if (session.getAttribute("user") != null) {
-            return "redirect:/user/home";
-        }
-        return "auth/register";
-    }
     
     @PostMapping("/auth/login")
     public String login(
@@ -80,21 +59,4 @@ public class AuthController {
             return "auth/register";
         }
     }
-
-    @GetMapping("/user/profile")
-    public String profile(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
-        model.addAttribute("user", user);
-        return "user/profile";
-    }
-
-    @GetMapping("/auth/logout")
-    public String logout(HttpSession session) {
-        session.removeAttribute("user");
-        return "redirect:/auth/login";
-    }
-    
 }

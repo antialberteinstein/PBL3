@@ -7,6 +7,10 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "shippers")
 public class Shipper{
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "shipper_id")
+    private int shipperId;
+
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -26,7 +30,8 @@ public class Shipper{
     public Shipper() {
     }
 
-    public Shipper(String driverLicense, String plateNumber, int vehicleType) {
+    public Shipper(User user, String driverLicense, String plateNumber, String vehicleType) {
+        this.user = user;
         this.driverLicense = driverLicense;
         this.plateNumber = plateNumber;
         this.vehicleType = vehicleType;
@@ -48,11 +53,11 @@ public class Shipper{
         this.plateNumber = plateNumber;
     }
 
-    public int getVehicleType() {
+    public String getVehicleType() {
         return vehicleType;
     }
 
-    public void setVehicleType(int vehicleType) {
+    public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
     }
 

@@ -1,0 +1,24 @@
+<div th:fragment="sidebar">
+    <div class="user-sidebar" th:if="${session.user != null}">
+        <img class="avatar" th:src="${session.user.avatar != null ? session.user.avatar : '/images/Avatar/default.png'}" alt="avatar">
+        <div class="user-name" th:text="${session.user.fullName}">Nguyễn Văn A</div>
+        <div style="font-size: 0.95rem; color: #888;" th:text="'SĐT: ' + ${session.user.phone}">SĐT: 0123456789</div>
+        
+        <!-- Menu for logged in users -->
+        <ul>
+            <li><a href="/user/profile">Thông tin tài khoản</a></li>
+            <li><a href="/user/order">Đơn hàng của tôi</a></li>
+            <li><a href="/user/history">Lịch sử mua hàng</a></li>
+            <li><a href="/user/cart">Giỏ hàng</a></li>
+            <li><a href="/user/promotions">Săn mã khuyến mãi</a></li>
+            <li><a href="/auth/logout">Đăng xuất</a></li>
+        </ul>
+    </div>
+    
+    <div class="user-sidebar" th:unless="${session.user != null}">
+        <div class="text-center">
+            <p>Vui lòng đăng nhập</p>
+            <a href="/auth/login" class="btn btn-primary">Đăng nhập</a>
+        </div>
+    </div>
+</div>

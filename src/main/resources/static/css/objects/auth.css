@@ -1,0 +1,201 @@
+/* Common Layout Components */
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+    padding-top: 60px;
+}
+
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    height: auto;
+    padding: 60px 50px 40px 0;
+}
+
+.left-img {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left-img img {
+    max-width: 450px;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Form Elements */
+.login-form {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box {
+    background: var(--card-background);
+    border: 4px solid var(--secondary-color);
+    z-index: 10;
+    border-radius: 10px;
+    box-shadow: 4px 4px 8px var(--secondary-color)33%;
+    padding: 32px 48px 28px 48px;
+    min-width: 600px;
+    max-width: 700px;
+}
+
+.input-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+.input-field label {
+    width: 160px;
+    margin-right: 10px;
+    text-align: right;
+}
+
+.input-field input, .input-field select, .input-field textarea {
+    width: 100%;
+    flex: 1;
+    padding: 5px;
+    background: var(--field-color);
+    border: none;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.feedback-container {
+    display: block;
+    margin-left: 170px;
+    width: calc(100% - 170px);
+    margin-bottom: 15px;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.is-invalid ~ .feedback-container .invalid-feedback {
+    display: block;
+}
+
+.password-strength {
+    flex: 1;
+    height: 5px;
+    margin-top: 5px;
+    border-radius: 2px;
+    background-color: #eee;
+    position: relative;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.password-feedback {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.weak { background-color: #dc3545; }
+.medium { background-color: #ffc107; }
+.strong { background-color: #28a745; }
+
+.toggle-password {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    bottom: 19%;
+    transform: translateY(-50%);
+    color: #777;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon input {
+    padding-right: 130px;
+}
+
+.required-star {
+    color: var(--accent1-color);
+}
+
+.field-valid {
+    border-color: #28a745 !important;
+}
+
+.valid-feedback {
+    display: none;
+    color: #28a745;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.field-valid ~ .feedback-container .valid-feedback {
+    display: block;
+}
+
+input[type=password]::-ms-reveal,
+input[type=password]::-ms-clear {
+    display: none;
+}
+
+.login-title {
+    color: var(--accent1-color);
+    font-size: 1.6rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 18px;
+    letter-spacing: 2px;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+/* Override Bootstrap Components */
+.nform-control {
+    background: var(--card-background);
+    border: 1px solid var(--secondary-color);
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.nbtn-primary {
+    background: var(--primary-color);
+    color: var(--text1-color);
+    font-weight: 600;
+    border: none;
+    margin-top: 10px;
+    margin-right: 10px;
+    min-width: 100px;
+}
+
+.nbtn-secondary {
+    background: var(--accent2-color);
+    color: var(--text1-color);
+    font-weight: 600;
+    border: none;
+    min-width: 100px;
+    margin-top: 10px;
+} 

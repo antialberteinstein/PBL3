@@ -1,4 +1,4 @@
-package dut.gianguhohi.shoppiefood.services.Restaurants;
+package dut.gianguhohi.shoppiefood.services;
 
 
 import org.springframework.stereotype.Service;

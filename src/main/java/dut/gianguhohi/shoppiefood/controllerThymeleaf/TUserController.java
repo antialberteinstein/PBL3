@@ -1,22 +1,30 @@
-package dut.gianguhohi.shoppiefood.controller.user;
+package dut.gianguhohi.shoppiefood.controllerThymeleaf;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.stereotype.Controller;
-import javax.servlet.http.HttpSession;
-import dut.gianguhohi.shoppiefood.service.OrderService;
-import dut.gianguhohi.shoppiefood.model.Order;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import jakarta.servlet.http.HttpSession;
+import dut.gianguhohi.shoppiefood.models.Users.User;
+import dut.gianguhohi.shoppiefood.models.Orders.Order;
+import dut.gianguhohi.shoppiefood.services.OrderService;
 import java.util.List;
 
-
 @Controller
-public class OrderController {
+public class TUserController {
 
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/user/orders")
+    @GetMapping("/user/home")
+    public String home(HttpSession session) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/auth/login";
+        }
+        return "user/home";
+    }
+
+    @GetMapping("/user/order")
     public String userOrders(HttpSession session, Model model) {
         try {
             User user = (User) session.getAttribute("user");
@@ -31,4 +39,4 @@ public class OrderController {
             return "redirect:/auth/login";
         }
     }
-}
+} 

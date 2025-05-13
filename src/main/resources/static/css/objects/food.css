@@ -1,0 +1,77 @@
+/* Category Styles */
+.category-badge {
+    cursor: pointer;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background-color: var(--secondary-color) !important;
+    color: white;
+}
+
+.category-badge.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: var(--text1-color);
+}
+
+.category-badge:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Food Card Styles */
+.food-card {
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    border: 2px solid var(--accent1-color);
+    box-shadow: 4px 4px 8px rgba(185, 110, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: var(--card-background);
+}
+
+.food-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 12px rgba(185, 110, 255, 0.3);
+}
+
+.food-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.food-card .card-body {
+    padding: 1.25rem;
+}
+
+.food-card .card-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text1-color);
+}
+
+.food-card .card-text {
+    color: var(--text1-color);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.food-card .price {
+    color: var(--accent1-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.food-card .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--text1-color);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+}
+
+.food-card .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: var(--text1-color);
+} 

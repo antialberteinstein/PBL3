@@ -6,24 +6,42 @@
         <title layout:title-pattern="$title | Shoppie Food">Shoppie Food</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-        <link rel="stylesheet" th:href="@{/css/main.css}">
+        <link rel="stylesheet" th:href="@{/css/base/color.css}">
+        <link rel="stylesheet" th:href="@{/css/components/navbar.css}">
+        <link rel="stylesheet" th:href="@{/css/components/sidebar.css}">
+        <link rel="stylesheet" th:href="@{/css/objects/auth.css}">
+        <link rel="stylesheet" th:href="@{/css/objects/food.css}">
+        <link rel="stylesheet" th:href="@{/css/objects/order.css}">
+        <link rel="stylesheet" th:href="@{/css/objects/user.css}">
+        <link rel="stylesheet" th:href="@{/css/misc.css}">
     </head>
     <body>
-        <!-- Navbar -->
-        <nav class="navbar navbar-custom">
-            <div class="container-fluid">
-                <a class="nav-link" href="#">Trang Chủ</a>
-                <a class="nav-link" href="#">Điều Khoản</a>
-                <a class="nav-link" th:each="link : ${links}" th:href="${link.url}" th:text="${link.text}"></a>
-                <a class="nav-link" th:if="${isLoggedIn}" href="#">Tài Khoản</a>
-                <a class="nav-link" th:if="${isLoggedIn}" href="#">Đăng Xuất</a>
-            </div>
-        </nav>
+        
+        <div th:replace="~{shared/fragments/navbar}"/>
+
+        <!-- Floating Sidebar -->
+        <div id="floatingSidebar" class="floating-sidebar">
+            <div th:replace="~{shared/fragments/sidebar :: sidebar}"></div>
+        </div>
+
+        <!-- Overlay for mobile -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
         <div layout:fragment="content"></div>
 
         <div layout:fragment="misc"></div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('floatingSidebar').classList.toggle('active');
+                document.getElementById('sidebarOverlay').classList.toggle('active');
+            });
+
+            document.getElementById('sidebarOverlay').addEventListener('click', function() {
+                document.getElementById('floatingSidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            });
+        </script>
     </body>
 </html>

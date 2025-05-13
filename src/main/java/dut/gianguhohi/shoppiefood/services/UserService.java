@@ -1,4 +1,4 @@
-package dut.gianguhohi.shoppiefood.services.Users;
+package dut.gianguhohi.shoppiefood.services;
 
 import java.util.List;
 

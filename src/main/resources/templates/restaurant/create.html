@@ -1,37 +1,25 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: head(title = 'Đăng Ký', css = '/css/login.css')}"></head>
-<body>
-    <div th:replace="~{fragments :: navbar(false)}"></div>
-    <!-- Main content -->
+<html decorate="~{shared/layout/base}">
+<head layout:title="Đăng Ký Cửa Hàng"></head>
+<div layout:fragment="content">
     <div class="container-fluid register-container">
         <!-- Register form -->
         <div class="login-form">
-            <form class="register-box" th:action="@{/customer/register}" method="post">
-                <div class="login-title">ĐĂNG KÝ</div>
-                <div class="mb-2">
+            <form class="login-box" th:action="@{/restaurant/register}" method="post">
+                <div class="login-title">ĐĂNG KÝ CỬA HÀNG MỚI</div>
+                <div class="input-field mb-2">
                     <label for="shopName" class="form-label">Tên Cửa Hàng</label>
-                    <input type="text" class="form-control" id="shopName" name="shopName" required>
+                    <input type="text" class="form-control nform-control" id="shopName" name="shopName" required>
                 </div>
-                <div class="mb-2">
-                    <label for="province" class="form-label">Tỉnh/Thành Phố</label>
-                    <input type="text" class="form-control" id="province" name="province" required>
+
+                <div class="input-field mb-2">
+                    <label for="description" class="form-label">Mô Tả Cửa Hàng</label>
+                    <textarea class="form-control nform-control" id="description" name="description"></textarea>
                 </div>
-                <div class="mb-2">
-                    <label for="ward" class="form-label">Xã/Phường</label>
-                    <input type="text" class="form-control" id="ward" name="ward" required>
-                </div>
-                <div class="mb-2">
-                    <label for="address1" class="form-label">Địa Chỉ 1</label>
-                    <input type="text" class="form-control" id="address1" name="address1" required>
-                </div>
-                <div class="mb-4">
-                    <label for="address2" class="form-label">Địa Chỉ 2</label>
-                    <input type="text" class="form-control" id="address2" name="address2">
-                </div>
+                
                 <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-login">Đăng Ký</button>
-                    <a href="/register" class="btn btn-register">Quay Lại Trang Trước</a>
+                    <button type="submit" class="btn btn-primary nbtn-primary">Đăng Ký</button>
+                    <a href="/register" class="btn btn-secondary nbtn-secondary">Quay Lại</a>
                 </div>
             </form>
         </div>
@@ -40,6 +28,5 @@
             <img th:src="@{/images/chef.png}" alt="Chef Image">
         </div>
     </div>
-    <div th:replace="~{fragments :: script}"></div>
-</body>
+</div>
 </html>

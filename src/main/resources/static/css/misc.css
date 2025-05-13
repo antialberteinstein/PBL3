@@ -1,0 +1,49 @@
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .search-box {
+        padding: 1.5rem;
+    }
+    
+    .food-card {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .main-container {
+        flex-direction: column;
+        height: auto;
+        padding: 30px 0;
+    }
+    
+    .left-img, .login-form {
+        flex: unset;
+        width: 100%;
+        margin-bottom: 30px;
+    }
+    
+    .user-main { 
+        flex-direction: column; 
+        gap: 0; 
+    }
+    
+    .user-sidebar { 
+        margin-top: 32px; 
+    }
+}
+
+@media (max-width: 1100px) {
+    .user-main { 
+        flex-direction: column; 
+    }
+    
+    .user-orders { 
+        width: 100%; 
+        max-width: 100%; 
+    }
+    
+    .user-sidebar { 
+        margin-left: 0; 
+        margin-top: 32px; 
+    }
+} 

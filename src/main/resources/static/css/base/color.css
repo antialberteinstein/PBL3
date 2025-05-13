@@ -1,0 +1,19 @@
+/* Variables */
+:root {
+    --primary-color: #FFD43B;
+    --secondary-color: #6a4c93;
+    --text1-color: #212121;
+    --text2-color: #555;
+    --background-color: #f4f4f4;
+    --card-background: #fff;
+    --accent1-color: #e6007a;
+    --accent2-color: #00f5d4;
+    --border-color: #eee;
+    --field-color: #fff8e1;
+    --sidebar-width: 320px;
+}
+
+/* Base Styles */
+body {
+    background: var(--background-color);
+}

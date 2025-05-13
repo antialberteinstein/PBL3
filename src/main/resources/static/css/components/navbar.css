@@ -1,0 +1,12 @@
+/* Navbar Styles */
+.navbar-custom {
+    background-color: var(--primary-color);
+    border-bottom: 3px solid #222;
+}
+
+.navbar-custom .nav-link {
+    color: var(--text1-color);
+    font-weight: 600;
+    font-size: 1.15rem;
+    margin-right: 20px;
+} 
