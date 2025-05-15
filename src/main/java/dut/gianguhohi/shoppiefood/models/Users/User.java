@@ -1,7 +1,6 @@
 package dut.gianguhohi.shoppiefood.models.Users;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.misc.Address;
 
@@ -13,19 +12,16 @@ public class User {
     @Column(name = "user_id")
     private int userId;
 
-    @NotBlank(message = "Tên không được để trống")
     @Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "Số điện thoại không được để trống")
     @Column(name = "phone_number", unique = true, nullable = false)
     private String phoneNumber;
 
-    @NotBlank(message = "Mật khẩu không được để trống")
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Column(name = "gender")
@@ -52,13 +48,13 @@ public class User {
     public User() {
     }
 
-    public User(String name, String password, String phoneNumber, String email, String gender, String dateOfBirth, String avatarUrl) {
+    public User(String name, String password, String phoneNumber, String email, String gender, String dateOfBirth) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
-        this.avatarUrl = avatarUrl;
+        this.avatarUrl = "";
         this.password = password;
         this.isActive = true;
     }

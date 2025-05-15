@@ -11,7 +11,6 @@ public class Restaurant {
     @Column(name = "restaurant_id")
     private int restaurantId;
 
-    @NotBlank(message = "Tên nhà hàng không được để trống")
     @Column(name = "restaurant_name", nullable = false)
     private String restaurantName;
 

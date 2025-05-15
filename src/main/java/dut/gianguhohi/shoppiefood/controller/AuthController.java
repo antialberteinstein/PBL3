@@ -5,6 +5,9 @@ import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import dut.gianguhohi.shoppiefood.models.Users.User;
+import dut.gianguhohi.shoppiefood.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 @Controller
 public class AuthController {

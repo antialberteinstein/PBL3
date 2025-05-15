@@ -1,4 +1,4 @@
-package dut.gianguhohi.shoppiefood.controllerThymeleaf;
+package dut.gianguhohi.shoppiefood.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

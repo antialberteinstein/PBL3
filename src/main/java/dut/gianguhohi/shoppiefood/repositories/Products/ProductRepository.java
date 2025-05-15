@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import dut.gianguhohi.shoppiefood.models.Product.Product;
 import dut.gianguhohi.shoppiefood.models.Product.Category;
+import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCategory(Category category);
@@ -14,4 +16,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :pattern, '%'))")
     List<Product> findByNameContains(String pattern);
+
+    Product findByProductId(int productId);
+    boolean existsByNameAndRestaurant(String name, Restaurant restaurant);
+    boolean existsByProductId(int productId);
 }

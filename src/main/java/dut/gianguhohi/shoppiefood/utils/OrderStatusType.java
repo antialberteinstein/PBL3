@@ -1,3 +1,5 @@
+package dut.gianguhohi.shoppiefood.utils;
+
 public class OrderStatusType {
     public static final String PENDING = "pending"; // Đang chờ xác nhận
     public static final String CONFIRMED = "confirmed"; // Đã xác nhận

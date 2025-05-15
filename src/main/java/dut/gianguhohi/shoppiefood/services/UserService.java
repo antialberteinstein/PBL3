@@ -1,15 +1,17 @@
 package dut.gianguhohi.shoppiefood.services;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.repositories.Users.UserRepository;
-import jakarta.validation.Valid;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import jakarta.transaction.Transactional;
+import dut.gianguhohi.shoppiefood.utils.AppServiceException;
+import dut.gianguhohi.shoppiefood.utils.Validator;
 
+@Transactional
 @Service
 public class UserService {
     
@@ -17,83 +19,132 @@ public class UserService {
     private UserRepository userRepository;
 
     public User readByPhoneNumber(String phoneNumber) {
+        Validator.validatePhoneNumber(phoneNumber);
         User user = userRepository.findByPhoneNumber(phoneNumber);
         return user;
     }
 
     public User readByEmail(String email) {
+        Validator.validateEmail(email);
         User user = userRepository.findByEmail(email);
         return user;
     }
 
     public User readById(int id) {
+        Validator.validateId(id, "Id không hợp lệ");
         User user = userRepository.findByUserId(id);
         return user;
     }
 
     public User login(String loginString, String password) {
+        Validator.validateString(loginString, "Số diện thoại/Email không được để trống");
+        Validator.validateString(password, "Mật khẩu không được để trống");
+
         User user = readByPhoneNumber(loginString);
         if (user == null) {
             user = readByEmail(loginString);
         }
         if (user == null || !user.getPassword().equals(password)) {
-            throw new LoginRelatedException("Sai số diện thoại, email hoặc mật khẩu");
+            throw new AppServiceException("Sai số diện thoại, email hoặc mật khẩu");
         }
+        if (!user.getIsActive()) {
+            throw new AppServiceException("Tài khoản của quý khách đã bị ngừng hoạt động");
+        }
+
         return user;
     }
 
-    public User register(@Valid User user, BindingResult result) {
-        if (result.hasErrors()) {
-            for (FieldError error : result.getFieldErrors()) {
-                throw new RegisterRelatedException(error.getDefaultMessage());
-            }
+    public User register(
+        String phoneNumber,
+        String email,
+        String password,
+        String confirmPassword,
+        String name,
+        String dateOfBirth,
+        String gender
+    ) {
+        validateRegister(phoneNumber, email, password, confirmPassword, name, dateOfBirth, gender);
+
+        // Check if user exists
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new AppServiceException("Số điện thoại đã có người sử dụng");
         }
 
-        if (userRepository.existsByPhoneNumber(user.getPhoneNumber())) {
-            throw new UserExistsException("Số điện thoại đã có người sử dụng");
+        if (userRepository.existsByEmail(email)) {
+            throw new AppServiceException("Email đã có người sử dụng");
         }
 
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new UserExistsException("Email đã có người sử dụng");
-        }
+        // Create new user
+        User user = new User();
+        user.setPhoneNumber(phoneNumber);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(name);
+        user.setDateOfBirth(dateOfBirth);
+        user.setGender(gender);
 
         return userRepository.save(user);
     }
 
-    public User update(User user) {
-        User existingUser = readById(user.getUserId());
+    public User update(
+        int id,
+        String newPhoneNumber,
+        String newEmail,
+        String newName,
+        String newDateOfBirth,
+        String newGender
+    ) {
+        
+
+        User existingUser = readById(id);
         if (existingUser == null) {
-            throw new UpdateRelatedException("Người dùng không tồn tại");
+            throw new AppServiceException("Người dùng không tồn tại");
         }
-        return userRepository.save(user);
+
+        validateUpdate(newPhoneNumber, newEmail, newName, newDateOfBirth, newGender);
+
+        existingUser.setPhoneNumber(newPhoneNumber);
+        existingUser.setEmail(newEmail);
+        existingUser.setName(newName);
+        existingUser.setDateOfBirth(newDateOfBirth);
+        existingUser.setGender(newGender);
+        
+
+        return userRepository.save(existingUser);
     }
 
     public User changePassword(int id, String oldPassword, String newPassword) {
+        Validator.validateId(id, "ID không hợp lệ");
+        Validator.validatePassword(
+            newPassword, 
+            "Mật khẩu mới không được để trống",
+            "Mật khẩu mới không hợp lệ");
+
         User user = readById(id);
         if (user == null) {
-            throw new UpdateRelatedException("Người dùng không tồn tại");
+            throw new AppServiceException("Người dùng không tồn tại");
         }
-        if (!user.getPassword().equals(oldPassword)) {
-            throw new UpdateRelatedException("Mật khẩu cũ không đúng");
-        }
+        validateConfirmPassword(oldPassword, newPassword);
         user.setPassword(newPassword);
         return userRepository.save(user);
     }
 
-    
     public void delete(int id) {
+        Validator.validateId(id, "ID không hợp lệ");
         User user = readById(id);
         if (user == null) {
-            throw new DeleteRelatedException("Người dùng không tồn tại");
+            throw new AppServiceException("Người dùng không tồn tại");
         }
         userRepository.delete(user);
     }
 
     public void disable(int id) {
+        Validator.validateId(id, "ID không hợp lệ");
         User user = readById(id);
         if (user == null) {
-            throw new DeleteRelatedException("Người dùng không tồn tại");
+            throw new AppServiceException("Người dùng không tồn tại");
         }
+        user.setIsActive(false);
         userRepository.save(user);
     }
 
@@ -102,40 +153,49 @@ public class UserService {
         return users;
     }
 
-
-    public static class UserRelatedException extends RuntimeException {
-        public UserRelatedException(String message) {
-            super(message);
+    private void validateConfirmPassword(String password, String confirmPassword) {
+        if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+            throw new AppServiceException("Mật khẩu xác nhận không được để trống");
+        }
+        if (!confirmPassword.equals(password)) {
+            throw new AppServiceException("Mật khẩu xác nhận không khớp");
         }
     }
 
-    public static class UpdateRelatedException extends UserRelatedException {
-        public UpdateRelatedException(String message) {
-            super(message);
-        }
+
+    /* Validation phase */
+    private void validateRegister(
+        String phoneNumber,
+        String email,
+        String password,
+        String confirmPassword,
+        String name,
+        String dateOfBirth,
+        String gender
+    ) {
+        // Validate all fields
+        Validator.validatePhoneNumber(phoneNumber);
+        Validator.validateEmail(email);
+        Validator.validatePassword(password);
+        Validator.validateName(name);
+        Validator.validateString(dateOfBirth, "Ngày sinh không được để trống");
+        Validator.validateString(gender, "Bạn chưa chọn giới tính");
+
+        validateConfirmPassword(password, confirmPassword);
     }
 
-    public static class DeleteRelatedException extends UserRelatedException {
-        public DeleteRelatedException(String message) {
-            super(message);
-        }
-    }
-
-    public static class LoginRelatedException extends UserRelatedException {
-        public LoginRelatedException(String message) {
-            super(message);
-        }
-    }
-
-    public static class RegisterRelatedException extends UserRelatedException {
-        public RegisterRelatedException(String message) {
-            super(message);
-        }
-    }
-
-    public static class UserExistsException extends RegisterRelatedException {
-        public UserExistsException(String message) {
-            super(message);
-        }
+    private void validateUpdate(
+        String phoneNumber,
+        String email,
+        String name,
+        String dateOfBirth,
+        String gender
+    ) {
+        // Validate all fields
+        Validator.validatePhoneNumber(phoneNumber);
+        Validator.validateEmail(email);
+        Validator.validateName(name);
+        Validator.validateString(dateOfBirth, "Ngày sinh không được để trống");
+        Validator.validateString(gender, "Bạn chưa chọn giới tính");
     }
 }

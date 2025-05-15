@@ -22,6 +22,19 @@ public class RestaurantController {
         return "restaurant/home";
     }
 
+    @GetMapping("/restaurant/create")
+    public String create(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+        if (session.getAttribute("role") == null || !session.getAttribute("role").equals("restaurant")) {
+            return "redirect:/restaurant/enter";
+        }
+        model.addAttribute("user", user);
+        return "restaurant/create";
+    }
+
     @GetMapping("/restaurant/enter")
     public String enter(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");

@@ -15,15 +15,12 @@ public class Shipper{
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @NotBlank(message = "Giấy phép lái xe không được để trống")
-    @Column(name = "driver_license")
+    @Column(name = "driver_license", nullable = false)
     private String driverLicense;
 
-    @NotBlank(message = "Biển số xe không được để trống")
-    @Column(name = "plate_number")
+    @Column(name = "plate_number", nullable = false)
     private String plateNumber;
 
-    @NotBlank(message = "Loại xe không được để trống")
     @Column(name = "vehicle_type")
     private String vehicleType;
 

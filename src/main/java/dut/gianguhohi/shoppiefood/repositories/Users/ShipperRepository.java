@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 
 
-
+@Repository
 public interface ShipperRepository extends JpaRepository<Shipper, Integer> {
     Shipper findByUser(User user);
 

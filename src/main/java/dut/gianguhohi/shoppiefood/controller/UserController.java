@@ -18,9 +18,9 @@ public class UserController {
 
     @GetMapping("/user/home")
     public String home(HttpSession session) {
-        if (session.getAttribute("user") == null) {
+        /* if (session.getAttribute("user") == null) {
             return "redirect:/auth/login";
-        }
+        } */
         return "user/home";
     }
 
@@ -28,9 +28,9 @@ public class UserController {
     public String userOrders(HttpSession session, Model model) {
         try {
             User user = (User) session.getAttribute("user");
-            if (user == null) {
+            /* if (user == null) {
                 return "redirect:/auth/login";
-            }
+            } */
 
             List<Order> orders = orderService.getOrdersByCustomer(user);
             model.addAttribute("orders", orders);

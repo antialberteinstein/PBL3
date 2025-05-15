@@ -6,11 +6,10 @@ import dut.gianguhohi.shoppiefood.models.Orders.CartItem;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.Product.Product;
-import java.util.Optional;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     List<CartItem> findByUser(User user);
-    Optional<CartItem> findByUserAndProduct(User user, Product product);
+    CartItem findByUserAndProduct(User user, Product product);
     void deleteByUser(User user);
 }
