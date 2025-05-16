@@ -12,12 +12,12 @@ public class RestaurantController {
     @GetMapping("/restaurant/home")
     public String home(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
-        if (session.getAttribute("role") == null || !session.getAttribute("role").equals("restaurant")) {
-            return "redirect:/restaurant/enter";
-        }
+        // if (user == null) {
+        //     return "redirect:/auth/login";
+        // }
+        // if (session.getAttribute("role") == null || !session.getAttribute("role").equals("restaurant")) {
+        //     return "redirect:/restaurant/enter";
+        // }
         model.addAttribute("user", user);
         return "restaurant/home";
     }

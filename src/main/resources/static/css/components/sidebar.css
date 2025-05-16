@@ -39,52 +39,124 @@
     color: var(--accent1-color);
 }
 
-/* Floating Sidebar Styles */
+/* Floating Sidebar Styles - Phong cách hiện đại */
 .floating-sidebar {
     position: fixed;
     top: 0;
-    left: -320px;
-    height: 100vh;
-    width: var(--sidebar-width);
-    background: var(--card-background);
-    z-index: 1000;
-    transition: left 0.3s ease-in-out;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-}
-
-.floating-sidebar.active {
-    left: 0;
-}
-
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+    left: 0; /* Hiển thị sidebar luôn */
+    width: 250px;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    background: linear-gradient(to bottom, #f3e6ff, #f0f0f7); /* Gradient nhẹ nhàng */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+    z-index: 1001;
+    overflow-y: auto;
+    padding-top: 20px;
 }
 
-.sidebar-overlay.active {
+/* App logo phía trên */
+.sidebar-header {
+    padding: 0 20px 25px;
+    display: flex;
+    align-items: center;
+    border-bottom: none;
+    margin-bottom: 10px;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #1a1a1a; /* Màu logo */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    overflow: hidden;
+}
+
+.logo-icon img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Phần Section */
+.sidebar-section {
+    margin-bottom: 30px;
+    padding: 0 15px;
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #666;
+    padding: 0 10px;
+    margin-bottom: 10px;
+}
+
+/* Menu Items */
+.user-menu {
+    width: 100%;
+    padding: 0;
+    list-style: none;
+}
+
+.user-menu li {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.3s;
+}
+
+.user-menu li:hover {
+    background-color: var(--hover-color);
+}
+
+.user-menu li a {
+    color: var(--text1-color);
+    text-decoration: none;
     display: block;
-    opacity: 1;
+    width: 100%;
 }
 
-/* Toggle Button Styles */
-#sidebarToggle {
-    padding: 0.5rem;
-    margin-right: 1rem;
-    font-size: 1.25rem;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+.user-menu li a i {
+    margin-right: 10px;
+    color: var(--accent1-color);
 }
 
-#sidebarToggle:hover {
-    transform: scale(1.1);
-} 
+/* User Info được đặt ở dưới cùng */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text1-color);
+}
+
+.user-contact {
+    font-size: 0.95rem;
+    color: var(--text2-color);
+    margin-bottom: 15px;
+}

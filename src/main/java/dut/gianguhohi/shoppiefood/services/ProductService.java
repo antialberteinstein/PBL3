@@ -9,7 +9,6 @@ import dut.gianguhohi.shoppiefood.models.Product.Category;
 import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.utils.AppServiceException;
-import dut.gianguhohi.shoppiefood.utils.Validator;
 
 @Transactional
 @Service

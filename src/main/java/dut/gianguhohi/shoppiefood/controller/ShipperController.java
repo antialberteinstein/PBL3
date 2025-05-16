@@ -1,5 +1,6 @@
  package dut.gianguhohi.shoppiefood.controller;
 
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,7 +68,7 @@ public class ShipperController {
     }
 
     @GetMapping("/shipper/home")
-    public String home(HttpSession session, Model model) {
+    public String home(Model model, Authentication authentication) {
         try {
             // User user = (User) session.getAttribute("user");
             /* if (user == null) {
@@ -80,7 +81,7 @@ public class ShipperController {
             /* List<Order> orders = orderService.getOrdersByShipper(shipper);
             model.addAttribute("orders", orders);
             model.addAttribute("shipper", shipper); */
-
+            model.addAttribute("userRole", "SHIPPER");
             return "shipper/home";
         } catch (Exception e) {
             return "redirect:/auth/login";

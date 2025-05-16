@@ -17,7 +17,7 @@
     </head>
     <body>
         
-        <div th:replace="~{shared/fragments/navbar}"/>
+        <div th:replace="~{shared/fragments/navbar}"></div>
 
         <!-- Floating Sidebar -->
         <div id="floatingSidebar" class="floating-sidebar">
@@ -41,6 +41,39 @@
             document.getElementById('sidebarOverlay').addEventListener('click', function() {
                 document.getElementById('floatingSidebar').classList.remove('active');
                 document.getElementById('sidebarOverlay').classList.remove('active');
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Toggle sidebar khi nhấp vào nút menu (nếu có)
+                const menuToggle = document.querySelector('.menu-toggle') || document.querySelector('.navbar-toggler');
+                const sidebar = document.getElementById('floatingSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                
+                if (menuToggle) {
+                    menuToggle.addEventListener('click', function() {
+                        sidebar.classList.toggle('active');
+                        overlay.classList.toggle('active');
+                    });
+                }
+                
+                // Đóng sidebar khi nhấp vào overlay
+                if (overlay) {
+                    overlay.addEventListener('click', function() {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
+                
+                // Đóng sidebar khi nhấp vào nút đóng
+                const closeBtn = document.querySelector('.sidebar-close-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function() {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
             });
         </script>
     </body>

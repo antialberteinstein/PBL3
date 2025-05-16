@@ -1,7 +1,6 @@
 package dut.gianguhohi.shoppiefood.models.misc;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "addresses")
@@ -17,11 +16,11 @@ public class Address {
     @Column(name = "address_line2")
     private String addressLine2;
 
-    @NotBlank(message = "Phường/Xã không được để trống")
+
     @Column(name = "ward")
     private String ward;
 
-    @NotBlank(message = "Thành phố không được để trống")
+
     @Column(name = "city")
     private String city;
     

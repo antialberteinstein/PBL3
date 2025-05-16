@@ -1,7 +1,6 @@
 package dut.gianguhohi.shoppiefood.models.Users;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "restaurants")

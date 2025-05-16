@@ -8,6 +8,7 @@ import dut.gianguhohi.shoppiefood.models.Orders.CartItem;
 import dut.gianguhohi.shoppiefood.repositories.Orders.CartItemRepository;
 import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.models.Product.Product;
+import dut.gianguhohi.shoppiefood.utils.AppServiceException;
 
 @Transactional
 @Service

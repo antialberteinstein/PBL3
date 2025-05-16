@@ -12,7 +12,6 @@ import dut.gianguhohi.shoppiefood.repositories.misc.BranchRepository;
 import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.repositories.misc.AddressRepository;
 import dut.gianguhohi.shoppiefood.utils.AppServiceException;
-import dut.gianguhohi.shoppiefood.utils.Validator;
 
 @Transactional
 @Service
@@ -87,7 +86,7 @@ public class RestaurantService {
             throw new AppServiceException("Tên nhà hàng phải từ 2 đến 100 ký tự");
         }
         if (description != null && description.length() > 500) {
-            throw new AppSerivceException("Mô tả nhà hàng không được vượt quá 500 ký tự");
+            throw new AppServiceException("Mô tả nhà hàng không được vượt quá 500 ký tự");
         }
     }
 

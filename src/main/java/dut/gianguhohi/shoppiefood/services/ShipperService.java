@@ -6,8 +6,8 @@ import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.repositories.Users.ShipperRepository;
 import jakarta.transaction.Transactional;
-import dut.gianguhohi.shoppiefood.utitls.AppServiceException;
-import dut.gianguhohi.shoppiefood.utitls.Validator;
+import dut.gianguhohi.shoppiefood.utils.AppServiceException;
+import dut.gianguhohi.shoppiefood.utils.Validator;
 
 @Transactional
 @Service
@@ -20,7 +20,7 @@ public class ShipperService {
         validateRegister(user, vehicleType, vehicleNumber, driverLicense);
 
         if (shipperRepository.existsByUser(user)) {
-            throw new RegisterRelatedException("Người dùng đã đăng ký làm shipper");
+            throw new AppServiceException("Người dùng đã đăng ký làm shipper");
         }
 
         Shipper shipper = new Shipper(user, vehicleType, vehicleNumber, driverLicense);
