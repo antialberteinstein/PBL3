@@ -2,28 +2,44 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <!-- Sidebar cho tất cả người dùng -->
-<div th:fragment="sidebar" class="sidebar">
-    <!-- Nội dung sidebar chung -->
-    <div class="sidebar-header">
-        <a href="/" class="sidebar-brand">ShoppieFood</a>
-        <button class="sidebar-close-btn">&times;</button>
+<div th:fragment="sidebar" class="user-sidebar">
+    <!-- Sidebar header -->
+    <div class="sidebar-header" style="text-align: center !important;">
+        <h3>ShoppieFood</h3>
     </div>
 
     <!-- Sidebar dành riêng cho shipper -->
-    <div th:if="${userRole == 'SHIPPER'}" class="user-info">
-        <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar">
-        <div class="user-name">Anh shipper thân thiện</div>
-        <div class="user-contact">SĐT: 0123 456 789</div>
+    <div th:if="${userRole == 'SHIPPER' || #strings.contains(#httpServletRequest.requestURI, '/shipper')}" 
+         class="user-info" 
+         style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
+        <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar" style="margin: 0 auto !important;">
+        <div class="user-name" style="text-align: center !important;">Anh shipper thân thiện</div>
+        <div class="user-contact" style="text-align: center !important;">SĐT: 0123 456 789</div>
+        
+            <!-- Menu items -->
         <ul class="user-menu">
-            <li><a href="/shipper/profile"><i class="fas fa-user"></i> Thông tin tài khoản</a></li>
-            <li><a href="/shipper/orders/new"><i class="fas fa-bell"></i> Hiển thị các đơn hàng mới</a></li>
-            <li><a href="/shipper/orders/history"><i class="fas fa-history"></i> Lịch sử giao hàng</a></li>
-            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+            <li><a href="/shipper/home" style="text-decoration: none !important;"><i class="fas fa-home" style="border: none !important; box-shadow: none !important;"></i> Trang chủ</a></li>
+            <li><a href="/shipper/profile" style="text-decoration: none !important;"><i class="fas fa-user" style="border: none !important; box-shadow: none !important;"></i> Thông tin tài khoản</a></li>
+            <li><a href="/shipper/orders/new" style="text-decoration: none !important;"><i class="fas fa-bell" style="border: none !important; box-shadow: none !important;"></i> Hiển thị các đơn hàng mới</a></li>
+            <li><a href="/shipper/orders/history" style="text-decoration: none !important;"><i class="fas fa-history" style="border: none !important; box-shadow: none !important;"></i> Lịch sử giao hàng</a></li>
+            <li><a href="/logout" style="text-decoration: none !important;"><i class="fas fa-sign-out-alt" style="border: none !important; box-shadow: none !important;"></i> Đăng xuất</a></li>
         </ul>
     </div>
-
-    <!-- Sidebar cho các vai trò khác (customer, restaurant, admin) -->
-    <!-- Nội dung sidebar cho các vai trò khác nếu cần -->
+    
+    
+    <!-- Fallback content khi không phải shipper và không có điều kiện nào khác -->
+    <div th:unless="${userRole == 'SHIPPER' || #strings.contains(#httpServletRequest.requestURI, '/shipper')}" class="user-info">
+        <img class="avatar" src="/images/Avatar/default.png" alt="avatar">
+        <div class="user-name">Chào mừng</div>
+        
+        <div class="user-menu-title">MENU</div>
+        <ul class="user-menu">
+            <li><a href="/"><i class="fas fa-home"></i> Trang chủ</a></li>
+            <li><a href="/menu"><i class="fas fa-utensils"></i> Thực đơn</a></li>
+            <li><a href="/about"><i class="fas fa-info-circle"></i> Về chúng tôi</a></li>
+            <li><a href="/auth/login"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a></li>
+        </ul>
+    </div>
 </div>
 
 </html>

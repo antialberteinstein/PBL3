@@ -17,10 +17,7 @@ public class UserController {
     private OrderService orderService;
 
     @GetMapping("/user/home")
-    public String home(HttpSession session) {
-        /* if (session.getAttribute("user") == null) {
-            return "redirect:/auth/login";
-        } */
+    public String home(Model model) {
         return "user/home";
     }
 

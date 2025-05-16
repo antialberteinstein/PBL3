@@ -5,6 +5,14 @@
     height: 100%;
     width: 100%;
     overflow-y: auto;
+    padding: 20px;
+    padding-top: 50px; /* Tạo khoảng cách với nút đóng */
+    text-align: center !important; /* Căn giữa nội dung */ 
+}
+
+/* Đảm bảo nội dung sidebar luôn căn giữa */
+.user-sidebar {
+    text-align: center !important;
 }
 
 .user-sidebar .user-name {
@@ -21,6 +29,8 @@
     text-align: left;
     width: 100%;
     margin-top: 18px;
+    list-style: none;
+    padding: 0;
 }
 
 .user-sidebar ul li {
@@ -39,105 +49,130 @@
     color: var(--accent1-color);
 }
 
-/* Floating Sidebar Styles - Phong cách hiện đại */
-.floating-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0; /* Hiển thị sidebar luôn */
-    width: 250px;
-    height: 100%;
-    background: linear-gradient(to bottom, #f3e6ff, #f0f0f7); /* Gradient nhẹ nhàng */
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
-    z-index: 1001;
-    overflow-y: auto;
-    padding-top: 20px;
-}
-
-/* App logo phía trên */
-.sidebar-header {
-    padding: 0 20px 25px;
-    display: flex;
-    align-items: center;
-    border-bottom: none;
-    margin-bottom: 10px;
-}
-
-.sidebar-brand {
-    display: flex;
-    align-items: center;
+.user-sidebar ul li a {
     text-decoration: none;
-    font-weight: 600;
-    font-size: 1.2rem;
-    color: #333;
-}
-
-.logo-icon {
-    width: 40px;
-    height: 40px;
-    background: #1a1a1a; /* Màu logo */
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-    overflow: hidden;
-}
-
-.logo-icon img {
-    width: 24px;
-    height: 24px;
-}
-
-/* Phần Section */
-.sidebar-section {
-    margin-bottom: 30px;
-    padding: 0 15px;
-}
-
-.section-title {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: #666;
-    padding: 0 10px;
-    margin-bottom: 10px;
-}
-
-/* Menu Items */
-.user-menu {
-    width: 100%;
-    padding: 0;
-    list-style: none;
-}
-
-.user-menu li {
-    padding: 10px 20px;
-    border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.3s;
-}
-
-.user-menu li:hover {
-    background-color: var(--hover-color);
-}
-
-.user-menu li a {
-    color: var(--text1-color);
-    text-decoration: none;
+    color: inherit;
     display: block;
     width: 100%;
 }
 
-.user-menu li a i {
-    margin-right: 10px;
-    color: var(--accent1-color);
+/* Floating Sidebar */
+.floating-sidebar {
+    position: fixed;
+    top: 0;
+    left: -350px;
+    width: 300px;
+    height: 100%;
+    background-color: #f8f9fa;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    z-index: 1050;
+    overflow-y: auto;
+    padding: 0;
+    text-align: center; /* Căn giữa nội dung */
 }
 
-/* User Info được đặt ở dưới cùng */
-.user-info {
+/* Sidebar Header */
+.sidebar-header {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eaeaea;
+    text-align: center;
+    position: relative; /* Để nút đóng có thể định vị tuyệt đối */
+    margin-top: 10px; /* Thêm khoảng cách từ trên xuống */
+}
+
+/* Tiêu đề sidebar */
+.sidebar-header {
+    text-align: center !important;
+    width: 100% !important;
+    padding: 20px 0 !important;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.4rem;
+}
+
+/* Overlay khi sidebar active */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1049;
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Toggle Button Styles - Nút mở sidebar */
+#sidebarToggleBtn {
+    padding: 0.5rem;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    color: var(--text1-color);
+}
+
+#sidebarToggleBtn:hover {
+    transform: scale(1.1);
+}
+
+
+.sidebar-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px; 
+    background-color: #f1f1f1;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    z-index: 1070;
+    width: 20px; 
+    height: 20px; 
     display: flex;
-    flex-direction: column;
     align-items: center;
-    padding: 20px 0;
-    border-bottom: 1px solid var(--border-color);
+    justify-content: center;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* .sidebar-close-btn:hover {
+    background-color: #e5e5e5;
+}
+
+/* User Info */
+.user-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important; /* Căn giữa phần tử bên trong */
+    justify-content: center !important; /* Căn giữa theo chiều dọc */
+    padding: 20px 10px !important; /* Thêm padding trên dưới */
+    border-bottom: 1px solid #eaeaea;
+    width: 100% !important;
+}
+
+/* Đảm bảo avatar và thông tin người dùng căn giữa */
+.user-info {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 20px 10px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
 }
 
 .avatar {
@@ -145,18 +180,126 @@
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 10px;
+    margin: 0 auto 15px; /* Căn giữa theo chiều ngang */
+    border: 2px solid #f0f0f0;
+    display: block; /* Đảm bảo hiển thị dạng block */
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Căn giữa avatar */
+.user-info .avatar {
+    display: block !important;
+    margin: 0 auto 15px !important;
+    width: 80px !important;
+    height: 80px !important;
 }
 
 .user-name {
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 5px;
-    color: var(--text1-color);
+    color: #333;
+    width: 100%;
+    text-align: center;
+}
+
+/* Căn giữa tên và thông tin liên hệ */
+.user-name, .user-contact {
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
 }
 
 .user-contact {
     font-size: 0.95rem;
-    color: var(--text2-color);
-    margin-bottom: 15px;
+    color: #666;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+/* User Menu Title */
+.user-menu-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #999;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Tiêu đề menu căn giữa */
+.user-menu-title {
+    width: 100% !important;
+    text-align: center !important;
+    margin: 15px 0 10px !important;
+}
+
+/* Menu */
+.user-menu {
+    width: 90%;
+    padding: 0;
+    list-style: none;
+    margin: 0 auto; /* Căn giữa menu */
+}
+
+/* Menu danh sách */
+.user-menu {
+    width: 80% !important;
+    margin: 0 auto !important;
+    padding-left: 0 !important;
+    list-style-type: none !important;
+}
+
+.user-menu li {
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+/* Menu items - căn nội dung sang trái nhưng menu chính giữa */
+.user-menu li {
+    text-align: left !important;
+    margin-bottom: 5px !important;
+}
+
+.user-menu li a {
+    text-decoration: none !important;
+    color: #333;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+
+.user-menu li a:hover {
+    background-color: #f5f5f5;
+    color: #007bff;
+    text-decoration: none !important;
+}
+
+/* Bỏ viền icon trong sidebar */
+.user-menu li a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+    color: #007bff;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Xóa gạch dưới cho mọi link trong sidebar */
+.user-sidebar a {
+    text-decoration: none !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .floating-sidebar {
+        width: 280px;
+    }
 }

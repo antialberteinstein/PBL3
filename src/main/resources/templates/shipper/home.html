@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html layout:decorate="~{shared/layout/base}">
-<head layout:title="Trang Chủ - Shipper">
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+<head>
+    <title>Trang Chủ - Shipper</title>
 </head>
-<div layout:fragment="content">
-    <div class="container user-main">
-        <!-- Danh sách đơn giao hàng mới -->
-        <div class="user-orders">
-            <div class="order-item">
-                <div class="order-info">
-                    <div class="order-name">Bún đậu mắm tôm</div>
-                    <div class="order-price">162,000 VNĐ</div>
+<body>
+    <div layout:fragment="content">
+        <div class="container user-main">
+            <!-- Danh sách đơn giao hàng mới -->
+            <div class="user-orders">
+                <div class="order-item">
+                    <div class="order-info">
+                        <div class="order-name">Bún đậu mắm tôm</div>
+                        <div class="order-price">162,000 VNĐ</div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn btn-warning">Xem thông tin</button>
+                        <button class="btn btn-primary">Nhận giao</button>
+                    </div>
                 </div>
-                <div class="order-actions">
-                    <button class="btn btn-warning">Xem thông tin</button>
-                    <button class="btn btn-primary nbtn-primary">Nhận giao</button>
-                </div>
+                <!-- Có thể thêm nhiều đơn hàng khác -->
             </div>
-            <!-- Có thể thêm nhiều đơn hàng khác -->
         </div>
     </div>
-</div>
+</body>
 </html>

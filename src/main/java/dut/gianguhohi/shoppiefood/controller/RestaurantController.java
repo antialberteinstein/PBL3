@@ -10,15 +10,7 @@ import dut.gianguhohi.shoppiefood.models.Users.User;
 public class RestaurantController {
     
     @GetMapping("/restaurant/home")
-    public String home(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-        // if (user == null) {
-        //     return "redirect:/auth/login";
-        // }
-        // if (session.getAttribute("role") == null || !session.getAttribute("role").equals("restaurant")) {
-        //     return "redirect:/restaurant/enter";
-        // }
-        model.addAttribute("user", user);
+    public String home(Model model) {
         return "restaurant/home";
     }
 

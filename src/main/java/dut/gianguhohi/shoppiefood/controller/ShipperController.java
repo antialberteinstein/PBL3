@@ -68,7 +68,7 @@ public class ShipperController {
     }
 
     @GetMapping("/shipper/home")
-    public String home(Model model, Authentication authentication) {
+    public String home(Model model) {
         try {
             // User user = (User) session.getAttribute("user");
             /* if (user == null) {

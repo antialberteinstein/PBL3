@@ -10,7 +10,6 @@ import dut.gianguhohi.shoppiefood.models.Orders.Order;
 import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import dut.gianguhohi.shoppiefood.models.Users.User;
-import dut.gianguhohi.shoppiefood.utils.Validator;
 import dut.gianguhohi.shoppiefood.utils.AppServiceException;
 
 @Transactional
