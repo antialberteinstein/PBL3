@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html layout:decorate="~{shared/layout/base}">
-<head layout:title="Trang Chủ">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+<head>
 </head>
 <div layout:fragment="content">
     <div class="container mt-4">
@@ -39,60 +41,5 @@
             </div>
         </div>
     </div>
-</div>
-
-<div layout:fragment="misc">
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const foodList = document.getElementById('foodList');
-            let currentCategory = 'all';
-
-            // Real-time search functionality
-            searchInput.addEventListener('input', function() {
-                filterFoods();
-            });
-
-            // Category filtering
-            document.querySelectorAll('.category-badge').forEach(badge => {
-                badge.addEventListener('click', function() {
-                    // Update badge styles
-                    document.querySelectorAll('.category-badge').forEach(b => {
-                        b.classList.remove('bg-primary');
-                        b.classList.add('bg-secondary');
-                    });
-                    this.classList.remove('bg-secondary');
-                    this.classList.add('bg-primary');
-
-                    // Update current category and filter
-                    currentCategory = this.dataset.category;
-                    filterFoods();
-                });
-            });
-
-            // Combined search and category filter function
-            function filterFoods() {
-                const keyword = searchInput.value.toLowerCase();
-                document.querySelectorAll('#foodList .food-card').forEach(card => {
-                    const name = card.querySelector('.card-title').textContent.toLowerCase();
-                    const category = card.dataset.category;
-                    
-                    const matchesSearch = name.includes(keyword);
-                    const matchesCategory = currentCategory === 'all' || category === currentCategory;
-                    
-                    card.style.display = matchesSearch && matchesCategory ? '' : 'none';
-                });
-            }
-
-            // Add to cart functionality
-            document.querySelectorAll('.btn-add-cart').forEach(button => {
-                button.addEventListener('click', function() {
-                    const productId = this.dataset.id;
-                    // TODO: Implement add to cart functionality
-                    console.log('Adding product to cart:', productId);
-                });
-            });
-        });
-    </script>
 </div>
 </html> 

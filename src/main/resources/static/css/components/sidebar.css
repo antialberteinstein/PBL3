@@ -72,6 +72,10 @@
     text-align: center; /* Căn giữa nội dung */
 }
 
+.floating-sidebar.active {
+    left: 0px;
+}
+
 /* Sidebar Header */
 .sidebar-header {
     padding: 20px;

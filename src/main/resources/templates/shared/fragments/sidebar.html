@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
 <!-- Sidebar cho tất cả người dùng -->
 <div th:fragment="sidebar" class="user-sidebar">
     <!-- Sidebar header -->
     <div class="sidebar-header" style="text-align: center !important;">
         <h3>ShoppieFood</h3>
     </div>
-
     <!-- Sidebar dành riêng cho shipper -->
-    <div th:if="${userRole == 'SHIPPER' || #strings.contains(#httpServletRequest.requestURI, '/shipper')}" 
-         class="user-info" 
-         style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
+    <div th:if="${session.role == 'shipper'}" 
+        class="user-info" 
+        style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
         <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar" style="margin: 0 auto !important;">
         <div class="user-name" style="text-align: center !important;">Anh shipper thân thiện</div>
         <div class="user-contact" style="text-align: center !important;">SĐT: 0123 456 789</div>
@@ -28,7 +24,7 @@
     
     
     <!-- Fallback content khi không phải shipper và không có điều kiện nào khác -->
-    <div th:unless="${userRole == 'SHIPPER' || #strings.contains(#httpServletRequest.requestURI, '/shipper')}" class="user-info">
+    <div th:unless="${session.role == 'shipper'}" class="user-info">
         <img class="avatar" src="/images/Avatar/default.png" alt="avatar">
         <div class="user-name">Chào mừng</div>
         
@@ -42,4 +38,3 @@
     </div>
 </div>
 
-</html>

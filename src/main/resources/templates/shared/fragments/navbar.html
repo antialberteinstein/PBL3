@@ -2,10 +2,12 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
-            <!-- Sidebar Toggle Button - Chỉ để mở sidebar -->
-            <button id="sidebarToggleBtn" class="menu-toggle me-2" type="button" aria-label="Toggle sidebar">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div th:if="${session.role != null}">
+                <!-- Sidebar Toggle Button - Chỉ để mở sidebar -->
+                <button id="sidebarToggleBtn" class="menu-toggle me-2" type="button" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
             
             <!-- Brand -->
             <a class="navbar-brand" href="/">Shoppie Food</a>

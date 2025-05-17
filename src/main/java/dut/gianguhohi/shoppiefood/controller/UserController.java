@@ -9,6 +9,8 @@ import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.Orders.Order;
 import dut.gianguhohi.shoppiefood.services.OrderService;
 import java.util.List;
+import java.util.ArrayList;
+import dut.gianguhohi.shoppiefood.models.Product.Product;
 
 @Controller
 public class UserController {
@@ -17,23 +19,16 @@ public class UserController {
     private OrderService orderService;
 
     @GetMapping("/user/home")
-    public String home(Model model) {
+    public String home(Model model, HttpSession session) {
+        
+        // For testing purposes
+        session.setAttribute("role", "user");
+
         return "user/home";
     }
 
     @GetMapping("/user/order")
     public String userOrders(HttpSession session, Model model) {
-        try {
-            User user = (User) session.getAttribute("user");
-            /* if (user == null) {
-                return "redirect:/auth/login";
-            } */
-
-            List<Order> orders = orderService.getOrdersByCustomer(user);
-            model.addAttribute("orders", orders);
-            return "user/order";
-        } catch (Exception e) {
-            return "redirect:/auth/login";
-        }
+        return "user/order";
     }
 } 

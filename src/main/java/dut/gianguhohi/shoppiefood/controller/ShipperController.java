@@ -1,6 +1,5 @@
  package dut.gianguhohi.shoppiefood.controller;
 
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,67 +23,27 @@ public class ShipperController {
 
     @GetMapping("/shipper/enter")
     public String enter(HttpSession session, Model model) {
-        /* if (session.getAttribute("role") != null && session.getAttribute("role").equals("shipper")) {
-            return "redirect:/shipper/home";
-        } */
-
-        try {
-            // User user = (User) session.getAttribute("user");
-            /* if (user == null) {
-                return "redirect:/auth/login";
-            }
-            Shipper shipper = shipperService.getShipperByUser(user);
-            if (shipper == null) {
-                return "redirect:/shipper/register";
-            } */
-
-            session.setAttribute("role", "shipper");
-            return "redirect:/shipper/home";
-        } catch (Exception e) {
-            return "redirect:/auth/login";
-        }
+        // session.setAttribute("role", "shipper");
+        return "redirect:/shipper/home";
     }
 
     @GetMapping("/shipper/register")
     public String register(HttpSession session, Model model) {
-        if (session.getAttribute("role") != null && session.getAttribute("role").equals("shipper")) {
-            return "redirect:/shipper/home";
-        }
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
-        Shipper shipper = shipperService.getShipperByUser(user);
-        if (shipper != null) {
-            return "redirect:/shipper/home";
-        }
         return "shipper/register";
     }
 
     @GetMapping("/shipper/exit")
     public String exit(HttpSession session) {
-        session.removeAttribute("role");
+        // session.setAttribute("role", "user");
         return "redirect:/user/home";
     }
 
     @GetMapping("/shipper/home")
-    public String home(Model model) {
-        try {
-            // User user = (User) session.getAttribute("user");
-            /* if (user == null) {
-                return "redirect:/auth/login";
-            } */
-            // Shipper shipper = shipperService.getShipperByUser(user);
-            /* if (shipper == null) {
-                return "redirect:/shipper/register";
-            } */
-            /* List<Order> orders = orderService.getOrdersByShipper(shipper);
-            model.addAttribute("orders", orders);
-            model.addAttribute("shipper", shipper); */
-            model.addAttribute("userRole", "SHIPPER");
-            return "shipper/home";
-        } catch (Exception e) {
-            return "redirect:/auth/login";
-        }
+    public String home(HttpSession session, Model model) {
+
+        // For testing purposes
+        session.setAttribute("role", "shipper");
+
+        return "shipper/home";
     }
 }
