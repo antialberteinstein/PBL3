@@ -5,12 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import jakarta.servlet.http.HttpSession;
-import dut.gianguhohi.shoppiefood.models.Users.User;
-import dut.gianguhohi.shoppiefood.models.Orders.Order;
 import dut.gianguhohi.shoppiefood.services.OrderService;
-import java.util.List;
-import java.util.ArrayList;
-import dut.gianguhohi.shoppiefood.models.Product.Product;
+
 
 @Controller
 public class UserController {
