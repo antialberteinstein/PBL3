@@ -17,7 +17,7 @@
         
         <div class="input-field">
           <label for="phoneNumber" class="form-label">Email/Số điện thoại <span class="required-star">*</span></label>
-          <input type="text" class="form-control nform-control" id="phoneNumber" name="phoneNumber" required>
+          <input type="text" class="form-control nform-control" id="phoneNumber" name="loginString" required>
         </div>
         <div class="feedback-container mb-2">
           <div class="invalid-feedback" id="phoneError">Vui lòng nhập email hoặc số điện thoại.</div>
@@ -47,7 +47,8 @@
             <a href="/auth/register" class="btn btn-secondary nbtn-secondary">Đăng Ký</a>
             <button type="submit" class="btn btn-primary nbtn-primary">Đăng Nhập</button>
         </div>
-        <p th:text="${message}" class="text-danger text-center mt-3"></p>
+        <p th:text="${error}" class="text-danger text-center mt-3"></p>
+        <p th:text="${success}" class="text-success text-center mt-3"></p>
       </form>
       
     </div>

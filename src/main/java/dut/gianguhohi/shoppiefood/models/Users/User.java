@@ -46,6 +46,7 @@ public class User {
     private String avatarUrl;
 
     public User() {
+        this.isActive = true;
     }
 
     public User(String name, String password, String phoneNumber, String email, String gender, String dateOfBirth) {

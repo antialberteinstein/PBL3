@@ -114,7 +114,7 @@
                     <a href="/auth/login" class="btn btn-secondary nbtn-secondary">Đăng Nhập</a>
                     <button type="submit" class="btn btn-primary nbtn-primary" id="registerBtn">Đăng Ký</button>
                 </div>
-                <p id="formMessage" class="text-danger mt-3 text-center" th:text="${message}"></p>
+                <p id="formMessage" class="text-danger mt-3 text-center" th:text="${error}"></p>
             </form>  
         </div>
         <div class="left-img">
@@ -141,9 +141,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<div layout:fragment="misc">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const registerForm = document.getElementById("register-form");

@@ -16,6 +16,16 @@ public class BaseController {
 
     @GetMapping("/home") 
     public String home(HttpSession session, Model model) {
+        if (session.getAttribute("user") != null) {
+            if (session.getAttribute("role").equals("user")) {
+                return "redirect:/user/home";
+            } else if (session.getAttribute("role").equals("shipper")) {
+                return "redirect:/shipper/home";
+            } else if (session.getAttribute("role").equals("restaurant")) {
+                return "redirect:/restaurant/home";
+            }
+        }
+
         return "redirect:/auth/login";
     }
 
