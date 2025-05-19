@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+
+<head>
+    <title>Chi tiết nhà hàng</title>
+    
+    <!-- CSS cho trang này -->
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/restaurant/profile.css}">
+    </th:block>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Main Content - chiếm toàn bộ không gian -->
+        <div class="content-container p-4">
+            <!-- Thông tin nhà hàng -->
+            <div class="restaurant-info-card">
+                <!-- Ảnh nhà hàng -->
+                <img th:src="${restaurant != null ? restaurant.imageUrl : '/images/Avatar/restaurant.png'}" 
+                     src="/images/Avatar/restaurant.png" 
+                     alt="Hình ảnh nhà hàng" 
+                     class="restaurant-image">
+                
+                <div class="restaurant-details">
+                    <!-- Tên nhà hàng -->
+                    <h1 class="restaurant-name" th:text="${restaurant != null ? restaurant.name : 'Nhà hàng ngon nhất Đà Nẵng'}">Nhà hàng ngon nhất Đà Nẵng</h1>
+                    
+                    <!-- Mô tả nhà hàng -->
+                    <p class="restaurant-description" th:text="${restaurant != null ? restaurant.description : 'Nhà hàng phục vụ các món ăn đặc sản với hương vị truyền thống. Thực đơn đa dạng từ các món khai vị đến món tráng miệng, đáp ứng mọi nhu cầu của thực khách.'}">
+                        Nhà hàng phục vụ các món ăn đặc sản với hương vị truyền thống. Thực đơn đa dạng từ các món khai vị đến món tráng miệng, đáp ứng mọi nhu cầu của thực khách.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Danh sách chi nhánh -->
+            <h3 class="section-title">Các chi nhánh</h3>
+            
+            <!-- Nút thêm chi nhánh -->
+            <div class="text-end mb-4">
+                <button class="add-branch-btn" data-bs-toggle="modal" data-bs-target="#addBranchModal">
+                    <i class="fas fa-plus me-2"></i>Thêm chi nhánh mới
+                </button>
+            </div>
+            
+            <!-- Danh sách chi nhánh -->
+            <div class="branches-list">
+                <!-- Hiển thị chi nhánh từ dữ liệu -->
+                <div class="branch-item" th:if="${branches != null}" th:each="branch : ${branches}">
+                    <div class="branch-name" th:text="${branch.branchName}">Chi nhánh Trung tâm</div>
+                    <div class="branch-address" th:text="${branch.address.addressLine2 + ', ' + branch.address.addressLine1 + ', ' + branch.address.ward + ', ' + branch.address.city}">
+                        Số 123, Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh
+                    </div>
+                </div>
+                
+                <!-- Hiển thị dữ liệu mẫu khi không có dữ liệu thật -->
+                <div class="branch-item" th:if="${branches == null || branches.isEmpty()}">
+                    <div class="branch-name">Chi nhánh Trung tâm</div>
+                    <div class="branch-address">123 Lê Duẩn, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</div>
+                </div>
+                
+                <div class="branch-item" th:if="${branches == null || branches.isEmpty()}">
+                    <div class="branch-name">Chi nhánh Quận 3</div>
+                    <div class="branch-address">456 Nguyễn Đình Chiểu, Phường 4, Quận 3, TP. Hồ Chí Minh</div>
+                </div>
+                
+                <div class="branch-item" th:if="${branches == null || branches.isEmpty()}">
+                    <div class="branch-name">Chi nhánh Quận 7</div>
+                    <div class="branch-address">789 Nguyễn Hữu Thọ, Phường Tân Phong, Quận 7, TP. Hồ Chí Minh</div>
+                </div>
+            </div>
+            
+            <!-- Modal thêm chi nhánh -->
+            <div class="modal fade" id="addBranchModal" tabindex="-1" aria-labelledby="addBranchModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addBranchModalLabel">Thêm chi nhánh mới</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addBranchForm">
+                                <div class="mb-3">
+                                    <label for="branchName" class="form-label">Tên chi nhánh</label>
+                                    <input type="text" class="form-control" id="branchName" name="branchName" placeholder="Chi nhánh Trung tâm">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="addressLine1" class="form-label">Số nhà, đường</label>
+                                    <input type="text" class="form-control" id="addressLine1" name="addressLine1" placeholder="123 Lê Lợi">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="addressLine2" class="form-label">Tòa nhà, lầu (nếu có)</label>
+                                    <input type="text" class="form-control" id="addressLine2" name="addressLine2" placeholder="Tòa nhà Landmark, Lầu 5">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="ward" class="form-label">Phường/Xã</label>
+                                    <input type="text" class="form-control" id="ward" name="ward" placeholder="Phường Bến Nghé">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="district" class="form-label">Quận/Huyện</label>
+                                    <input type="text" class="form-control" id="district" name="district" placeholder="Quận 1">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="city" class="form-label">Thành phố</label>
+                                    <input type="text" class="form-control" id="city" name="city" placeholder="TP. Hồ Chí Minh">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" id="saveBranchBtn" class="btn btn-primary">Lưu chi nhánh</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Toast thông báo -->
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto" id="toastTitle">Thông báo</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body" id="toastMessage">
+                        Đã thêm chi nhánh mới thành công!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript riêng cho trang này -->
+    <th:block layout:fragment="script">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Trang chi tiết nhà hàng đã được tải');
+                
+                // Khởi tạo toast
+                const notificationToast = new bootstrap.Toast(document.getElementById('notificationToast'));
+                const toastTitle = document.getElementById('toastTitle');
+                const toastMessage = document.getElementById('toastMessage');
+                
+                // Xử lý nút lưu chi nhánh
+                const saveBranchBtn = document.getElementById('saveBranchBtn');
+                const addBranchModal = document.getElementById('addBranchModal');
+                
+                if (saveBranchBtn) {
+                    saveBranchBtn.addEventListener('click', function() {
+                        // Lấy giá trị từ form
+                        const branchName = document.getElementById('branchName').value;
+                        const addressLine1 = document.getElementById('addressLine1').value;
+                        const addressLine2 = document.getElementById('addressLine2').value;
+                        const ward = document.getElementById('ward').value;
+                        const district = document.getElementById('district').value;
+                        const city = document.getElementById('city').value;
+                        
+                        // Validate các trường bắt buộc
+                        if (!branchName || !addressLine1 || !ward || !district || !city) {
+                            toastTitle.textContent = 'Lỗi';
+                            toastTitle.className = 'me-auto text-danger';
+                            toastMessage.textContent = 'Vui lòng điền đầy đủ thông tin chi nhánh';
+                            notificationToast.show();
+                            return;
+                        }
+                        
+                        // Mô phỏng thêm chi nhánh (sẽ được xử lý bởi backend sau này)
+                        console.log('Thêm chi nhánh mới:', {
+                            branchName,
+                            address: {
+                                addressLine1,
+                                addressLine2,
+                                ward,
+                                district,
+                                city
+                            }
+                        });
+                        
+                        // Thêm chi nhánh mới vào danh sách hiển thị
+                        const branchList = document.querySelector('.branches-list');
+                        const newBranchHTML = `
+                            <div class="branch-item">
+                                <div class="branch-name">${branchName}</div>
+                                <div class="branch-address">${addressLine2 ? addressLine2 + ', ' : ''}${addressLine1}, ${ward}, ${district}, ${city}</div>
+                            </div>
+                        `;
+                        branchList.insertAdjacentHTML('afterbegin', newBranchHTML);
+                        
+                        // Đóng modal
+                        const modal = bootstrap.Modal.getInstance(addBranchModal);
+                        modal.hide();
+                        
+                        // Reset form
+                        document.getElementById('addBranchForm').reset();
+                        
+                        // Hiển thị thông báo thành công
+                        toastTitle.textContent = 'Thành công';
+                        toastTitle.className = 'me-auto text-success';
+                        toastMessage.textContent = 'Đã thêm chi nhánh mới thành công!';
+                        notificationToast.show();
+                    });
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>
