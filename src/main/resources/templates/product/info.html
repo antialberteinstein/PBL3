@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+
+<head>
+    <title>Chi tiết món ăn</title>
+    
+    <!-- CSS cho trang này -->
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/product/info.css}">
+    </th:block>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Main Content -->
+        <main class="container mt-4">
+            <div class="row">
+                <!-- Chi tiết sản phẩm -->
+                <div class="col-lg-8">
+                    <div class="product-details card shadow-sm">
+                        <!-- Tiêu đề và giá sản phẩm -->
+                        <div class="card-header product-header">
+                            <h2 class="product-title" th:text="${product != null ? product.name : 'Bún măng gà'}">Bún măng gà</h2>
+                            <div class="product-price">
+                                <span class="price-value" th:text="${product != null ? #numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '100.000 VND'}">100.000 VND</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <!-- Ảnh sản phẩm -->
+                            <div class="product-image-container mb-4">
+                                <img th:src="${product != null ? product.imageUrl : '/images/Food/bunmangga.png'}" 
+                                     src="/images/Food/bunmangga.png" 
+                                     alt="Hình ảnh món ăn" 
+                                     class="product-image img-fluid rounded">
+                            </div>
+                            
+                            <!-- Thông tin chi tiết -->
+                            <div class="product-info">
+                                <h5 class="section-title">Mô tả sản phẩm</h5>
+                                <p class="product-description" th:text="${product != null ? product.description : 'Cực ngon và hấp dẫn, ko ăn phí mất nửa đời người.'}">Cực ngon và hấp dẫn, ko ăn phí mất nửa đời người.</p>
+                                
+                                <h5 class="section-title mt-4">Địa chỉ quán</h5>
+                                <p class="product-restaurant-address" th:text="${product != null && product.restaurant != null ? product.restaurant.address : '179 Trần Cao Vân, Quận Thanh Khê, TP.Đà Nẵng'}">179 Trần Cao Vân, Quận Thanh Khê, TP.Đà Nẵng</p>
+                                
+                                <!-- Rating -->
+                                <h5 class="section-title mt-4">Đánh giá</h5>
+                                <div class="product-rating">
+                                    <div class="stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <span class="rating-value">(4.0/5)</span>
+                                </div>
+                                
+                                <!-- Feedback -->
+                                <h5 class="section-title mt-4">Feedback</h5>
+                                <div class="product-feedback">
+                                    <ul class="feedback-list">
+                                        <li th:if="${feedbacks != null}" th:each="feedback : ${feedbacks}" th:text="${feedback}">
+                                            Rất ngon, sẽ ủng hộ lần sau.
+                                        </li>
+                                        <li th:if="${feedbacks == null || feedbacks.isEmpty()}">
+                                            Rất ngon, sẽ ủng hộ lần sau.
+                                        </li>
+                                        <li th:if="${feedbacks == null || feedbacks.isEmpty()}">
+                                            Đóng gói kỹ, giao nhanh.
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Thông tin giao hàng và đặt hàng -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Thông tin giao hàng</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="orderForm">
+                                <input type="hidden" name="productId" th:value="${product != null ? product.id : '123'}" value="123">
+                                
+                                <div class="mb-3">
+                                    <label for="deliveryAddress" class="form-label">Chọn địa chỉ giao hàng:</label>
+                                    <input type="text" class="form-control" id="deliveryAddress" placeholder="54 Nguyễn Lương Bằng, Quận Liên Chiểu, TP.Đà Nẵng" readonly>
+                                </div>
+                                
+                                <div class="d-flex gap-2 mt-3">
+                                    <button type="button" id="addAddressBtn" class="btn btn-info flex-grow-1 text-white" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                                        Thêm địa chỉ giao hàng
+                                    </button>
+                                    
+                                    <button type="button" id="orderBtn" class="btn btn-warning flex-grow-1">
+                                        Đặt hàng
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Sản phẩm liên quan -->
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">Sản phẩm tương tự</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="related-products">
+                                <!-- Hiển thị dữ liệu động nếu có -->
+                                <div class="related-product-item" th:if="${relatedProducts != null}" th:each="relatedProduct : ${relatedProducts}">
+                                    <a th:href="@{/product/{id}(id=${relatedProduct.id})}" href="#">
+                                        <img th:src="${relatedProduct.imageUrl}" alt="Sản phẩm liên quan" class="img-fluid rounded">
+                                        <div class="related-product-info">
+                                            <h6 th:text="${relatedProduct.name}">Bún đậu mắm tôm</h6>
+                                            <span th:text="${#numbers.formatDecimal(relatedProduct.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">30.000 VND</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                
+                                <!-- Fallback khi không có dữ liệu -->
+                                <div class="related-product-item" th:if="${relatedProducts == null || relatedProducts.isEmpty()}">
+                                    <a href="#">
+                                        <img src="/images/Food/bundau.png" class="img-fluid rounded" alt="Phở gà">
+                                        <div class="related-product-info">
+                                            <h6>Bún đậu mắm tôm</h6>
+                                            <span>30.000 VND</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                
+                                <div class="related-product-item" th:if="${relatedProducts == null || relatedProducts.isEmpty()}">
+                                    <a href="#">
+                                        <img src="/images/Food/bunbo.png" class="img-fluid rounded" alt="Bún bò Huế">
+                                        <div class="related-product-info">
+                                            <h6>Bún bò Huế</h6>
+                                            <span>45.000 VND</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Modal thêm địa chỉ -->
+        <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addAddressModalLabel">Thêm địa chỉ giao hàng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addAddressForm">
+                            <div class="mb-3">
+                                <label for="city" class="form-label">Thành phố:</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="Đà Nẵng" value="Đà Nẵng">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="district" class="form-label">Quận/Huyện:</label>
+                                <input type="text" class="form-control" id="district" name="district" placeholder="Quận Thanh Khê" value="Quận Thanh Khê">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="ward" class="form-label">Phường:</label>
+                                <input type="text" class="form-control" id="ward" name="ward" placeholder="Phường Xuân Hà" value="Phường Xuân Hà">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="street" class="form-label">Địa chỉ cụ thể:</label>
+                                <input type="text" class="form-control" id="street" name="street" placeholder="K179/08/12 Trần Cao Vân" value="K179/08/12 Trần Cao Vân">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" id="saveAddressBtn" class="btn btn-primary">Lưu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast thông báo -->
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="orderToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto" id="toastTitle">Thông báo</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" id="toastMessage">
+                    Đặt hàng thành công!
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript riêng cho trang này -->
+    <th:block layout:fragment="script">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // JavaScript tùy chỉnh cho trang sản phẩm
+                console.log('Trang chi tiết sản phẩm đã được tải');
+                
+                // Khởi tạo toast
+                const orderToast = new bootstrap.Toast(document.getElementById('orderToast'));
+                const toastTitle = document.getElementById('toastTitle');
+                const toastMessage = document.getElementById('toastMessage');
+                
+                // Xử lý modal thêm địa chỉ
+                const addAddressModal = document.getElementById('addAddressModal');
+                const saveAddressBtn = document.getElementById('saveAddressBtn');
+                const deliveryAddressInput = document.getElementById('deliveryAddress');
+                
+                if (saveAddressBtn) {
+                    saveAddressBtn.addEventListener('click', function() {
+                        // Lấy giá trị từ form
+                        const city = document.getElementById('city').value;
+                        const district = document.getElementById('district').value;
+                        const ward = document.getElementById('ward').value;
+                        const street = document.getElementById('street').value;
+                        
+                        // Validate các trường
+                        if (!city || !district || !ward || !street) {
+                            toastTitle.textContent = 'Lỗi';
+                            toastTitle.className = 'me-auto text-danger';
+                            toastMessage.textContent = 'Vui lòng điền đầy đủ thông tin địa chỉ';
+                            orderToast.show();
+                            return;
+                        }
+                        
+                        // Tạo địa chỉ đầy đủ
+                        const fullAddress = `${street}, ${ward}, ${district}, ${city}`;
+                        
+                        // Cập nhật trường địa chỉ
+                        if (deliveryAddressInput) {
+                            deliveryAddressInput.value = fullAddress;
+                        }
+                        
+                        // Đóng modal
+                        const modal = bootstrap.Modal.getInstance(addAddressModal);
+                        modal.hide();
+                        
+                        // Hiển thị thông báo thành công
+                        toastTitle.textContent = 'Thành công';
+                        toastTitle.className = 'me-auto text-success';
+                        toastMessage.textContent = 'Đã thêm địa chỉ giao hàng mới';
+                        orderToast.show();
+                    });
+                }
+                
+                // Xử lý nút đặt hàng
+                const orderBtn = document.getElementById('orderBtn');
+                if (orderBtn) {
+                    orderBtn.addEventListener('click', function() {
+                        // Kiểm tra xem đã có địa chỉ chưa
+                        if (!deliveryAddressInput.value.trim()) {
+                            toastTitle.textContent = 'Lỗi';
+                            toastTitle.className = 'me-auto text-danger';
+                            toastMessage.textContent = 'Vui lòng chọn địa chỉ giao hàng';
+                            orderToast.show();
+                            return;
+                        }
+                        
+                        // Hiển thị thông báo đặt hàng thành công
+                        toastTitle.textContent = 'Thành công';
+                        toastTitle.className = 'me-auto text-success';
+                        toastMessage.innerHTML = `
+                            <p class="mb-1">Đặt hàng thành công!</p>
+                            <p class="mb-0">Mã đơn hàng: ORD-${Math.floor(Math.random() * 10000)}</p>
+                            <p class="mb-0">Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ gọi điện xác nhận trong ít phút.</p>
+                        `;
+                        orderToast.show();
+                        
+                        // Không cần submit form vì chưa có backend
+                        console.log('Đặt hàng với địa chỉ:', deliveryAddressInput.value);
+                    });
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>
