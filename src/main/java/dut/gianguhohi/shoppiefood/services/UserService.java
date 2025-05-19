@@ -18,19 +18,16 @@ public class UserService {
     private UserRepository userRepository;
 
     public User readByPhoneNumber(String phoneNumber) {
-        Validator.validatePhoneNumber(phoneNumber);
         User user = userRepository.findByPhoneNumber(phoneNumber);
         return user;
     }
 
     public User readByEmail(String email) {
-        Validator.validateEmail(email);
         User user = userRepository.findByEmail(email);
         return user;
     }
 
     public User readById(int id) {
-        Validator.validateId(id, "Id không hợp lệ");
         User user = userRepository.findByUserId(id);
         return user;
     }
@@ -74,13 +71,7 @@ public class UserService {
         }
 
         // Create new user
-        User user = new User();
-        user.setPhoneNumber(phoneNumber);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setName(name);
-        user.setDateOfBirth(dateOfBirth);
-        user.setGender(gender);
+        User user = new User(name, password, phoneNumber, email, gender, dateOfBirth);
 
         return userRepository.save(user);
     }
