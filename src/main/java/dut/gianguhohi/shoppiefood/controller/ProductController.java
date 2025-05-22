@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-public class ProductInfoController {
+public class ProductController {
     @GetMapping("/product/info")
     public String getProductInfo(Model model, HttpSession session) {
         try {

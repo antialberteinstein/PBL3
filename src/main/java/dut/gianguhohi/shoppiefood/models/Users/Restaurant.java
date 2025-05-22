@@ -20,13 +20,18 @@ public class Restaurant {
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
+    @Column(name = "background_url")
+    private String backgroundUrl;
+
     public Restaurant() {
+        this.backgroundUrl = "";
     }
 
     public Restaurant(String restaurantName, String description, User seller) {
         this.restaurantName = restaurantName;
         this.description = description;
         this.seller = seller;
+        this.backgroundUrl = "";
     }
 
     public int getRestaurantId() {
@@ -59,6 +64,14 @@ public class Restaurant {
 
     public void setSeller(User seller) {
         this.seller = seller;
+    }
+
+    public String getBackgroundUrl() {
+        return backgroundUrl;
+    }
+
+    public void setBackgroundUrl(String backgroundUrl) {
+        this.backgroundUrl = backgroundUrl;
     }
     
 }
