@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.misc.Branch;
 import dut.gianguhohi.shoppiefood.models.misc.Address;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class RestaurantController {
@@ -34,6 +35,23 @@ public class RestaurantController {
     @GetMapping("/restaurant/create")
     public String create(HttpSession session, Model model) {
         return "restaurant/create";
+    }
+
+    @PostMapping("/restaurant/create")
+    public String createRestaurant(
+        @RequestParam String name,
+        @RequestParam String description,
+        HttpSession session
+    ) {
+        User seller = (User) session.getAttribute("user");
+        if (seller == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Người bán không tồn tại");
+        }
+
+        Restaurant restaurant = restaurantService.create(seller, name, description);
+        session.setAttribute("restaurant", restaurant);
+
+        return "redirect:/restaurant/enter/" + restaurant.getRestaurantId();
     }
 
     @GetMapping("/restaurant/enter/{id}")

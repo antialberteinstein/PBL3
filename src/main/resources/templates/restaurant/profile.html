@@ -18,10 +18,15 @@
         <!-- Thông tin nhà hàng -->
         <div class="restaurant-info-card">
             <!-- Ảnh nhà hàng -->
-            <img th:if="${restaurant != null}" th:src="${restaurant.backgroundUrl}" alt="Hình ảnh nhà hàng" class="restaurant-image">
+            <img th:if="${restaurant != null && restaurant.backgroundUrl != null}"
+                th:src="${restaurant.backgroundUrl} + '?v=' + ${#dates.createNow().time}" class="restaurant-image">
             <div class="restaurant-details" th:if="${restaurant != null}">
-                <!-- Tên nhà hàng -->
-                <h1 class="restaurant-name" th:text="${restaurant.restaurantName}">Nhà hàng ngon nhất Đà Nẵng</h1>
+                <div class="d-flex align-items-center mb-2">
+                    <h1 class="restaurant-name me-3" th:text="${restaurant.restaurantName}">Nhà hàng ngon nhất Đà Nẵng</h1>
+                    <button class="btn btn-sm btn-outline-primary" id="editRestaurantBtn" th:if="${session.role == 'restaurant' and isOwner}">
+                        <i class="fas fa-edit"></i> Cập nhật thông tin
+                    </button>
+                </div>
                 
                 <!-- Mô tả nhà hàng -->
                 <p class="restaurant-description" th:text="${restaurant.description}">
@@ -95,6 +100,40 @@
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal cập nhật thông tin nhà hàng -->
+        <div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-labelledby="editRestaurantModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="editRestaurantForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editRestaurantModalLabel">Cập nhật thông tin nhà hàng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="restaurantName" class="form-label">Tên nhà hàng</label>
+                                <input type="text" class="form-control" id="restaurantName" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="restaurantDescription" class="form-label">Mô tả</label>
+                                <textarea class="form-control" id="restaurantDescription" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="restaurantImage" class="form-label">Ảnh nền nhà hàng</label>
+                                <input type="file" class="form-control" id="restaurantImage" accept="image/*">
+                                <input type="hidden" id="backgroundUrl" name="backgroundUrl">
+                                <div id="previewImage" class="mt-2"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -306,6 +345,100 @@
                     e.preventDefault();
                     const page = parseInt(e.target.dataset.page);
                     loadBranches(page);
+                }
+            });
+
+            const editRestaurantBtn = document.getElementById('editRestaurantBtn');
+            const editRestaurantModalEl = document.getElementById('editRestaurantModal');
+            const editRestaurantModal = new bootstrap.Modal(editRestaurantModalEl);
+            const editRestaurantForm = document.getElementById('editRestaurantForm');
+
+            if (editRestaurantBtn) {
+                editRestaurantBtn.addEventListener('click', function() {
+                    // Fill current info
+                    editRestaurantForm.restaurantName.value = /*[[${restaurant.restaurantName}]]*/ '';
+                    editRestaurantForm.restaurantDescription.value = /*[[${restaurant.description}]]*/ '';
+                    editRestaurantModal.show();
+                });
+            }
+
+            const restaurantImageInput = document.getElementById('restaurantImage');
+            const backgroundUrlInput = document.getElementById('backgroundUrl');
+            const previewImage = document.getElementById('previewImage');
+
+            // Preview and upload image
+            restaurantImageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" style="max-height:150px;">`;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // When opening modal, show current image if available
+            if (editRestaurantBtn) {
+                editRestaurantBtn.addEventListener('click', function() {
+                    editRestaurantForm.restaurantName.value = /*[[${restaurant.restaurantName}]]*/ '';
+                    editRestaurantForm.restaurantDescription.value = /*[[${restaurant.description}]]*/ '';
+                    backgroundUrlInput.value = /*[[${restaurant.backgroundUrl}]]*/ '';
+                    if (backgroundUrlInput.value) {
+                        previewImage.innerHTML = `<img src="${backgroundUrlInput.value}" class="img-fluid rounded" style="max-height:150px;">`;
+                    } else {
+                        previewImage.innerHTML = '';
+                    }
+                    editRestaurantModal.show();
+                });
+            }
+
+            editRestaurantForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const file = restaurantImageInput.files[0];
+                const oldImage = backgroundUrlInput.value;
+                const formData = new FormData(editRestaurantForm);
+
+                function doUpdate(imageUrl) {
+                    formData.set('backgroundUrl', imageUrl || oldImage || '');
+                    fetch(`/api/restaurant/${restaurantId}`, {
+                        method: 'PUT',
+                        body: new URLSearchParams(formData),
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        return res.json();
+                    })
+                    .then(data => {
+                        toastSuccess('Cập nhật thông tin nhà hàng thành công!');
+                        editRestaurantModal.hide();
+                        location.reload();
+                    })
+                    .catch(() => toastError('Không thể cập nhật thông tin nhà hàng!'));
+                }
+
+                if (file) {
+                    // Nếu có ảnh mới, upload trước
+                    const uploadData = new FormData();
+                    uploadData.append('file', file);
+                    fetch('/api/image/upload', {
+                        method: 'POST',
+                        body: uploadData
+                    })
+                    .then(res => res.ok ? res.text() : Promise.reject())
+                    .then(url => {
+                        // Xóa ảnh cũ nếu có
+                        if (oldImage) {
+                            fetch('/api/image/delete?path=' + encodeURIComponent(oldImage), { method: 'DELETE' }).catch(() => {});
+                        }
+                        doUpdate(url.replace(/"/g, ''));
+                    })
+                    .catch(() => {
+                        toastError('Không thể upload ảnh!');
+                    });
+                } else {
+                    // Không có ảnh mới, chỉ cập nhật thông tin khác
+                    doUpdate();
                 }
             });
 

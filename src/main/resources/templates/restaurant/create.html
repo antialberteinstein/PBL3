@@ -1,32 +1,30 @@
 <!DOCTYPE html>
-<html decorate="~{shared/layout/base}">
-<head layout:title="Đăng Ký Cửa Hàng"></head>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{shared/layout/base}">
+<head>
+    <title>Đăng Ký Cửa Hàng</title>
+</head>
 <div layout:fragment="content">
-    <div class="container-fluid register-container">
-        <!-- Register form -->
-        <div class="login-form">
-            <form class="login-box" th:action="@{/restaurant/register}" method="post">
-                <div class="login-title">ĐĂNG KÝ CỬA HÀNG MỚI</div>
-                <div class="input-field mb-2">
-                    <label for="shopName" class="form-label">Tên Cửa Hàng</label>
-                    <input type="text" class="form-control nform-control" id="shopName" name="shopName" required>
-                </div>
-
-                <div class="input-field mb-2">
-                    <label for="description" class="form-label">Mô Tả Cửa Hàng</label>
-                    <textarea class="form-control nform-control" id="description" name="description"></textarea>
-                </div>
-                
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary nbtn-primary">Đăng Ký</button>
-                    <a href="/register" class="btn btn-secondary nbtn-secondary">Quay Lại</a>
-                </div>
-            </form>
+    <main class="container-fluid register-container py-5">
+        <div class="row justify-content-center align-items-center">
+            <!-- Register form -->
+            <div class="col-md-6">
+                <form class="login-box" th:action="@{/restaurant/create}" method="post">
+                    <div class="login-title mb-4">ĐĂNG KÝ CỬA HÀNG MỚI</div>
+                    <div class="input-field mb-3">
+                        <label for="name" class="form-label">Tên Cửa Hàng</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="input-field mb-3">
+                        <label for="description" class="form-label">Mô Tả Cửa Hàng</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">Đăng Ký</button>
+                        <a th:href="@{/register}" class="btn btn-secondary">Quay Lại</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        <!-- Right image -->
-        <div class="left-img">
-            <img th:src="@{/images/chef.png}" alt="Chef Image">
-        </div>
-    </div>
+    </main>
 </div>
 </html>
