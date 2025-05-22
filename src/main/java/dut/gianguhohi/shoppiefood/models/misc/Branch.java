@@ -19,16 +19,28 @@ public class Branch {
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
-    @Column(name = "branch_name", nullable = false)
+    @Column(name = "branch_name")
     private String branchName;
+
+    @Column(name = "phoneNumber")
+    private String phoneNumber;
+
+    @Column(name = "start_time")
+    private String startTime;
+
+    @Column(name = "end_time")
+    private String endTime;
 
     public Branch() {
     }
 
-    public Branch(Restaurant restaurant, Address address, String branchName) {
+    public Branch(Restaurant restaurant, Address address, String branchName, String phoneNumber, String startTime, String endTime) {
         this.restaurant = restaurant;
         this.address = address;
         this.branchName = branchName;
+        this.phoneNumber = phoneNumber;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public int getBranchId() {
@@ -61,5 +73,29 @@ public class Branch {
 
     public void setBranchName(String branchName) {
         this.branchName = branchName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+<head>
+    <title>Lỗi hệ thống</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container text-center" style="padding: 60px 0;">
+            <h1 style="font-size: 5rem; color: #ff6f61; font-weight: bold;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </h1>
+            <h2 style="margin-bottom: 20px;">Đã xảy ra lỗi!</h2>
+            <p class="mb-4">
+                Có lỗi không xác định đã xảy ra.<br>
+                Vui lòng thử lại sau hoặc liên hệ quản trị viên nếu sự cố tiếp tục.
+            </p>
+            <a href="/" class="btn btn-primary" style="padding: 10px 30px; font-size: 1.2rem;">
+                <i class="fas fa-home"></i> Về trang chủ
+            </a>
+        </div>
+    </div>
+</body>
+</html>

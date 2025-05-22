@@ -17,11 +17,11 @@ public class Address {
     private String addressLine2;
 
 
-    @Column(name = "ward")
+    @Column(name = "ward", nullable = false)
     private String ward;
 
 
-    @Column(name = "city")
+    @Column(name = "city", nullable = false)
     private String city;
     
     public Address() {

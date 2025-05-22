@@ -1,0 +1,247 @@
+/* Styles cho trang chi tiết sản phẩm */
+
+/* Container chính */
+.product-details {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    border: none;
+}
+
+/* Header của sản phẩm */
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.product-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.product-price {
+    font-size: 22px;
+    font-weight: 600;
+    color: #e53935;
+}
+
+/* Container ảnh sản phẩm */
+.product-image-container {
+    text-align: center;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.product-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.02);
+}
+
+/* Thông tin chi tiết sản phẩm */
+.product-info {
+    padding: 10px 0;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.product-description {
+    color: #555;
+    line-height: 1.6;
+}
+
+.product-restaurant-address {
+    color: #666;
+    font-style: italic;
+}
+
+/* Rating */
+.product-rating {
+    display: flex;
+    align-items: center;
+}
+
+.stars {
+    color: #ffc107;
+    margin-right: 10px;
+}
+
+.rating-value {
+    color: #666;
+}
+
+/* Feedback */
+.feedback-list {
+    padding-left: 20px;
+}
+
+.feedback-list li {
+    margin-bottom: 8px;
+    color: #555;
+}
+
+/* Related products */
+.related-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.related-product-item {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.related-product-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.related-product-item a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.related-product-info {
+    padding: 10px;
+    background-color: #fff;
+}
+
+.related-product-info h6 {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.related-product-info span {
+    font-size: 13px;
+    color: #e53935;
+    font-weight: 600;
+    display: block;
+    margin-top: 5px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .col-lg-4 {
+        margin-top: 25px;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .product-price {
+        margin-top: 10px;
+    }
+    
+    .related-products {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Thiết kế cho thông tin giao hàng */
+.card {
+    border-radius: 8px;
+    border: none;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 15px 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Nút đặt hàng và thêm địa chỉ */
+.btn-info {
+    background-color: #00c9a7;
+    border: none;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+    color: #212529;
+}
+
+.btn-info:hover {
+    background-color: #00b396;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+/* Form input */
+.form-control {
+    border-radius: 6px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+}
+
+.form-control:focus {
+    border-color: #00c9a7;
+    box-shadow: 0 0 0 0.25rem rgba(0, 201, 167, 0.25);
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 10px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 15px 20px;
+}
+
+.modal-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 15px 20px;
+}
+
+/* Nút trong modal */
+.modal-footer .btn-secondary {
+    background-color: #f2f2f2;
+    color: #333;
+    border: none;
+}
+
+.modal-footer .btn-primary {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: #e0a800;
+}

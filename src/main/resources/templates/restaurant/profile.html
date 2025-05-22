@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+
+<head>
+    <title>Chi tiết nhà hàng</title>
+    
+    <!-- CSS cho trang này -->
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/restaurant/profile.css}">
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Main Content - chiếm toàn bộ không gian -->
+    <div class="content-container p-4">
+        <!-- Thông tin nhà hàng -->
+        <div class="restaurant-info-card">
+            <!-- Ảnh nhà hàng -->
+            <img th:if="${restaurant != null}" th:src="${restaurant.backgroundUrl}" alt="Hình ảnh nhà hàng" class="restaurant-image">
+            <div class="restaurant-details" th:if="${restaurant != null}">
+                <!-- Tên nhà hàng -->
+                <h1 class="restaurant-name" th:text="${restaurant.restaurantName}">Nhà hàng ngon nhất Đà Nẵng</h1>
+                
+                <!-- Mô tả nhà hàng -->
+                <p class="restaurant-description" th:text="${restaurant.description}">
+                    Nhà hàng phục vụ các món ăn đặc sản với hương vị truyền thống. Thực đơn đa dạng từ các món khai vị đến món tráng miệng, đáp ứng mọi nhu cầu của thực khách.
+                </p>
+            </div>
+        </div>
+
+        <!-- Danh sách chi nhánh -->
+        <h3 class="section-title">Các chi nhánh</h3>
+        
+        <!-- Nút thêm chi nhánh -->
+        <div class="text-end mb-4" th:if="${session.role != null && session.role == 'restaurant' && isOwner != null && isOwner}">
+            <button class="add-branch-btn" data-bs-toggle="modal" data-bs-target="#addBranchModal">
+                <i class="fas fa-plus me-2"></i>Thêm chi nhánh mới
+            </button>
+        </div>
+        
+        <!-- Danh sách chi nhánh -->
+        <div class="branches-list" id="branchesList">
+            <!-- Branches will be rendered here by JS -->
+        </div>
+        <div id="branchesPaging" class="mt-3"></div>
+
+        <!-- Modal thêm/sửa chi nhánh -->
+        <div class="modal fade" id="addBranchModal" tabindex="-1" aria-labelledby="addBranchModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBranchModalLabel">Thêm chi nhánh mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addBranchForm">
+                            <input type="hidden" id="branchId" name="branchId" value="">
+                            <div class="mb-3">
+                                <label for="branchName" class="form-label">Tên chi nhánh</label>
+                                <input type="text" class="form-control" id="branchName" name="branchName" placeholder="Chi nhánh Trung tâm">
+                            </div>
+                            <div class="mb-3">
+                                <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="0123456789">
+                            </div>
+                            <div class="mb-3">
+                                <label for="startTime" class="form-label">Giờ mở cửa</label>
+                                <input type="time" class="form-control" id="startTime" name="startTime" placeholder="08:00">
+                            </div>
+                            <div class="mb-3">
+                                <label for="endTime" class="form-label">Giờ đóng cửa</label>
+                                <input type="time" class="form-control" id="endTime" name="endTime" placeholder="22:00">
+                            </div>
+                            <div class="mb-3">
+                                <label for="addressLine1" class="form-label">Address Line 1 (Số nhà, đường)</label>
+                                <input type="text" class="form-control" id="addressLine1" name="addressLine1" placeholder="123 Lê Lợi">
+                            </div>
+                            <div class="mb-3">
+                                <label for="addressLine2" class="form-label">Address Line 2 (Tòa nhà, lầu)</label>
+                                <input type="text" class="form-control" id="addressLine2" name="addressLine2" placeholder="">
+                            </div>
+                            <div class="mb-3">
+                                <label for="ward" class="form-label">Phường/Xã</label>
+                                <input type="text" class="form-control" id="ward" name="ward" placeholder="Hòa Khánh">
+                            </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">Thành phố</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="Đà Nẵng">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary" id="saveBranchBtn">Lưu chi nhánh</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast thông báo -->
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 2000">
+            <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto" id="toastTitle">Thông báo</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" id="toastMessage"></div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const restaurantId = [[${restaurant.restaurantId}]];
+            const userRole = [[${session.role}]];
+            const isOwner = [[${isOwner}]];
+
+            const notificationToast = new bootstrap.Toast(document.getElementById('notificationToast'));
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const addBranchForm = document.getElementById('addBranchForm');
+            const addBranchModalEl = document.getElementById('addBranchModal');
+            const addBranchModal = new bootstrap.Modal(addBranchModalEl);
+            const branchesList = document.getElementById('branchesList');
+            const saveBranchBtn = document.getElementById('saveBranchBtn');
+
+            function toastError(msg = 'Vui lòng điền đầy đủ thông tin chi nhánh') {
+                toastTitle.textContent = 'Lỗi';
+                toastTitle.className = 'me-auto text-danger';
+                toastMessage.textContent = msg;
+                notificationToast.show();
+            }
+
+            function toastSuccess(msg = 'Đã thêm chi nhánh mới thành công!') {
+                toastTitle.textContent = 'Thành công';
+                toastTitle.className = 'me-auto text-success';
+                toastMessage.textContent = msg;
+                notificationToast.show();
+            }
+
+            // Render branches
+            function renderBranches(data) {
+                const branches = data.branches || [];
+                const totalPages = data.totalPages || 1;
+                const currentPage = data.page || 1;
+
+                // Render branch list (same as before)
+                if (!branches.length) {
+                    branchesList.innerHTML = `<div class="text-center text-muted">Chưa có chi nhánh nào cho nhà hàng này.</div>`;
+                } else {
+                    branchesList.innerHTML = branches.map(branch => `
+                        <div class="branch-item d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <div class="branch-name fw-bold">${branch.branchName}</div>
+                                    <div class="branch-address text-muted">
+                                        ${[branch.addressLine2, branch.addressLine1, branch.ward, branch.city].filter(Boolean).join(', ') || 'Không có địa chỉ'}
+                                    </div>
+                                    <div class="branch-meta mt-1 small text-secondary">
+                                        <div>Số điện thoại: ${branch.phoneNumber || 'Chưa cập nhật'}</div>
+                                        <div>Giờ mở cửa: 
+                                            ${branch.startTime ? branch.startTime : '??'} - 
+                                            ${branch.endTime ? branch.endTime : '??'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                ${
+                                    userRole === 'restaurant' && isOwner
+                                    ? `
+                                        <button class="btn btn-sm btn-outline-primary me-2 update-branch-btn" data-id="${branch.branchId}" title="Cập nhật">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-branch-btn" data-id="${branch.branchId}" title="Xóa">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    `
+                                    : ''
+                                }
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Render paging navigator
+                let pagingHtml = '';
+                if (totalPages > 1) {
+                    pagingHtml = `<nav><ul class="pagination justify-content-center">`;
+                    for (let i = 1; i <= totalPages; i++) {
+                        pagingHtml += `
+                            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                <a class="page-link branch-page-link" href="#" data-page="${i}">${i}</a>
+                            </li>
+                        `;
+                    }
+                    pagingHtml += `</ul></nav>`;
+                }
+                document.getElementById('branchesPaging').innerHTML = pagingHtml;
+            }
+            // Load branches from API
+            function loadBranches(page = 1) {
+            fetch(`/api/restaurant/${restaurantId}/branches?page=${page}&size=5`)
+                .then(res => res.json())
+                .then(renderBranches)
+                .catch(err => {
+                    console.error('Error loading branches:', err);
+                    toastError('Không thể tải danh sách chi nhánh!');
+                });
+        }
+
+            // Reset form
+            function resetForm() {
+                addBranchForm.reset();
+                addBranchForm.branchId.value = '';
+                document.getElementById('addBranchModalLabel').textContent = 'Thêm chi nhánh mới';
+                saveBranchBtn.textContent = 'Lưu chi nhánh';
+            }
+
+            // Show modal for update
+            branchesList.addEventListener('click', function(e) {
+                if (e.target.closest('.update-branch-btn')) {
+                    const branchId = e.target.closest('.update-branch-btn').dataset.id;
+                    fetch(`/api/restaurant/branch/${branchId}`)
+                        .then(res => res.json())
+                        .then(branch => {
+                            if (branch) {
+                                addBranchForm.branchId.value = branch.branchId;
+                                addBranchForm.branchName.value = branch.branchName;
+                                addBranchForm.phoneNumber.value = branch.phoneNumber || '';
+                                addBranchForm.startTime.value = branch.startTime || '';
+                                addBranchForm.endTime.value = branch.endTime || '';
+                                addBranchForm.addressLine1.value = branch.addressLine1 || '';
+                                addBranchForm.addressLine2.value = branch.addressLine2 || '';
+                                addBranchForm.ward.value = branch.ward || '';
+                                addBranchForm.city.value = branch.city || '';
+                                document.getElementById('addBranchModalLabel').textContent = 'Cập nhật chi nhánh';
+                                saveBranchBtn.textContent = 'Cập nhật';
+                                addBranchModal.show();
+                            }
+                        });
+                }
+                // Delete branch
+                if (e.target.closest('.delete-branch-btn')) {
+                    const branchId = e.target.closest('.delete-branch-btn').dataset.id;
+                    if (confirm('Bạn có chắc chắn muốn xóa chi nhánh này?')) {
+                        fetch(`/api/restaurant/branch/${branchId}`, { method: 'DELETE' })
+                            .then(res => {
+                                if (!res.ok) throw new Error();
+                                toastSuccess('Đã xóa chi nhánh thành công!');
+                                loadBranches();
+                            })
+                            .catch(() => toastError('Không thể xóa chi nhánh!'));
+                    }
+                }
+            });
+
+            // Handle add/update branch form submit
+            addBranchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(addBranchForm);
+                const branchId = formData.get('branchId');
+                const url = branchId
+                    ? `/api/restaurant/branch/${branchId}`
+                    : '/api/restaurant/addBranch';
+                const method = branchId ? 'PUT' : 'POST';
+
+                // Validate
+                if (
+                    !formData.get('branchName')?.trim() ||
+                    !formData.get('ward')?.trim() ||
+                    !formData.get('city')?.trim()
+                ) {
+                    toastError();
+                    return;
+                }
+
+                fetch(url, {
+                    method: method,
+                    body: new URLSearchParams(formData),
+                    headers: { 'Accept': 'application/json' }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
+                .then(data => {
+                    addBranchModal.hide();
+                    toastSuccess(branchId ? 'Cập nhật chi nhánh thành công!' : 'Đã thêm chi nhánh mới thành công!');
+                    loadBranches();
+                    resetForm();
+                })
+                .catch(() => toastError(branchId ? 'Không thể cập nhật chi nhánh!' : 'Không thể thêm chi nhánh!'));
+            });
+
+            // Reset form when opening modal for add
+            const addBranchBtn = document.querySelector('.add-branch-btn');
+            if (addBranchBtn)
+                addBranchBtn.addEventListener('click', function() {
+                    resetForm();
+                });
+
+            document.getElementById('branchesPaging').addEventListener('click', function(e) {
+                if (e.target.classList.contains('branch-page-link')) {
+                    e.preventDefault();
+                    const page = parseInt(e.target.dataset.page);
+                    loadBranches(page);
+                }
+            });
+
+            // Initial load
+            loadBranches();
+        });
+        </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+<head>
+    <title>404 - Không tìm thấy trang</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container text-center" style="padding: 60px 0;">
+            <h1 style="font-size: 6rem; color: #ff6f61; font-weight: bold;">404</h1>
+            <h2 style="margin-bottom: 20px;">Không tìm thấy trang</h2>
+            <p class="mb-4">Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.</p>
+            <p th:text="${message}" class="mb-4"></p>
+            <a href="/" class="btn btn-primary" style="padding: 10px 30px; font-size: 1.2rem;">
+                <i class="fas fa-home"></i> Về trang chủ
+            </a>
+        </div>
+    </div>
+</body>
+</html>
