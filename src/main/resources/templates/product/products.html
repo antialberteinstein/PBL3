@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+<head>
+    <title>Sản phẩm - Shoppie Food</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container mt-4">
+            <h2 class="section-title">Tất cả món ăn</h2>
+            
+            <!-- Filter options -->
+            <div class="filter-options mb-4">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="categoryFilter">
+                            <option value="">Tất cả danh mục</option>
+                            <option value="1">Món chính</option>
+                            <option value="2">Tráng miệng</option>
+                            <option value="3">Đồ uống</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="priceFilter">
+                            <option value="">Giá</option>
+                            <option value="1">Dưới 30,000đ</option>
+                            <option value="2">30,000đ - 50,000đ</option>
+                            <option value="3">50,000đ - 100,000đ</option>
+                            <option value="4">Trên 100,000đ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="sortOrder">
+                            <option value="">Sắp xếp</option>
+                            <option value="price_asc">Giá: thấp đến cao</option>
+                            <option value="price_desc">Giá: cao đến thấp</option>
+                            <option value="popularity">Phổ biến nhất</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product grid -->
+            <div class="food-grid">
+                <!-- Sản phẩm 1 -->
+                <div class="food-card">
+                    <img src="/images/Food/bundau.png" alt="Bún đậu mắm tôm" class="food-image">
+                    <div class="food-info">
+                        <h3 class="food-name">Bún đậu mắm tôm</h3>
+                        <p class="food-price">30,000 đ</p>
+                        <p class="food-restaurant">Nhà hàng ABC</p>
+                        <button class="btn-add-to-cart" onclick="addToCart(1, 'Bún đậu mắm tôm', 30000, '/images/Food/bundau.png', 'Nhà hàng ABC')">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sản phẩm 2 -->
+                <div class="food-card">
+                    <img src="/images/Food/bundau.png" alt="Phở bò" class="food-image">
+                    <div class="food-info">
+                        <h3 class="food-name">Phở bò</h3>
+                        <p class="food-price">40,000 đ</p>
+                        <p class="food-restaurant">Phở 24</p>
+                        <button class="btn-add-to-cart" onclick="addToCart(2, 'Phở bò', 40000, '/images/Food/bundau.png', 'Phở 24')">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sản phẩm 3 -->
+                <div class="food-card">
+                    <img src="/images/Food/bundau.png" alt="Bánh mì thịt" class="food-image">
+                    <div class="food-info">
+                        <h3 class="food-name">Bánh mì thịt</h3>
+                        <p class="food-price">20,000 đ</p>
+                        <p class="food-restaurant">Bánh mì Phượng</p>
+                        <button class="btn-add-to-cart" onclick="addToCart(3, 'Bánh mì thịt', 20000, '/images/Food/bundau.png', 'Bánh mì Phượng')">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sản phẩm 4 -->
+                <div class="food-card">
+                    <img src="/images/Food/bundau.png" alt="Cơm gà xối mỡ" class="food-image">
+                    <div class="food-info">
+                        <h3 class="food-name">Cơm gà xối mỡ</h3>
+                        <p class="food-price">35,000 đ</p>
+                        <p class="food-restaurant">Cơm gà A Hai</p>
+                        <button class="btn-add-to-cart" onclick="addToCart(4, 'Cơm gà xối mỡ', 35000, '/images/Food/bundau.png', 'Cơm gà A Hai')">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

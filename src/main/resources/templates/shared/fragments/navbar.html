@@ -33,10 +33,12 @@
                 
                 <!-- Right side items -->
                 <ul class="navbar-nav">
-                    <li class="nav-item" th:if="${session.role == 'user'}">
-                        <a class="nav-link" href="/user/cart">
-                            <i class="fas fa-shopping-cart"></i>
-                        </a>
+                    <!-- Thay thế liên kết giỏ hàng bằng phần tử div chứa cart fragment -->
+                    <li class="nav-item" >
+                        <div class="nav-link" style="cursor: pointer;">
+                            <!-- Nhúng fragment cart vào đây -->
+                            <div th:replace="~{shared/fragments/cart :: cart}"></div>
+                        </div>
                     </li>
                     <li class="nav-item" th:if="${session.user == null}">
                         <a class="nav-link" href="/auth/login">Đăng nhập</a>
