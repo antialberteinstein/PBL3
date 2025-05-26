@@ -58,6 +58,31 @@ public class RestaurantService {
         return restaurantRepository.save(restaurant);
     }
 
+    public Restaurant update(
+        int id,
+        String name,
+        String description,
+        String backgroundUrl
+    ) {
+        if (id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID nhà hàng không hợp lệ");
+        }
+
+        Restaurant restaurant = restaurantRepository.findByRestaurantId(id);
+        if (restaurant == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhà hàng");
+        }
+
+        validateRestaurant(name, description, restaurant.getSeller());
+
+        restaurant.setRestaurantName(name);
+        restaurant.setDescription(description);
+        if (backgroundUrl != null && !backgroundUrl.trim().isEmpty()) {
+            restaurant.setBackgroundUrl(backgroundUrl);
+        }
+        return restaurantRepository.save(restaurant);
+    }
+
     public Branch createBranch(
         Restaurant restaurant,
         String branchName,
