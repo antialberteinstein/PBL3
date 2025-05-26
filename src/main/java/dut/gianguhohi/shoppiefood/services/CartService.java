@@ -9,6 +9,9 @@ import dut.gianguhohi.shoppiefood.repositories.Orders.CartItemRepository;
 import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.models.Product.Product;
 import dut.gianguhohi.shoppiefood.utils.AppServiceException;
+import dut.gianguhohi.shoppiefood.repositories.Products.ProductRepository;
+import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
+import dut.gianguhohi.shoppiefood.repositories.Users.RestaurantRepository;
 
 @Transactional
 @Service
@@ -16,6 +19,12 @@ public class CartService {
 
     @Autowired
     private CartItemRepository cartItemRepository;
+    
+    @Autowired
+    private ProductRepository productRepository;
+    
+    @Autowired
+    private RestaurantRepository restaurantRepository;
 
     public List<CartItem> getCartItemsByUser(User user) {
         validateUser(user);
@@ -83,5 +92,15 @@ public class CartService {
         if (cartItem == null) {
             throw new AppServiceException("CartItem không hợp lệ");
         }
+    }
+
+    public Object getCartItems() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCartItems'");
+    }
+
+    public Object getTotalAmount() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTotalAmount'");
     }
 }

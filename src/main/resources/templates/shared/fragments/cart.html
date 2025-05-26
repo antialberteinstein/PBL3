@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Cart Fragment - có thể được sử dụng trên mọi trang -->
+    <div th:fragment="cart">
+        <!-- Cart Toggle Button -->
+        <div class="cart-toggle" id="cartToggle">
+            <svg class="cart-icon" viewBox="0 0 24 24">
+                <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+            <span class="cart-badge">0</span>
+        </div>
+
+        <!-- Cart overlay -->
+        <div class="cart-overlay" id="cartOverlay"></div>
+
+        <!-- Cart Popup -->
+        <div class="cart-popup" id="cartPopup">
+            <div class="cart-header">
+                <h3 class="cart-title">Giỏ hàng</h3>
+                <button class="cart-close" id="cartClose" type="button">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="cart-body">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Tổng cộng:</span>
+                    <span>0 đ</span>
+                </div>
+                <div class="cart-actions">
+                    <button type="button" class="btn btn-secondary" id="hideCart">Ẩn giỏ hàng</button>
+                    <button type="button" class="btn btn-checkout" id="checkoutBtn">Đặt hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

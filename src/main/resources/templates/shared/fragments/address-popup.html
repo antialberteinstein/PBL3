@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="address-popup">
+        <!-- Modal overlay -->
+        <div id="addressPopup" class="modal-overlay">
+            <!-- Address popup container -->
+            <div class="address-popup">
+                <div class="popup-header">
+                    <h3>Chọn địa chỉ giao hàng</h3>
+                    <button id="addressClose" class="popup-close-btn" type="button">&times;</button>
+                </div>
+                
+                <div class="popup-body">
+                    <!-- Danh sách địa chỉ đã lưu -->
+                    <div class="saved-addresses">
+                        <div class="address-item selected">
+                            <div class="address-radio">
+                                <input type="radio" name="selectedAddress" id="address1" value="1" checked>
+                                <label for="address1"></label>
+                            </div>
+                            <div class="address-content">
+                                <div class="address-info">
+                                    <div class="address-name">Nhà riêng</div>
+                                    <div class="address-user">Nguyễn Văn A | 0912345678</div>
+                                    <div class="address-text">123 Nguyễn Văn Linh, Quận Hải Châu, Đà Nẵng</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="address-item">
+                            <div class="address-radio">
+                                <input type="radio" name="selectedAddress" id="address2" value="2">
+                                <label for="address2"></label>
+                            </div>
+                            <div class="address-content">
+                                <div class="address-info">
+                                    <div class="address-name">Công ty</div>
+                                    <div class="address-user">Nguyễn Văn A | 0912345678</div>
+                                    <div class="address-text">456 Trần Phú, Quận Thanh Khê, Đà Nẵng</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="address-item">
+                            <div class="address-radio">
+                                <input type="radio" name="selectedAddress" id="address3" value="3">
+                                <label for="address3"></label>
+                            </div>
+                            <div class="address-content">
+                                <div class="address-info">
+                                    <div class="address-name">Trường học</div>
+                                    <div class="address-user">Nguyễn Văn A | 0912345678</div>
+                                    <div class="address-text">54 Nguyễn Lương Bằng, Liên Chiểu, Đà Nẵng</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nút thêm địa chỉ mới -->
+                    <div class="add-new-address">
+                        <button type="button" class="btn-add-address">
+                            <i class="fas fa-plus-circle"></i> Thêm địa chỉ mới
+                        </button>
+                    </div>
+                    
+                    <!-- Ghi chú đơn hàng -->
+                    <div class="form-group">
+                        <label for="note">Ghi chú đơn hàng (tùy chọn)</label>
+                        <textarea id="note" class="form-control" rows="2" placeholder="Ghi chú cho người giao hàng"></textarea>
+                    </div>
+                </div>
+                
+                <div class="address-action-buttons">
+                    <button type="button" class="btn-secondary" id="cancelAddress">Hủy</button>
+                    <button type="button" class="btn-primary" id="confirmAddress">Xác nhận đặt hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
