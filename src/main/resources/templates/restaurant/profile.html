@@ -659,6 +659,10 @@
                     })
                     .then(res => res.ok ? res.text() : Promise.reject())
                     .then(url => {
+                        // Xóa ảnh cũ nếu có
+                        if (oldImageUrl) {
+                            fetch('/api/image/delete?path=' + encodeURIComponent(oldImageUrl), { method: 'DELETE' }).catch(() => {});
+                        }
                         doSubmit(url.replace(/"/g, ''));
                     })
                     .catch(() => {
