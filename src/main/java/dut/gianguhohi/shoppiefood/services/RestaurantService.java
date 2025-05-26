@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import dut.gianguhohi.shoppiefood.repositories.Products.ProductRepository;
+import dut.gianguhohi.shoppiefood.models.Product.Product;
 
 @Transactional
 @Service
@@ -31,8 +33,20 @@ public class RestaurantService {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAll();
+    }
+
+    public Page<Product> getProductsByRestaurant(Restaurant restaurant, int page, int size) {
+        if (restaurant == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nhà hàng không hợp lệ");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findByRestaurant(restaurant, pageable);
     }
 
     public List<Restaurant> getBySeller(User seller) {

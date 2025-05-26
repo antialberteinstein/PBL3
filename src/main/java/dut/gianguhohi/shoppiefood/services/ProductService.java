@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import dut.gianguhohi.shoppiefood.repositories.Products.ProductRepository;
 import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.models.Product.Product;
-import dut.gianguhohi.shoppiefood.models.Product.Category;
 import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.utils.AppServiceException;
@@ -13,6 +12,8 @@ import dut.gianguhohi.shoppiefood.utils.AppServiceException;
 @Transactional
 @Service
 public class ProductService {
+
+    private static final int MAX_CATEGORIES = 3;
 
     @Autowired
     private ProductRepository productRepository;
@@ -27,9 +28,6 @@ public class ProductService {
     }
 
     public Product readById(int id) {
-        if (id <= 0) {
-            throw new AppServiceException("ID sản phẩm không hợp lệ");
-        }
         Product product = productRepository.findByProductId(id);
         if (product == null) {
             throw new AppServiceException("Không tìm thấy sản phẩm");
@@ -39,48 +37,115 @@ public class ProductService {
 
     public Product create(
         Restaurant restaurant,
-        Category category,
         String imageUrl,
         String name,
         String description,
         long price,
-        float rating
+        List<String> categories,
+        long remainingQuantity
     ) {
-        validateProduct(restaurant, category, name, description, price);
+        validateProduct(restaurant, name, description, price);
+        if (categories == null) {
+            categories = List.of(); // Default to empty list if null
+        }
+        if (categories.size() > MAX_CATEGORIES) {
+            throw new AppServiceException("Số lượng danh mục không hợp lệ, tối đa là " + MAX_CATEGORIES);
+        }
+
+        if (remainingQuantity < 0) {
+            throw new AppServiceException("Số lượng sản phẩm không hợp lệ");
+        }
 
         // Optional: Check for duplicate product name in the same restaurant
         if (productRepository.existsByNameAndRestaurant(name, restaurant)) {
             throw new AppServiceException("Sản phẩm với tên này đã tồn tại trong nhà hàng");
         }
 
-        Product product = new Product(restaurant, category, imageUrl, name, description, price, rating);
+        float rating = 0.0f; // Default rating for new products
+        long ratingNumber = 0; // Default rating number for new products
+
+        Product product = new Product(restaurant, imageUrl, name, description, price, rating, ratingNumber, categories, remainingQuantity);
+        product.setAllow(true); // Assuming new products are allowed by default
         return productRepository.save(product);
     }
 
     public Product update(
         int id,
         Restaurant restaurant,
-        Category category,
         String imageUrl,
         String name,
         String description,
-        long price,
-        float rating,
-        boolean isAvailable
+        long price
     ) {
         Product existingProduct = readById(id);
-        validateProduct(restaurant, category, name, description, price);
+        validateProduct(restaurant, name, description, price);
 
         existingProduct.setRestaurant(restaurant);
-        existingProduct.setCategory(category);
         existingProduct.setImageUrl(imageUrl);
         existingProduct.setName(name);
         existingProduct.setDescription(description);
         existingProduct.setPrice(price);
-        existingProduct.setRating(rating);
-        existingProduct.setAvailable(isAvailable);
 
         return productRepository.save(existingProduct);
+    }
+
+    public float rate(int id, int rating) {
+        if (rating < 1 || rating > 5) {
+            throw new AppServiceException("Đánh giá phải từ 1 đến 5 sao");
+        }
+
+        Product product = readById(id);
+        float currentRating = product.getRating();
+        long ratingCount = product.getRatingNumber();
+
+        // Calculate new rating
+        float newRating = ((currentRating * ratingCount) + rating) / (ratingCount + 1);
+        product.setRating(newRating);
+        product.setRatingNumber(ratingCount + 1);
+
+        productRepository.save(product);
+        return newRating;
+    }
+
+    public void disable(int id) {
+        Product product = readById(id);
+        product.setAllow(false);
+        productRepository.save(product);
+    }
+
+    public void changeQuantity(int id, long newQuantity) {
+        Product product = readById(id);
+        if (newQuantity < 0) {
+            throw new AppServiceException("Số lượng sản phẩm không hợp lệ");
+        }
+        product.setRemainingQuantity(newQuantity);
+        productRepository.save(product);
+    }
+
+    public void enable(int id) {
+        Product product = readById(id);
+        product.setAllow(true);
+        productRepository.save(product);
+    }
+
+    public void addCategory(int id, String category) {
+        Product product = readById(id);
+        if (product.getCategories().size() >= MAX_CATEGORIES) {
+            throw new AppServiceException("Sản phẩm đã có đủ danh mục");
+        }
+        if (category == null || category.trim().isEmpty()) {
+            throw new AppServiceException("Danh mục không được để trống");
+        }
+        product.getCategories().add(category);
+        productRepository.save(product);
+    }
+
+    public void removeCategory(int id, String category) {
+        Product product = readById(id);
+        if (!product.getCategories().remove(category)) {
+            throw new AppServiceException("Danh mục không tồn tại trong sản phẩm");
+        }
+        productRepository.save(product);
     }
 
     public void delete(int id) {
@@ -89,12 +154,9 @@ public class ProductService {
     }
 
     /* Validation phase */
-    private void validateProduct(Restaurant restaurant, Category category, String name, String description, long price) {
+    private void validateProduct(Restaurant restaurant, String name, String description, long price) {
         if (restaurant == null) {
             throw new AppServiceException("Nhà hàng không hợp lệ");
-        }
-        if (category == null) {
-            throw new AppServiceException("Danh mục không hợp lệ");
         }
         if (name == null || name.trim().isEmpty()) {
             throw new AppServiceException("Tên sản phẩm không được để trống");
