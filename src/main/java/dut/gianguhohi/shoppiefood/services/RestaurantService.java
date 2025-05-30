@@ -13,7 +13,6 @@ import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.repositories.misc.AddressRepository;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +23,9 @@ import dut.gianguhohi.shoppiefood.models.Product.Product;
 @Service
 public class RestaurantService {
 
+    // ==========================
+    // == Repository Injection  ==
+    // ==========================
     @Autowired
     private RestaurantRepository restaurantRepository;
 
@@ -36,19 +38,19 @@ public class RestaurantService {
     @Autowired
     private ProductRepository productRepository;
 
+
+
+
+    // ==========================
+    // == Restaurant Methods   ==
+    // ==========================
+
+    // Get all restaurants
     public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAll();
     }
 
-    public Page<Product> getProductsByRestaurant(Restaurant restaurant, int page, int size) {
-        if (restaurant == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nhà hàng không hợp lệ");
-        }
-
-        Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findByRestaurant(restaurant, pageable);
-    }
-
+    // Get restaurant by seller
     public List<Restaurant> getBySeller(User seller) {
         if (seller == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Người bán không hợp lệ");
@@ -56,39 +58,32 @@ public class RestaurantService {
         return restaurantRepository.findBySeller(seller);
     }
 
-    public Page<Branch> getByRestaurant(Restaurant restaurant, int page, int size) {
-        if (restaurant == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nhà hàng không hợp lệ");
-        }
-
-        Pageable pageable = PageRequest.of(page, size);
-        return branchRepository.findByRestaurant(restaurant, pageable);
-    }
-
-    public Restaurant create(User seller, String name, String description) {
-        validateRestaurant(name, description, seller);
-
-        Restaurant restaurant = new Restaurant(name, description, seller);
-        return restaurantRepository.save(restaurant);
-    }
-
-    public Restaurant update(
-        int id,
-        String name,
-        String description,
-        String backgroundUrl
-    ) {
-        if (id <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID nhà hàng không hợp lệ");
-        }
-
+    // Get restaurant by id
+    public Restaurant readById(int id) {
         Restaurant restaurant = restaurantRepository.findByRestaurantId(id);
         if (restaurant == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhà hàng");
         }
+        return restaurant;
+    }
 
+    // Create new restaurant
+    public Restaurant create(User seller, String name, String description) {
+        validateRestaurant(name, description, seller);
+        Restaurant restaurant = new Restaurant(name, description, seller);
+        return restaurantRepository.save(restaurant);
+    }
+
+    // Update restaurant
+    public Restaurant update(int id, String name, String description, String backgroundUrl) {
+        if (id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID nhà hàng không hợp lệ");
+        }
+        Restaurant restaurant = restaurantRepository.findByRestaurantId(id);
+        if (restaurant == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhà hàng");
+        }
         validateRestaurant(name, description, restaurant.getSeller());
-
         restaurant.setRestaurantName(name);
         restaurant.setDescription(description);
         if (backgroundUrl != null && !backgroundUrl.trim().isEmpty()) {
@@ -97,6 +92,41 @@ public class RestaurantService {
         return restaurantRepository.save(restaurant);
     }
 
+
+
+
+
+    // ==========================
+    // == Product Methods      ==
+    // ==========================
+
+    // Get products by restaurant
+    public Page<Product> getProductsByRestaurant(Restaurant restaurant, int page, int size) {
+        if (restaurant == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nhà hàng không hợp lệ");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findByRestaurant(restaurant, pageable);
+    }
+
+
+
+
+
+    // ==========================
+    // == Branch Methods       ==
+    // ==========================
+
+    // Get branches by restaurant
+    public Page<Branch> getByRestaurant(Restaurant restaurant, int page, int size) {
+        if (restaurant == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nhà hàng không hợp lệ");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        return branchRepository.findByRestaurant(restaurant, pageable);
+    }
+
+    // Create new branch
     public Branch createBranch(
         Restaurant restaurant,
         String branchName,
@@ -123,6 +153,7 @@ public class RestaurantService {
         return branch;
     }
 
+    // Update branch
     public Branch updateBranch(
         Restaurant restaurant,
         int branchId,
@@ -142,7 +173,16 @@ public class RestaurantService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chi nhánh không tồn tại");
         }
 
-        Address address = new Address(addressLine1, addressLine2, ward, city);
+        Address address = branch.getAddress();
+        if (address == null) {
+            address = new Address(addressLine1, addressLine2, ward, city);
+        } else {
+            address.setAddressLine1(addressLine1);
+            address.setAddressLine2(addressLine2);
+            address.setWard(ward);
+            address.setCity(city);
+        }
+
         address = addressRepository.save(address);
 
         branch.setAddress(address);
@@ -153,26 +193,20 @@ public class RestaurantService {
         return branchRepository.save(branch);
     }
 
-    public void deleteBranch(Restaurant restaurant, int branchId) {
+    // Delete branch
+    public void deleteBranch(int branchId) {
         Branch branch = branchRepository.findByBranchId(branchId);
-        if (branch == null || branch.getRestaurant().getRestaurantId() != restaurant.getRestaurantId()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chi nhánh không tồn tại");
-        }
         Address address = branch.getAddress();
-        if (address != null) {
-            addressRepository.delete(address);
-        }
         branchRepository.delete(branch);
-    }
-
-    public Restaurant readById(int id) {
-        Restaurant restaurant = restaurantRepository.findByRestaurantId(id);
-        if (restaurant == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhà hàng");
+        if (address != null) {
+            Address existingAddress = addressRepository.findByAddressId(address.getAddressId());
+            if (existingAddress != null) {
+                addressRepository.delete(existingAddress);
+            }
         }
-        return restaurant;
     }
 
+    // Get branch by id
     public Branch readBranchById(int id) {
         Branch branch = branchRepository.findByBranchId(id);
         if (branch == null) {
@@ -181,7 +215,16 @@ public class RestaurantService {
         return branch;
     }
 
-    // Validation methods
+
+
+
+    
+
+    // ==========================
+    // == Validation Methods   ==
+    // ==========================
+
+    // Validate restaurant info
     private void validateRestaurant(String name, String description, User seller) {
         if (seller == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Người bán không hợp lệ");
@@ -197,6 +240,7 @@ public class RestaurantService {
         }
     }
 
+    // Validate branch info
     private void validateBranch(Restaurant restaurant, String branchName, String city, String ward) {
         if (restaurant == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nhà hàng không hợp lệ");
