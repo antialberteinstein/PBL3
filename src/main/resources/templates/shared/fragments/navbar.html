@@ -35,7 +35,7 @@
                 <ul class="navbar-nav">
                     <!-- Thay thế liên kết giỏ hàng bằng phần tử div chứa cart fragment -->
                     <li class="nav-item" >
-                        <div class="nav-link" style="cursor: pointer;">
+                        <div class="nav-link" style="cursor: pointer;" th:if="${session.role != null && session.role == 'user'}">
                             <!-- Nhúng fragment cart vào đây -->
                             <div th:replace="~{shared/fragments/cart :: cart}"></div>
                         </div>

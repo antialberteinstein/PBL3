@@ -55,12 +55,13 @@
 /* Cart popup - dạng notification */
 .cart-popup {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
+    top: 250px; /* hoặc top: 80px; tuỳ navbar của bạn */
+    right: -200px; /* hoặc 24px, tuỳ khoảng cách mong muốn */
+    transform: none;
     width: 450px;
     max-width: 90vw;
     max-height: 80vh;
+    height: 80vh; /* Thêm dòng này để đảm bảo chiều cao cố định */
     background-color: white;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
@@ -109,14 +110,13 @@
     justify-content: center;
 }
 
-/* Cart Body - cập nhật cho scrollable */
+/* Cart Body - chiếm hết phần còn lại */
 .cart-body {
-    flex: 1;
-    overflow-y: auto !important; /* Đảm bảo scroll luôn hiển thị khi cần */
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
     padding: 16px;
-    max-height: 300px !important; /* Giảm max-height để tạo scroll dễ hơn */
-    min-height: 150px !important; /* Có khoảng trống tối thiểu cho giỏ trống */
-    /* Thêm kiểu cho scrollbar các trình duyệt khác nhau */
+    min-height: 150px !important;
+    max-height: unset !important; /* Bỏ max-height nếu có */
 }
 
 /* Scrollbar cho Chrome, Edge, và Safari */
@@ -228,17 +228,16 @@
     margin: 0 4px;
 }
 
-/* Cart Footer - ghim ở dưới */
+/* Cart Footer - luôn ở đáy */
 .cart-footer {
     border-top: 1px solid #eee;
     padding: 16px;
-    position: sticky;
-    bottom: 0;
     background-color: white;
     z-index: 2;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+    /* Xóa position: sticky, bottom: 0; */
 }
 
 .cart-total {

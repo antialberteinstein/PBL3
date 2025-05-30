@@ -130,6 +130,8 @@
                     }
                 });
 
+                
+
                 // Prevent popup from closing when clicking inside
                 if (cartPopup) {
                     cartPopup.addEventListener('click', function(e) {
@@ -143,20 +145,20 @@
                 const addressClose = document.getElementById('addressClose');
                 const cancelAddress = document.getElementById('cancelAddress');
                 
+
+                
+
                 if (checkoutBtn && addressPopup) {
                     checkoutBtn.addEventListener('click', function(e) {
                         e.preventDefault();
-                        e.stopPropagation(); // Thêm dòng này
-                        console.log("Checkout button clicked");
-                        
+                        e.stopPropagation();
                         // Đóng cart popup
                         if (cartPopup) cartPopup.classList.remove('active');
                         if (cartOverlay) cartOverlay.classList.remove('active');
-                        
                         // Mở address popup
-                        addressPopup.classList.add('active'); // Đảm bảo thêm class active
+                        addressPopup.classList.add('active');
                         document.body.style.overflow = 'hidden';
-                        
+                        fetchAddresses(); // <-- GỌI NGAY Ở ĐÂY
                         return false;
                     });
                 }
@@ -190,22 +192,6 @@
                     closePopupX.addEventListener('click', function() {
                         addressPopup.classList.remove('active');
                         document.body.style.overflow = '';
-                    });
-                }
-                
-                // Xử lý chọn địa chỉ
-                const addressItems = document.querySelectorAll('.address-item');
-                if (addressItems && addressItems.length > 0) {
-                    addressItems.forEach(item => {
-                        item.addEventListener('click', function() {
-                            // Bỏ chọn tất cả các item
-                            addressItems.forEach(i => i.classList.remove('selected'));
-                            // Chọn item hiện tại
-                            this.classList.add('selected');
-                            // Chọn radio button tương ứng
-                            const radio = this.querySelector('input[type="radio"]');
-                            if (radio) radio.checked = true;
-                        });
                     });
                 }
                 
@@ -248,56 +234,207 @@
                         }
                     });
                 }
-                
-                // Xử lý thêm địa chỉ mới
-                const addAddressBtn = document.querySelector('.btn-add-address');
-                if (addAddressBtn) {
-                    addAddressBtn.addEventListener('click', function() {
-                        showToast('Chức năng thêm địa chỉ mới sẽ được phát triển sau');
-                    });
-                }
 
-                // Khởi tạo UI giỏ hàng
-                updateCartTotal();
                 updateCartUI();
             });
-            
-            // Dữ liệu giỏ hàng mẫu
-            let cartItems = [
-                {
-                    id: 1,
-                    name: 'Bún đậu mắm tôm',
-                    price: 30000,
-                    imageUrl: '/images/Food/bundau.png',
-                    restaurantName: 'Nhà hàng Cá chà bặc',
-                    quantity: 1
-                },
-                {
-                    id: 2,
-                    name: 'Bún măng gà',
-                    price: 25000,
-                    imageUrl: '/images/Food/bunmangga.png',
-                    restaurantName: 'Lá chà bồn',
-                    quantity: 3
-                },
-                {
-                    id: 3,
-                    name: 'Bún bò Huế',
-                    price: 45000,
-                    imageUrl: '/images/Food/bunbo.png',
-                    restaurantName: 'Cam mười tú',
-                    quantity: 2
+
+            // Hàm render danh sách địa chỉ
+            function renderAddresses(addresses) {
+                console.log("Rendered addresses:", addresses);
+                const container = document.getElementById('savedAddresses');
+                if (!container) return;
+                if (!addresses || addresses.length === 0) {
+                    container.innerHTML = `<div class="text-muted px-2 py-2">Bạn chưa có địa chỉ nào.</div>`;
+                    return;
                 }
-            ];
+                container.innerHTML = addresses.map((addr, idx) => `
+                    <div class="address-item${addr.default ? ' selected' : ''}">
+                        <div class="address-radio">
+                            <input type="radio" name="selectedAddress" id="address${addr.userAddressId}" value="${addr.userAddressId}" ${addr.default ? 'checked' : ''}>
+                            <label for="address${addr.userAddressId}"></label>
+                        </div>
+                        <div class="address-content">
+                            <div class="address-info">
+                                <div class="address-name">${addr.addressName || ''}${addr.default ? ' <span class="badge bg-success">Mặc định</span>' : ''}</div>
+                                <div class="address-user">${addr.note ? addr.note + ' | ' : ''}${addr.phoneNumber || ''}</div>
+                                <div class="address-text">${addr.fullAddress || ''}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-info ms-2 btn-edit-address" data-id="${addr.userAddressId}"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger ms-2 btn-delete-address" data-id="${addr.userAddressId}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `).join('');
+                // Gán sự kiện chọn address
+                document.querySelectorAll('.address-item').forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        if (e.target.classList.contains('btn-delete-address')) return; // Không trigger khi bấm xóa
+                        document.querySelectorAll('.address-item').forEach(i => i.classList.remove('selected'));
+                        this.classList.add('selected');
+                        const radio = this.querySelector('input[type="radio"]');
+                        if (radio) radio.checked = true;
+                    });
+                });
+                // Gán sự kiện xóa
+                document.querySelectorAll('.btn-delete-address').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = this.getAttribute('data-id');
+                        if (confirm('Bạn chắc chắn muốn xóa địa chỉ này?')) {
+                            fetch(`/api/user-addresses/${id}`, { method: 'DELETE' })
+                                .then(res => res.ok ? fetchAddresses() : alert('Không thể xóa địa chỉ!'));
+                        }
+                    });
+                });
 
-            let totalAmount = 0;
+                window.addressList = addresses;
+                document.querySelectorAll('.btn-edit-address').forEach(btn => {
+                    btn.onclick = function() {
+                        const id = this.getAttribute('data-id');
+                        const address = window.addressList.find(addr => addr.userAddressId == id);
+                        if (address) openEditAddressModal(address);
+                    };
+                });
 
+                // Thêm địa chỉ mới (ví dụ đơn giản, bạn có thể mở modal nhập form)
+                const btnAddAddress = document.getElementById('btnAddAddress');
+                if (btnAddAddress) {
+                    btnAddAddress.onclick = function() {
+                        console.log("Thêm địa chỉ mới được nhấn");
+                        const modalLabel = document.getElementById('addressEditModalLabel');
+                        const addressEditForm = document.getElementById('addressEditForm');
+                        const editAddressId = document.getElementById('editAddressId');
+                        const addressEditModal = document.getElementById('addressEditModal');
+                        if (modalLabel) modalLabel.textContent = 'Thêm địa chỉ mới';
+                        if (addressEditForm) addressEditForm.reset();
+                        if (editAddressId) editAddressId.value = '';
+                        if (addressEditModal) new bootstrap.Modal(addressEditModal).show();
+                        if (addressEditForm) {
+                            addressEditForm.onsubmit = function(e) {
+                                e.preventDefault();
+
+                                console.log("Form debugged!");
+
+                                const id = document.getElementById('editAddressId').value;
+                                const data = {
+                                    addressName: document.getElementById('editAddressName').value,
+                                    phoneNumber: document.getElementById('editPhoneNumber').value,
+                                    addressLine1: document.getElementById('editAddressLine1').value,
+                                    addressLine2: document.getElementById('editAddressLine2').value,
+                                    ward: document.getElementById('editWard').value,
+                                    city: document.getElementById('editCity').value,
+                                    note: document.getElementById('editNote').value
+                                };
+                                let url = `/api/user-addresses/add`;
+                                let method = 'POST';
+                                let params = new URLSearchParams({
+                                    addressName: document.getElementById('editAddressName').value,
+                                    phoneNumber: document.getElementById('editPhoneNumber').value,
+                                    addressLine1: document.getElementById('editAddressLine1').value,
+                                    addressLine2: document.getElementById('editAddressLine2').value,
+                                    ward: document.getElementById('editWard').value,
+                                    city: document.getElementById('editCity').value,
+                                    note: document.getElementById('editNote').value
+                                }).toString();
+
+                                if (id) {
+                                    url = `/api/user-addresses/update/${id}`;
+                                    method = 'POST';
+                                }
+
+                                fetch(url, {
+                                    method: method,
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: params
+                                })
+                                .then(res => res.ok ? fetchAddresses() : alert('Không thể lưu địa chỉ!'));
+                            };
+                        }
+                    };
+                }
+            }
+
+            function openEditAddressModal(address) {
+                const modalLabel = document.getElementById('addressEditModalLabel');
+                const editAddressId = document.getElementById('editAddressId');
+                const editAddressName = document.getElementById('editAddressName');
+                const editPhoneNumber = document.getElementById('editPhoneNumber');
+                const editAddressLine1 = document.getElementById('editAddressLine1');
+                const editAddressLine2 = document.getElementById('editAddressLine2');
+                const editWard = document.getElementById('editWard');
+                const editCity = document.getElementById('editCity');
+                const editNote = document.getElementById('editNote');
+                const addressEditModal = document.getElementById('addressEditModal');
+
+                if (modalLabel) modalLabel.textContent = 'Cập nhật địa chỉ';
+                if (editAddressId) editAddressId.value = address.userAddressId;
+                if (editAddressName) editAddressName.value = address.addressName || '';
+                if (editPhoneNumber) editPhoneNumber.value = address.phoneNumber || '';
+                if (editAddressLine1) editAddressLine1.value = address.addressLine1 || '';
+                if (editAddressLine2) editAddressLine2.value = address.addressLine2 || '';
+                if (editWard) editWard.value = address.ward || '';
+                if (editCity) editCity.value = address.city || '';
+                if (editNote) editNote.value = address.note || '';
+                if (addressEditModal) new bootstrap.Modal(addressEditModal).show();
+            }
+
+            // Hàm lấy danh sách địa chỉ
+            function fetchAddresses() {
+                fetch(`/api/user-addresses`)
+                    .then(res => res.json())
+                    .then(renderAddresses)
+                    .catch(() => {
+                        const container = document.getElementById('savedAddresses');
+                        if (container) container.innerHTML = '<div class="text-danger">Không thể tải địa chỉ.</div>';
+                    });
+            }
+            
             // Xử lý đặt hàng và hiện popup chọn địa chỉ
             function handleCheckout() {
                 console.log("Handle checkout called");
                 
-                // Lấy tham chiếu đến phần tử addressPopup
-                const addressPopup = document.getElementById('addressPopup');
+                
+            
+
+            
+
+            // Khi mở popup thì load lại địa chỉ
+            const addressPopup = document.getElementById('addressPopup');
+            if (addressPopup) {
+                addressPopup.addEventListener('transitionend', function() {
+                    if (addressPopup.classList.contains('active')) fetchAddresses();
+                });
+            }
+
+            // Khi xác nhận đặt hàng
+            document.getElementById('confirmAddress')?.addEventListener('click', function() {
+                const selected = document.querySelector('input[name="selectedAddress"]:checked');
+                const note = document.getElementById('note').value;
+                if (!selected) {
+                    alert('Vui lòng chọn địa chỉ giao hàng!');
+                    return;
+                }
+                const addressId = selected.value;
+                // TODO: Gửi addressId và note lên server khi đặt hàng
+                alert('Đặt hàng với địa chỉ ID: ' + addressId + '\nGhi chú: ' + note);
+                addressPopup.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Khi hủy
+            document.getElementById('cancelAddress')?.addEventListener('click', function() {
+                addressPopup.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Khi đóng popup
+            document.getElementById('addressClose')?.addEventListener('click', function() {
+                addressPopup.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Lần đầu load nếu popup đã mở
+            if (addressPopup && addressPopup.classList.contains('active')) fetchAddresses();
+
                 
                 // Kiểm tra xem phần tử có tồn tại không
                 if (addressPopup) {
@@ -315,204 +452,121 @@
                 return false; // Ngăn chặn chuyển hướng trang
             }
 
+            // Lấy giỏ hàng từ server
+            function fetchCart() {
+                fetch('/api/cart')
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        return res.json();
+                    })
+                    .then(updateCartUI)
+                    .catch(() => updateCartUI([]));
+            }
+
             // Thêm sản phẩm vào giỏ hàng
-            window.addToCart = function(foodId, name, price, imageUrl, restaurantName) {
-                // Kiểm tra xem sản phẩm đã tồn tại chưa
-                const existingItemIndex = cartItems.findIndex(item => item.id === foodId);
-                
-                if (existingItemIndex !== -1) {
-                    // Nếu đã có, tăng số lượng
-                    cartItems[existingItemIndex].quantity += 1;
-                } else {
-                    // Nếu chưa có, thêm mới
-                    cartItems.push({
-                        id: foodId,
-                        name: name,
-                        price: price,
-                        imageUrl: imageUrl || "/images/food-placeholder.jpg",
-                        restaurantName: restaurantName,
-                        quantity: 1
-                    });
-                }
-                
-                // Cập nhật giỏ hàng
-                updateCartTotal();
-                updateCartUI();
-                
-                // Hiển thị popup giỏ hàng
-                const cartPopup = document.getElementById('cartPopup');
-                const cartOverlay = document.getElementById('cartOverlay');
-                if (cartPopup && cartOverlay) {
-                    cartPopup.classList.add('active');
-                    cartOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-                
-                // Hiển thị thông báo
-                showToast('Đã thêm sản phẩm vào giỏ hàng!');
-                
-                return false; // Ngăn chặn chuyển hướng trang
+            window.addToCart = function(productId, name, price, imageUrl, restaurantName) {
+                fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `productId=${productId}&quantity=1`
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    showToast('Đã thêm sản phẩm vào giỏ hàng!');
+                    fetchCart();
+                })
+                .catch(() => showToast('Không thể thêm sản phẩm!', 'error'));
+            };
+
+            // Tăng số lượng
+            function increaseQuantity(cartItemId) {
+                changeQuantity(cartItemId, 1);
             }
 
-            // Tăng số lượng sản phẩm
-            function increaseQuantity(foodId) {
-                const item = cartItems.find(item => item.id === foodId);
-                if (item) {
-                    item.quantity += 1;
-                    updateCartTotal();
-                    updateCartUI();
-                }
-                return false;
+            // Giảm số lượng
+            function decreaseQuantity(cartItemId) {
+                changeQuantity(cartItemId, -1);
             }
 
-            // Giảm số lượng sản phẩm
-            function decreaseQuantity(foodId) {
-                const index = cartItems.findIndex(item => item.id === foodId);
-                if (index !== -1) {
-                    if (cartItems[index].quantity > 1) {
-                        cartItems[index].quantity -= 1;
-                    } else {
-                        // Nếu số lượng = 1, xóa khỏi giỏ hàng
-                        cartItems.splice(index, 1);
-                    }
-                    updateCartTotal();
-                    updateCartUI();
-                }
-                return false;
+            // Đổi số lượng (tăng/giảm)
+            function changeQuantity(cartItemId, delta) {
+                // Lấy số lượng hiện tại từ DOM
+                const quantityEl = document.querySelector(`#cart-quantity-${cartItemId}`);
+                let current = parseInt(quantityEl.textContent);
+                let newQuantity = current + delta;
+                if (newQuantity < 1) return;
+                fetch('/api/cart/change', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `cartItemId=${cartItemId}&quantity=${newQuantity}`
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    fetchCart();
+                })
+                .catch(() => showToast('Không thể cập nhật số lượng!', 'error'));
             }
 
             // Xóa sản phẩm khỏi giỏ hàng
-            function removeFromCart(foodId) {
-                cartItems = cartItems.filter(item => item.id !== foodId);
-                updateCartTotal();
-                updateCartUI();
-                return false;
-            }
-
-            // Xóa toàn bộ giỏ hàng
-            function clearCart() {
-                cartItems = [];
-                updateCartTotal();
-                updateCartUI();
-            }
-
-            // Tính tổng tiền giỏ hàng
-            function updateCartTotal() {
-                totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            function removeFromCart(cartItemId) {
+                fetch('/api/cart/remove?cartItemId=' + cartItemId, { method: 'DELETE' })
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        fetchCart();
+                    })
+                    .catch(() => showToast('Không thể xóa sản phẩm!', 'error'));
             }
 
             // Cập nhật giao diện giỏ hàng
-            function updateCartUI() {
-                // Cập nhật số lượng sản phẩm hiển thị trên icon giỏ hàng
+            function updateCartUI(cartItems) {
+                cartItems = cartItems || [];
+                // Cập nhật số lượng badge
                 const cartBadge = document.querySelector('.cart-badge');
                 if (cartBadge) {
                     cartBadge.textContent = cartItems.reduce((sum, item) => sum + item.quantity, 0);
                 }
-                
                 // Cập nhật nội dung giỏ hàng
                 const cartBody = document.querySelector('.cart-body');
                 if (cartBody) {
                     if (cartItems.length === 0) {
-                        // Hiển thị giỏ hàng trống
-                        cartBody.innerHTML = `
-                            <div class="empty-cart">
-                                <svg class="empty-cart-icon" viewBox="0 0 24 24">
-                                    <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                </svg>
-                                <p>Giỏ hàng của bạn đang trống</p>
-                            </div>
-                        `;
+                        cartBody.innerHTML = `<div class="empty-cart"><p>Giỏ hàng của bạn đang trống</p></div>`;
                     } else {
-                        // Hiển thị sản phẩm trong giỏ hàng
                         let cartItemsHTML = '';
-                        
-                        // Thêm các sản phẩm thực tế từ cartItems
                         cartItems.forEach(item => {
                             cartItemsHTML += `
                                 <div class="cart-item">
-                                    <img src="${item.imageUrl}" alt="${item.name}" class="item-image">
+                                    <img src="${item.productImageUrl}" alt="${item.productName}" class="item-image">
                                     <div class="item-details">
-                                        <div class="item-name">${item.name}</div>
-                                        <div class="item-price">${formatCurrency(item.price)} VNĐ</div>
-                                        <div class="item-restaurant">${item.restaurantName}</div>
+                                        <div class="item-name">${item.productName}</div>
+                                        <div class="item-price">${formatCurrency(item.productPrice)} VNĐ</div>
                                     </div>
                                     <div class="quantity-controls">
-                                        <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
-                                        <span class="quantity-display">${item.quantity}</span>
-                                        <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                                        <button class="quantity-btn" onclick="decreaseQuantity(${item.cartItemId})">-</button>
+                                        <span class="quantity-display" id="cart-quantity-${item.cartItemId}">${item.quantity}</span>
+                                        <button class="quantity-btn" onclick="increaseQuantity(${item.cartItemId})">+</button>
                                     </div>
-                                    <button class="remove-item-btn" onclick="removeFromCart(${item.id})">
+                                    <button class="remove-item-btn" onclick="removeFromCart(${item.cartItemId})">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             `;
                         });
-                        
-                        // Thêm sản phẩm giả nếu cần để tạo scrollbar (chỉ để test)
-                        // bỏ comment dòng dưới
-                        for (let i = 0; i < 10; i++) {
-                            cartItemsHTML += `
-                                <div class="cart-item">
-                                    <img src="/images/Food/bundau.png" alt="Test item ${i}" class="item-image">
-                                    <div class="item-details">
-                                        <div class="item-name">Test item ${i}</div>
-                                        <div class="item-price">20,000 VNĐ</div>
-                                        <div class="item-restaurant">Test restaurant</div>
-                                    </div>
-                                    <div class="quantity-controls">
-                                        <button class="quantity-btn">-</button>
-                                        <span class="quantity-display">1</span>
-                                        <button class="quantity-btn">+</button>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                        
                         cartBody.innerHTML = cartItemsHTML;
                     }
                 }
-                
-                // Cập nhật phần footer giỏ hàng
+                // Cập nhật tổng tiền
                 const cartFooter = document.querySelector('.cart-footer');
                 if (cartFooter) {
                     if (cartItems.length === 0) {
                         cartFooter.style.display = 'none';
                     } else {
                         cartFooter.style.display = 'block';
+                        const total = cartItems.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
                         const totalEl = cartFooter.querySelector('.cart-total span:last-child');
                         if (totalEl) {
-                            totalEl.textContent = `${formatCurrency(totalAmount)} VNĐ`;
+                            totalEl.textContent = `${formatCurrency(total)} VNĐ`;
                         }
                     }
-                }
-
-                // Thêm lại sự kiện click cho nút đặt hàng sau khi cập nhật UI
-                const checkoutBtn = document.getElementById('checkoutBtn');
-                if (checkoutBtn) {
-                    // Xóa tất cả event listener cũ
-                    const newCheckoutBtn = checkoutBtn.cloneNode(true);
-                    checkoutBtn.parentNode.replaceChild(newCheckoutBtn, checkoutBtn);
-                    
-                    // Thêm listener mới
-                    newCheckoutBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log("Checkout button clicked from updateCartUI");
-                        
-                        // Show address popup
-                        const addressPopup = document.getElementById('addressPopup');
-                        const cartPopup = document.getElementById('cartPopup');
-                        const cartOverlay = document.getElementById('cartOverlay');
-                        
-                        if (addressPopup) {
-                            addressPopup.classList.add('active');
-                            if (cartPopup) cartPopup.classList.remove('active');
-                            if (cartOverlay) cartOverlay.classList.remove('active');
-                            document.body.style.overflow = 'hidden';
-                        }
-                        
-                        return false;
-                    });
                 }
             }
 
@@ -548,6 +602,11 @@
                     }, 300);
                 }, 3000);
             }
+
+            fetchCart();
+
+            
+            
         </script>
         <th:block layout:fragment="script"></th:block>
     </body>

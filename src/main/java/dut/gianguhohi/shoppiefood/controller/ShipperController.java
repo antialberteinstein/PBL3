@@ -11,6 +11,8 @@ import dut.gianguhohi.shoppiefood.services.ShipperService;
 import dut.gianguhohi.shoppiefood.services.OrderService;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.Orders.Order;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @Controller
 public class ShipperController {
@@ -23,7 +25,19 @@ public class ShipperController {
 
     @GetMapping("/shipper/enter")
     public String enter(HttpSession session, Model model) {
-        // session.setAttribute("role", "shipper");
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+
+        Shipper shipper = shipperService.getShipperByUser(user);
+        if (shipper == null) {
+            return "redirect:/shipper/register";
+        }
+
+        session.setAttribute("shipper", shipper);
+        session.setAttribute("role", "shipper");
+
         return "redirect:/shipper/home";
     }
 
@@ -34,15 +48,16 @@ public class ShipperController {
 
     @GetMapping("/shipper/exit")
     public String exit(HttpSession session) {
-        // session.setAttribute("role", "user");
+        session.setAttribute("role", "user");
+        session.removeAttribute("shipper");
         return "redirect:/user/home";
     }
 
     @GetMapping("/shipper/home")
     public String home(HttpSession session, Model model) {
-
-        // For testing purposes
-        session.setAttribute("role", "shipper");
+        if (session.getAttribute("shipper") == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper không tồn tại");
+        }
 
         return "shipper/home";
     }

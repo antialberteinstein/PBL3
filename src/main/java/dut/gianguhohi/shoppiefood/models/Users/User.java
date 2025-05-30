@@ -2,7 +2,7 @@ package dut.gianguhohi.shoppiefood.models.Users;
 
 import jakarta.persistence.*;
 import java.util.List;
-import dut.gianguhohi.shoppiefood.models.misc.Address;
+import dut.gianguhohi.shoppiefood.models.misc.UserAddress;
 
 @Entity
 @Table(name = "users")
@@ -40,7 +40,7 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "address_id")
     )
-    private List<Address> addresses;
+    private List<UserAddress> addresses;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -92,12 +92,26 @@ public class User {
         this.avatarUrl = avatarUrl;
     }
     
-    public List<Address> getAddresses() {
+    public List<UserAddress> getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(List<Address> addresses) {
+    public void setAddresses(List<UserAddress> addresses) {
         this.addresses = addresses;
+    }
+
+    public void addAddress(UserAddress address) {
+        if (this.addresses == null) {
+            this.addresses = new java.util.ArrayList<>();
+        }
+        this.addresses.add(address);
+        address.setUser(this);
+    }
+
+    public void removeAddress(UserAddress address) {
+        if (this.addresses != null) {
+            this.addresses.remove(address);
+        }
     }
 
     public String getPhoneNumber() {

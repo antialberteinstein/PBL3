@@ -10,6 +10,8 @@ import dut.gianguhohi.shoppiefood.models.Product.Product;
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     List<CartItem> findByUser(User user);
+
+    CartItem findByCartItemId(int cartItemId);
     CartItem findByUserAndProduct(User user, Product product);
     void deleteByUser(User user);
 }

@@ -33,6 +33,14 @@ public class Shipper{
         this.vehicleType = vehicleType;
     }
 
+    public int getShipperId() {
+        return shipperId;
+    }
+
+    public void setShipperId(int shipperId) {
+        this.shipperId = shipperId;
+    }
+
     public String getDriverLicense() {
         return driverLicense;
     }
