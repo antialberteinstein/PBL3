@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import dut.gianguhohi.shoppiefood.services.ShipperService;
-import dut.gianguhohi.shoppiefood.services.OrderService;
-import java.util.List;
-import dut.gianguhohi.shoppiefood.models.Orders.Order;
+
 
 @Controller
 public class ShipperController {
@@ -18,32 +16,88 @@ public class ShipperController {
     @Autowired
     private ShipperService shipperService;
 
-    @Autowired
-    private OrderService orderService;
+    // @Autowired
+    // private OrderService orderService;
 
     @GetMapping("/shipper/enter")
     public String enter(HttpSession session, Model model) {
-        // session.setAttribute("role", "shipper");
-        return "redirect:/shipper/home";
+        /* if (session.getAttribute("role") != null && session.getAttribute("role").equals("shipper")) {
+            return "redirect:/shipper/home";
+        } */
+
+        try {
+            // User user = (User) session.getAttribute("user");
+            /* if (user == null) {
+                return "redirect:/auth/login";
+            }
+            Shipper shipper = shipperService.getShipperByUser(user);
+            if (shipper == null) {
+                return "redirect:/shipper/register";
+            } */
+
+            session.setAttribute("role", "shipper");
+            return "redirect:/shipper/home";
+        } catch (Exception e) {
+            return "redirect:/auth/login";
+        }
     }
 
     @GetMapping("/shipper/register")
     public String register(HttpSession session, Model model) {
+        if (session.getAttribute("role") != null && session.getAttribute("role").equals("shipper")) {
+            return "redirect:/shipper/home";
+        }
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+        Shipper shipper = shipperService.getShipperByUser(user);
+        if (shipper != null) {
+            return "redirect:/shipper/home";
+        }
         return "shipper/register";
     }
 
     @GetMapping("/shipper/exit")
     public String exit(HttpSession session) {
-        // session.setAttribute("role", "user");
+        session.removeAttribute("role");
         return "redirect:/user/home";
     }
 
     @GetMapping("/shipper/home")
-    public String home(HttpSession session, Model model) {
+    public String home(Model model) {
+        try {
+            // User user = (User) session.getAttribute("user");
+            /* if (user == null) {
+                return "redirect:/auth/login";
+            } */
+            // Shipper shipper = shipperService.getShipperByUser(user);
+            /* if (shipper == null) {
+                return "redirect:/shipper/register";
+            } */
+            /* List<Order> orders = orderService.getOrdersByShipper(shipper);
+            model.addAttribute("orders", orders);
+            model.addAttribute("shipper", shipper); */
+            model.addAttribute("userRole", "SHIPPER");
+            return "shipper/home";
+        } catch (Exception e) {
+            return "redirect:/auth/login";
+        }
+    }
+     @GetMapping("/shipper/profile")
+    public String profile(HttpSession session, Model model) {
+        try {
+            session.setAttribute("role", "shipper");
 
-        // For testing purposes
-        session.setAttribute("role", "shipper");
-
-        return "shipper/home";
+            // Thêm dữ liệu mẫu (có thể thay bằng dữ liệu thực từ database sau)
+            model.addAttribute("shipperName", "PHAN MINH HIẾU");
+            model.addAttribute("shipperId", "SH102230345");
+            model.addAttribute("phone", "1234567890");
+            model.addAttribute("email", "hieuphan@gmail.com");
+            return "shipper/profile";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/shipper/home";
+        }
     }
 }
