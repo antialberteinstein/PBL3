@@ -42,14 +42,20 @@ public class User {
     )
     private List<UserAddress> addresses;
 
+    @OneToOne
+    @JoinColumn(name = "default_address_id")
+    private UserAddress defaultAddress;
+
     @Column(name = "avatar_url")
     private String avatarUrl;
 
     public User() {
         this.isActive = true;
+        this.defaultAddress = null;
     }
 
     public User(String name, String password, String phoneNumber, String email, String gender, String dateOfBirth) {
+        this();
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
@@ -57,7 +63,14 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.avatarUrl = "";
         this.password = password;
-        this.isActive = true;
+    }
+
+    public UserAddress getDefaultAddress() {
+        return defaultAddress;
+    }
+
+    public void setDefaultAddress(UserAddress address) {
+        this.defaultAddress = address;
     }
 
     public String getName() {

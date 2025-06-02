@@ -1,40 +1,41 @@
-package dut.gianguhohi.shoppiefood.controller;
+package dut.gianguhohi.shoppiefood.controller.web.user;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import dut.gianguhohi.shoppiefood.models.Users.User;
-import dut.gianguhohi.shoppiefood.services.UserService;
+import dut.gianguhohi.shoppiefood.services.user.AuthService;
+import dut.gianguhohi.shoppiefood.services.user.UserService;
 
 @Controller
+@RequestMapping("/auth")
 public class AuthController {
-    
+
+    @Autowired
+    private AuthService authService;
+
     @Autowired
     private UserService userService;
 
-    @GetMapping("/auth/login")
+    @GetMapping("/login")
     public String login(Model model) {
         return "auth/login";
     }
 
-    @GetMapping("/auth/register")
+    @GetMapping("/register")
     public String register(Model model) {
         return "auth/register";
     }
 
-    @GetMapping("/auth/logout")
-    public String logout(Model model, HttpSession session) {
-        // Clear the session
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
         session.invalidate();
-        // Redirect to the login page
         return "redirect:/auth/login";
-    } 
+    }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public String login(
         @RequestParam("loginString") String loginString,
         @RequestParam("password") String password,
@@ -42,10 +43,11 @@ public class AuthController {
         HttpSession session
     ) {
         try {
-            User user = userService.login(loginString, password);
+            User user = authService.login(loginString, password);
             if (user != null) {
                 session.setAttribute("role", "user");
-                session.setAttribute("user", user);
+                session.setAttribute("userId", user.getUserId());
+                session.setAttribute("userName", user.getName());
                 return "redirect:/user/home";
             } else {
                 model.addAttribute("error", "Invalid username or password");
@@ -57,7 +59,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/auth/register")
+    @PostMapping("/register")
     public String register(
         @RequestParam("phoneNumber") String phoneNumber,
         @RequestParam("email") String email,

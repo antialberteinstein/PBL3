@@ -7,7 +7,6 @@ public class UserAddressDTO {
     private int userAddressId;
     private int userId;
     private int addressId;
-    private boolean isDefault;
     private String addressName;
     private String phoneNumber;
     private String note;
@@ -33,7 +32,6 @@ public class UserAddressDTO {
             this.city = address.getCity();
             this.fullAddress = address.getFullAddress();
         }
-        this.isDefault = userAddress.isDefault();
         this.note = userAddress.getNote();
         this.addressName = userAddress.getAddressName();
 
@@ -71,14 +69,6 @@ public class UserAddressDTO {
 
     public void setAddressId(int addressId) {
         this.addressId = addressId;
-    }
-
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
     }
 
     public String getNote() {

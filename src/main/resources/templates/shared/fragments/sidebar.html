@@ -1,79 +1,84 @@
-<!-- Sidebar cho tất cả người dùng -->
 <div th:fragment="sidebar" class="user-sidebar">
     <!-- Sidebar header -->
     <div class="sidebar-header" style="text-align: center !important; margin-bottom: -10px !important;">
         <h3>ShoppieFood</h3>
     </div>
 
-    <!-- Sidebar dành riêng cho restaurant -->
-    <div th:if="${session.role == 'restaurant'}" 
-        class="user-info" 
+    <!-- Sidebar for Restaurant -->
+        <div th:if="${session.role == 'restaurant'}"
+        class="user-info"
         style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
-        
-        <img class="avatar" src="/images/Avatar/seller.png" alt="avatar" style="margin: 0 auto !important;">
-        <div class="user-name" style="text-align: center !important;">Anh bán hàng thân thiện</div>
-        <div class="user-contact" style="text-align: center !important;">K179/08/12 Trần Cao Vấn</div>
-        
-        <!-- Menu items -->
+        <img class="avatar"
+            th:src="${restaurantBackgroundUrl != null} ? ${restaurantBackgroundUrl} : '/images/Avatar/seller.png'"
+            alt="avatar"
+            style="margin: 0 auto !important;">
+        <div class="user-name" style="text-align: center !important;" th:text="${restaurantName}">Nhà hàng</div>
+        <div class="user-contact" style="text-align: center !important;" th:text="${restaurantDescription}">Địa chỉ nhà hàng</div>
         <ul class="user-menu">
-            <li><a href="/merchant/profile" style="text-decoration: none !important;"><i class="fas fa-user" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Thông tin tài khoản</a></li>
-            <li><a href="/merchant/orders/new" style="text-decoration: none !important;"><i class="fas fa-bell" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Các đơn hàng mới</a></li>
-            <li><a href="/merchant/revenue" style="text-decoration: none !important;"><i class="fas fa-chart-line" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Doanh thu</a></li>
-            <li><a href="/merchant/promotions" style="text-decoration: none !important;"><i class="fas fa-tags" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Thêm mã khuyến mãi</a></li>
-            <li><a href="/merchant/products" style="text-decoration: none !important;"><i class="fas fa-hamburger" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Đăng sản phẩm</a></li>
-            <li><a href="/auth/logout" style="text-decoration: none !important;"><i class="fas fa-sign-out-alt" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Đăng xuất</a></li>
+            <li><a href="/restaurant/home"><i class="fas fa-user"></i>Trang chủ</a></li>
+            <li><a href="/restaurant/profile"><i class="fas fa-user"></i> Thông tin tài khoản</a></li>
+            <li><a href="/restaurant/order/active"><i class="fas fa-bell"></i> Các đơn hàng mới</a></li>
+            <li><a href="/restaurant/order/history"><i class="fas fa-history"></i> Lịch sử đơn hàng</a></li>
+            <li><a href="/restaurant/revenue"><i class="fas fa-chart-line"></i> Doanh thu</a></li>
+            <li><a href="/restaurant/exit"><i class="fas fa-sign-out-alt"></i> Thoát</a></li>
+            <li><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
         </ul>
     </div>
 
-    <!-- Sidebar dành riêng cho shipper -->
-    <div th:if="${session.role == 'shipper'}" 
-        class="user-info" 
-        style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
+    <!-- Sidebar for Shipper -->
+    <div th:if="${session.role == 'shipper'}"
+         class="user-info"
+         style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
         <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar" style="margin: 0 auto !important;">
-        <div class="user-name" style="text-align: center !important;">Anh shipper may mắn</div>
+        <div class="user-name" style="text-align: center !important;">Shipper</div>
         <div class="user-contact" style="text-align: center !important;">SĐT: 0123 456 789</div>
-        
-        <!-- Menu items -->
         <ul class="user-menu">
-            <li><a href="/shipper/home" style="text-decoration: none !important;"><i class="fas fa-home" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Trang chủ</a></li>
-            <li><a href="/shipper/profile" style="text-decoration: none !important;"><i class="fas fa-user" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Thông tin tài khoản</a></li>
-            <li><a href="/shipper/orders/new" style="text-decoration: none !important;"><i class="fas fa-bell" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Các đơn hàng mới</a></li>
-            <li><a href="/shipper/orders/history" style="text-decoration: none !important;"><i class="fas fa-history" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Lịch sử giao hàng</a></li>
-            <li><a href="/auth/logout" style="text-decoration: none !important;"><i class="fas fa-sign-out-alt" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Đăng xuất</a></li>
+            <li><a href="/shipper/home"><i class="fas fa-home"></i> Trang chủ</a></li>
+            <li><a href="/shipper/profile"><i class="fas fa-user"></i> Thông tin tài khoản</a></li>
+            <li><a href="/shipper/order/active"><i class="fas fa-bell"></i> Các đơn hàng mới</a></li>
+            <li><a href="/shipper/orders/history"><i class="fas fa-history"></i> Lịch sử giao hàng</a></li>
+            <li><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
         </ul>
     </div>
-    <!-- Sidebar dành riêng cho user -->
-    <div th:if="${session.role == 'user'}" 
-        class="user-info" 
-        style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
-        <img class="avatar" src="/images/Avatar/happy.png" alt="avatar" style="margin: 0 auto !important;">
-        <div class="user-name" style="text-align: center !important;">Hiếu hay ho</div>
-        <div class="user-contact" style="text-align: center !important;">Khách hàng siêu cấp Vippro</div>
-        
-        <!-- Menu items -->
-        <ul class="user-menu">
-            <li><a href="/user/home" style="text-decoration: none !important;"><i class="fas fa-home" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Trang chủ</a></li>
-            <li><a href="/user/profile" style="text-decoration: none !important;"><i class="fas fa-user" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Thông tin tài khoản</a></li>
-            <li><a href="/user/orders/current" style="text-decoration: none !important;"><i class="fas fa-truck" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Đơn hàng đang giao</a></li>
-            <li><a href="/user/orders/history" style="text-decoration: none !important;"><i class="fas fa-history" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Lịch sử mua hàng</a></li>
-            <li><a href="/user/cart" style="text-decoration: none !important;"><i class="fas fa-shopping-cart" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Giỏ hàng</a></li>
-            <li><a href="/user/promotions" style="text-decoration: none !important;"><i class="fas fa-ticket-alt" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Mã khuyến mãi</a></li>
-            <li><a href="/auth/logout" style="text-decoration: none !important;"><i class="fas fa-sign-out-alt" style="border: none !important; box-shadow: none !important; margin-left: -30px;"></i> Đăng xuất</a></li>
-        </ul>
-    </div>
-    
-    <!-- Fallback content khi không phải shipper và restaurant -->
-    <!-- <div th:unless="${session.role == 'shipper' || session.role == 'merchant'}" class="user-info">
-        <img class="avatar" src="/images/Avatar/default.png" alt="avatar">
-        <div class="user-name">Chào mừng</div>
-        
-        <div class="user-menu-title">MENU</div>
-        <ul class="user-menu">
-            <li><a href="/"><i class="fas fa-home"></i> Trang chủ</a></li>
-            <li><a href="/menu"><i class="fas fa-utensils"></i> Thực đơn</a></li>
-            <li><a href="/about"><i class="fas fa-info-circle"></i> Về chúng tôi</a></li>
-            <li><a href="/auth/login"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a></li>
-        </ul>
-    </div> -->
-</div>
 
+    <!-- Sidebar for User -->
+    <div th:if="${session.role == 'user'}"
+        class="user-info"
+        style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
+        <img class="avatar"
+            th:src="${userAvatarUrl != null} ? ${userAvatarUrl} : '/images/Avatar/happy.png'"
+            alt="avatar"
+            style="margin: 0 auto !important;">
+        <div class="user-name" style="text-align: center !important;" th:text="${session.userName}">Tên người dùng</div>
+        <div class="user-contact" style="text-align: center !important;" th:text="${userPhoneNumber}">Khách hàng siêu cấp Vippro</div>
+        <!-- Toggle button for restaurant list -->
+        <button class="btn btn-outline-secondary btn-sm mb-2" type="button"
+                onclick="document.getElementById('userRestaurantList').classList.toggle('d-none')">
+            <i class="fas fa-store"></i> Nhà hàng của tôi
+        </button>
+
+        <!-- Restaurant list (hidden by default) -->
+        <div id="userRestaurantList" class="mb-2 d-none">
+            <ul class="list-group">
+                <li th:each="entry : ${restaurantMap}"
+                    class="list-group-item p-1">
+                    <a th:href="@{'/restaurant/enter/' + ${entry.key}}"
+                    th:text="${entry.value}"></a>
+                </li>
+                <!-- Add new restaurant link -->
+                <li class="list-group-item p-1">
+                    <a href="/restaurant/create" class="text-success">
+                        <i class="fas fa-plus"></i> Thêm nhà hàng mới
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <ul class="user-menu">
+            <li><a href="/user/home"><i class="fas fa-home"></i> Trang chủ</a></li>
+            <li><a href="/user/profile"><i class="fas fa-user"></i> Thông tin tài khoản</a></li>
+            <li><a href="/user/order/active"><i class="fas fa-truck"></i> Đơn hàng đang giao</a></li>
+            <li><a href="/user/order/history"><i class="fas fa-history"></i> Lịch sử mua hàng</a></li>
+            <li><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+        </ul>
+    </div>
+</div>

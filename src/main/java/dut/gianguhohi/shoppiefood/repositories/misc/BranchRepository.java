@@ -11,7 +11,9 @@ import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 public interface BranchRepository extends JpaRepository<Branch, Integer> {
     Page<Branch> findByRestaurant(Restaurant restaurant, Pageable pageable);
     Branch findByBranchId(int branchId);
+    Branch findByRestaurantAndBranchName(Restaurant restaurant, String branchName);
     boolean existsByBranchId(int branchId);
+
     boolean existsByRestaurantAndBranchName(Restaurant restaurant, String branchName);
     boolean existsByRestaurantAndBranchId(Restaurant restaurant, int branchId);
     

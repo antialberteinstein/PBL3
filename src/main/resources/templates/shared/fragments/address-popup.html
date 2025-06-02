@@ -2,26 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <div th:fragment="address-popup">
-        <!-- Modal overlay -->
+        <!-- Modal overlay for address selection -->
         <div id="addressPopup" class="modal-overlay">
-            <!-- Address popup container -->
             <div class="address-popup">
                 <div class="popup-header">
                     <h3>Chọn địa chỉ giao hàng</h3>
                     <button id="addressClose" class="popup-close-btn" type="button">&times;</button>
                 </div>
                 <div class="popup-body">
-                    <!-- Danh sách địa chỉ sẽ được render ở đây -->
+                    <!-- Address list -->
                     <div class="saved-addresses" id="savedAddresses"></div>
-                    
-                    <!-- Nút thêm địa chỉ mới -->
+                    <!-- Add new address button -->
                     <div class="add-new-address">
                         <button type="button" class="btn-add-address" id="btnAddAddress">
                             <i class="fas fa-plus-circle"></i> Thêm địa chỉ mới
                         </button>
                     </div>
-                    
-                    <!-- Ghi chú đơn hàng -->
+                    <!-- Order note -->
                     <div class="form-group">
                         <label for="note">Ghi chú đơn hàng (tùy chọn)</label>
                         <textarea id="note" class="form-control" rows="2" placeholder="Ghi chú cho người giao hàng"></textarea>
@@ -34,7 +31,7 @@
             </div>
         </div>
 
-        <!-- Modal Thêm/Cập nhật địa chỉ -->
+        <!-- Modal for Add/Update Address -->
         <div class="modal fade" id="addressEditModal" tabindex="-1" aria-labelledby="addressEditModalLabel" aria-hidden="true" style="z-index: 1333;">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -47,11 +44,11 @@
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="editAddressName" class="form-label">Tên địa chỉ</label>
-                                <input type="text" class="form-control" id="editAddressName" placeholder="Nhà riêng, Văn phòng,..." required>
+                                <input type="text" class="form-control" id="editAddressName" placeholder="Nhà riêng, Văn phòng,...">
                             </div>
                             <div class="mb-3">
                                 <label for="editPhoneNumber" class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" id="editPhoneNumber" required>
+                                <input type="text" class="form-control" id="editPhoneNumber"/>
                             </div>
                             <div class="mb-3">
                                 <label for="editAddressLine1" class="form-label">Địa chỉ 1 (Số nhà, tên đường)</label>

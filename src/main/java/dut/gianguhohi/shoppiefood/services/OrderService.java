@@ -1,23 +1,19 @@
 package dut.gianguhohi.shoppiefood.services;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import dut.gianguhohi.shoppiefood.repositories.Orders.OrderRepository;
-import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.models.Orders.Order;
 import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import dut.gianguhohi.shoppiefood.models.Users.User;
-import dut.gianguhohi.shoppiefood.utils.AppServiceException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import dut.gianguhohi.shoppiefood.models.misc.Branch;
 
 @Transactional
@@ -27,7 +23,9 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
-
+    // ==========================
+    // == Order Query Methods  ==
+    // ==========================
     public Order getOrderById(int id) {
         Order order = orderRepository.findByOrderId(id);
         if (order == null) {
@@ -39,7 +37,7 @@ public class OrderService {
         return order;
     }
 
-        public Page<Order> getCustomerHistory(User user, int page, int size) {
+    public Page<Order> getCustomerHistory(User user, int page, int size) {
         validateUser(user);
         Pageable pageable = PageRequest.of(page, size);
         return orderRepository.getCustomerHistory(user, pageable);
@@ -52,17 +50,13 @@ public class OrderService {
     }
 
     public Page<Order> getBranchHistory(Branch branch, int page, int size) {
-        if (branch == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chi nhánh không hợp lệ");
-        }
+        validateBranch(branch);
         Pageable pageable = PageRequest.of(page, size);
         return orderRepository.getBranchHistory(branch, pageable);
     }
 
     public Page<Order> getBranchActiveOrders(Branch branch, int page, int size) {
-        if (branch == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chi nhánh không hợp lệ");
-        }
+        validateBranch(branch);
         Pageable pageable = PageRequest.of(page, size);
         return orderRepository.getBranchActiveOrders(branch, pageable);
     }
@@ -79,6 +73,9 @@ public class OrderService {
         return orderRepository.getShipperActiveOrders(shipper, pageable);
     }
 
+    // ==========================
+    // == Order CRUD Methods   ==
+    // ==========================
     public Order placeOrder(Order order) {
         validateOrder(order);
         return orderRepository.save(order);
@@ -90,28 +87,36 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
-    /* Validation phase */
+    // ==========================
+    // == Validation Methods   ==
+    // ==========================
     private void validateId(int id) {
         if (id <= 0) {
-            throw new AppServiceException("ID đơn hàng không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID đơn hàng không hợp lệ");
         }
     }
 
     private void validateUser(User user) {
         if (user == null) {
-            throw new AppServiceException("Khách hàng không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Khách hàng không hợp lệ");
         }
     }
 
     private void validateShipper(Shipper shipper) {
         if (shipper == null) {
-            throw new AppServiceException("Shipper không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shipper không hợp lệ");
+        }
+    }
+
+    private void validateBranch(Branch branch) {
+        if (branch == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chi nhánh không hợp lệ");
         }
     }
 
     private void validateOrder(Order order) {
         if (order == null) {
-            throw new AppServiceException("Đơn hàng không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Đơn hàng không hợp lệ");
         }
         // Add more field validations as needed
     }

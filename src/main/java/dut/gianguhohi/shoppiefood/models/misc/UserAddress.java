@@ -19,9 +19,6 @@ public class UserAddress {
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
-    @Column(name = "is_default")
-    private boolean isDefault = false;
-
     @Column(name = "address_name")
     private String addressName;
     
@@ -33,10 +30,9 @@ public class UserAddress {
 
     public UserAddress() {}
 
-    public UserAddress(User user, Address address, boolean isDefault, String note, String addressName, String phoneNumber) {
+    public UserAddress(User user, Address address, String note, String addressName, String phoneNumber) {
         this.user = user;
         this.address = address;
-        this.isDefault = isDefault;
         this.note = note;
         this.addressName = addressName;
         this.phoneNumber = phoneNumber;
@@ -80,14 +76,6 @@ public class UserAddress {
 
     public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
     }
 
     public String getNote() {

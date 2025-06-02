@@ -19,9 +19,6 @@ public class Product {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @ElementCollection
-    private List<String> categories;
-
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -52,24 +49,20 @@ public class Product {
 
     public Product() {
         this.postedAt = LocalDateTime.now();
-        this.isAllow = false;
-        this.categories = new ArrayList<String>();
+        this.isAllow = true;  // Chưa có chức năng kiểm duyệt.
     }
 
     public Product(Restaurant restaurant, String imageUrl, String name, 
-                  String description, long price, float rating, long ratingNumber, List<String> categories,
+                  String description, long price, float rating, long ratingNumber,
                   long remaininngQuantity) {
+        this();
         this.restaurant = restaurant;
         this.imageUrl = imageUrl;
         this.name = name;
         this.description = description;
         this.price = price;
         this.rating = rating;
-        this.postedAt = LocalDateTime.now();
-        this.categories = categories;
-        this.remainingQuantity = remaininngQuantity;
-        this.isAllow = false;
-        this.categories = categories;
+        this.remainingQuantity = remainingQuantity;
         this.ratingNumber = ratingNumber;
     }
 
@@ -136,14 +129,6 @@ public class Product {
 
     public void setRating(float rating) {
         this.rating = rating;
-    }
-
-    public List<String> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
     }
 
     public long getRemainingQuantity() {

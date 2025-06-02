@@ -7,7 +7,6 @@ import dut.gianguhohi.shoppiefood.models.Product.Product;
 public class ProductDTO {
     private Integer productId;
     private Integer restaurantId;
-    private Integer categoryId;
     private List<String> categories;
     private String imageUrl;
     private String name;
@@ -21,11 +20,11 @@ public class ProductDTO {
 
     public ProductDTO() {}
 
-    public ProductDTO(Product product) {
+    // New constructor: pass in category names
+    public ProductDTO(Product product, List<String> categoryNames) {
         this.productId = product.getProductId();
         this.restaurantId = product.getRestaurant() != null ? product.getRestaurant().getRestaurantId() : null;
-        this.categories = product.getCategories();
-        this.categories = product.getCategories();
+        this.categories = categoryNames;
         this.imageUrl = product.getImageUrl();
         this.name = product.getName();
         this.description = product.getDescription();
@@ -43,9 +42,6 @@ public class ProductDTO {
 
     public Integer getRestaurantId() { return restaurantId; }
     public void setRestaurantId(Integer restaurantId) { this.restaurantId = restaurantId; }
-
-    public Integer getCategoryId() { return categoryId; }
-    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
 
     public List<String> getCategories() { return categories; }
     public void setCategories(List<String> categories) { this.categories = categories; }
@@ -75,6 +71,5 @@ public class ProductDTO {
     public void setIsAllow(Boolean isAllow) { this.isAllow = isAllow; }
 
     public Long getRatingNumber() { return ratingNumber; }
-
     public void setRatingNumber(Long ratingNumber) { this.ratingNumber = ratingNumber; }
 }
