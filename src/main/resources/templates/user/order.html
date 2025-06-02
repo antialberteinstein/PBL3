@@ -9,17 +9,79 @@
                 <!-- Render danh sách đơn hàng ở đây -->
                 <!-- Ví dụ mẫu -->
                 
-                <div class="order-item">
-                    <span class="order-name">Bún đậu mắm tôm</span>
-                    <span class="order-price">30,000 VNĐ</span>
-                    <div class="order-actions">
-                        <button class="btn btn-warning">Xem thông tin</button>
-                        <button class="btn btn-danger">Hủy đơn</button>
-                    </div>
-                </div>
+                
                
             </div>            
         </div>
     </div>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy customerId từ session.user
+            const customerId = /*[[${session.user != null ? session.user.userId : 0}]]*/ 0;
+            if (!customerId) {
+                document.getElementById('orderList').innerHTML = '<div class="text-danger">Bạn cần đăng nhập để xem đơn hàng.</div>';
+                return;
+            }
+
+
+            // Gọi API lấy danh sách đơn hàng
+            fetch(`/api/orders/customer/${customerId}?page=1&size=20`)
+                .then(res => res.json())
+                .then(data => renderOrders(data.orders))
+                .catch((err) => {
+                    document.getElementById('orderList').innerHTML = '<div class="text-danger">Không thể tải danh sách đơn hàng.</div>';
+                    document.getElementById('orderList').innerHTML += `<div class="text-muted">Lỗi: ${err}</div>`;
+                });
+
+            // Hàm render danh sách đơn hàng
+            function renderOrders(orders) {
+                if (!orders || orders.length === 0) {
+                    document.getElementById('orderList').innerHTML = '<div class="text-muted">Bạn chưa có đơn hàng nào.</div>';
+                    return;
+                }
+                document.getElementById('orderList').innerHTML = orders.map(order => `
+                    <div class="order-item mb-3 p-3 border rounded">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="${order.firstProductImageUrl || '/images/no-image.png'}" alt="Ảnh món" style="width:64px;height:64px;object-fit:cover;border-radius:8px;">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">#${order.orderId} - ${order.firstProductName || 'Sản phẩm'}</div>
+                                <div>Nhà hàng: <span class="text-primary">${order.restaurantName || ''}</span></div>
+                                <div>Địa chỉ lấy: <span>${order.pickupAddress || ''}</span></div>
+                                <div>Địa chỉ giao: <span>${order.deliveryAddress || ''}</span></div>
+                                <div>Ngày đặt: <span>${order.createdAt ? order.createdAt.replace('T', ' ').substring(0, 16) : ''}</span></div>
+                                <div>Trạng thái: <span class="badge bg-info">${order.status}</span></div>
+                                <div>Tổng tiền: <span class="text-danger fw-bold">${order.totalAmount.toLocaleString('vi-VN')} VNĐ</span></div>
+                            </div>
+                            <div class="order-actions d-flex flex-column gap-2">
+                                <button class="btn btn-warning btn-sm" onclick="viewOrder(${order.orderId})">Xem thông tin</button>
+                                ${(order.status === 'pending' || order.status === 'confirmed') ? 
+                                    `<button class="btn btn-danger btn-sm" onclick="cancelOrder(${order.orderId})">Hủy đơn</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Hàm xem thông tin đơn hàng (bạn có thể mở modal hoặc chuyển trang)
+            window.viewOrder = function(orderId) {
+                alert('Xem thông tin đơn hàng #' + orderId);
+                // TODO: Hiển thị chi tiết đơn hàng
+            };
+
+            // Hàm hủy đơn hàng (gọi API hủy)
+            window.cancelOrder = function(orderId) {
+                if (!confirm('Bạn chắc chắn muốn hủy đơn hàng #' + orderId + '?')) return;
+                fetch(`/api/orders/${orderId}/cancel`, { method: 'POST' })
+                    .then(res => {
+                        if (res.ok) {
+                            alert('Đã hủy đơn hàng!');
+                            location.reload();
+                        } else {
+                            alert('Không thể hủy đơn hàng!');
+                        }
+                    });
+            };
+        });
+    </script>
 </div>
 </html>

@@ -9,6 +9,12 @@ import dut.gianguhohi.shoppiefood.repositories.Users.UserRepository;
 import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.utils.AppServiceException;
 import dut.gianguhohi.shoppiefood.utils.Validator;
+import dut.gianguhohi.shoppiefood.models.misc.Address;
+import dut.gianguhohi.shoppiefood.repositories.misc.AddressRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import dut.gianguhohi.shoppiefood.repositories.misc.UserAddressRepository;
+import dut.gianguhohi.shoppiefood.models.misc.UserAddress;
 
 @Transactional
 @Service
@@ -17,9 +23,121 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private UserAddressRepository userAddressRepository;
+
     public User readByPhoneNumber(String phoneNumber) {
         User user = userRepository.findByPhoneNumber(phoneNumber);
         return user;
+    }
+
+    public List<UserAddress> getUserAddresses(User user) {
+        if (user == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Người dùng không tồn tại"
+            );
+        }
+        return userAddressRepository.findByUser(user);
+    }
+
+    public UserAddress addAddressToUser(User user, String addressLine1, String addressLine2, String ward, String city, String addressName, String phoneNumber, String note) {
+        Validator.validateString(ward, "Phường/xã không được để trống");
+        Validator.validateString(city, "Thành phố không được để trống");
+
+        if (user == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Người dùng không tồn tại"
+            );
+        }
+
+        Address address = new Address(addressLine1, addressLine2, ward, city);
+        address = addressRepository.save(address);
+
+        boolean isDefault = false; // Default address is false by default
+        
+        UserAddress userAddress = new UserAddress(user, address, isDefault, note, addressName, phoneNumber);
+        
+        return userAddressRepository.save(userAddress);
+    }
+
+    public UserAddress setDefault(User user, Address address) {
+        if (user == null || address == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Người dùng hoặc địa chỉ không tồn tại"
+            );
+        }
+
+        UserAddress userAddress = userAddressRepository.findByUserAndAddress(user, address);
+        if (userAddress == null) {
+            throw new AppServiceException("Địa chỉ không thuộc về người dùng này");
+        }
+
+        // Set all other addresses to not default
+        List<UserAddress> userAddresses = user.getAddresses();
+        for (UserAddress ua : userAddresses) {
+            ua.setDefault(false);
+            userAddressRepository.save(ua);
+        }
+
+        // Set this address as default
+        userAddress.setDefault(true);
+        return userAddressRepository.save(userAddress);
+    }
+
+    public UserAddress updateAddress(User user, Address address, String newAddressLine1, String newAddressLine2, String newWard, String newCity, String newAddressName, String newPhoneNumber, String newNote) {
+        if (user == null || address == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Người dùng hoặc địa chỉ không tồn tại"
+            );
+        }
+
+        UserAddress userAddress = userAddressRepository.findByUserAndAddress(user, address);
+        if (userAddress == null) {
+            throw new AppServiceException("Địa chỉ không thuộc về người dùng này");
+        }
+
+        // Update address details
+        address.setAddressLine1(newAddressLine1);
+        address.setAddressLine2(newAddressLine2);
+        address.setWard(newWard);
+        address.setCity(newCity);
+        
+        // Update user address details
+        userAddress.setAddressName(newAddressName);
+        userAddress.setPhoneNumber(newPhoneNumber);
+        userAddress.setNote(newNote);
+
+        // Save changes
+        addressRepository.save(address);
+        return userAddressRepository.save(userAddress);
+    }
+
+    public UserAddress deleteAddress(User user, Address address) {
+        if (user == null || address == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, 
+                "Người dùng hoặc địa chỉ không tồn tại"
+            );
+        }
+
+        UserAddress userAddress = userAddressRepository.findByUserAndAddress(user, address);
+        if (userAddress == null) {
+            throw new AppServiceException("Địa chỉ không thuộc về người dùng này");
+        }
+
+        userAddressRepository.delete(userAddress);
+
+        addressRepository.delete(address);
+        user.removeAddress(userAddress);
+        userRepository.save(user);
+        return userAddress;
     }
 
     public User readByEmail(String email) {

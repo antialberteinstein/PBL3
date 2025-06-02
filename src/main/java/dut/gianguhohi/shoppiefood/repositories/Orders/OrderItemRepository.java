@@ -8,5 +8,5 @@ import dut.gianguhohi.shoppiefood.models.Orders.Order;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
-    List<OrderItem> findByOrder(Order order);
+    
 }

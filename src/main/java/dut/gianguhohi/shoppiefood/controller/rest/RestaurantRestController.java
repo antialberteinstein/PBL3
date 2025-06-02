@@ -121,4 +121,20 @@ public class RestaurantRestController {
         restaurantService.deleteBranch(restaurant, branchId);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/api/restaurant/{id}")
+    public ResponseEntity<?> updateRestaurant(
+        @PathVariable int id,
+        @RequestParam String name,
+        @RequestParam String description,
+        @RequestParam(required = false) String backgroundUrl,
+        HttpSession session
+    ) {
+        restaurantService.update(id, name, description, backgroundUrl);
+
+        // Reload session
+        Restaurant restaurant = restaurantService.readById(id);
+        session.setAttribute("restaurant", restaurant);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
 }

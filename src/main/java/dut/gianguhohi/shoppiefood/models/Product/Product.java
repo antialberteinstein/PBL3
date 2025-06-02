@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import dut.gianguhohi.shoppiefood.models.Orders.OrderItem;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "products")
@@ -18,9 +19,8 @@ public class Product {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @ElementCollection
+    private List<String> categories;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -40,28 +40,37 @@ public class Product {
     @Column
     private float rating;
 
-    @Column(name = "is_available", nullable = false)
-    private boolean isAvailable;
+    @Column
+    private long ratingNumber;
 
-    @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems;
+    @Column(name = "remaining_quantity")
+    private long remainingQuantity;
+
+    // Có vượt qua kiểm duyệt không?
+    @Column(name = "is_alow")
+    private boolean isAllow;
 
     public Product() {
         this.postedAt = LocalDateTime.now();
-        this.isAvailable = true;
+        this.isAllow = false;
+        this.categories = new ArrayList<String>();
     }
 
-    public Product(Restaurant restaurant, Category category, String imageUrl, String name, 
-                  String description, long price, float rating) {
+    public Product(Restaurant restaurant, String imageUrl, String name, 
+                  String description, long price, float rating, long ratingNumber, List<String> categories,
+                  long remaininngQuantity) {
         this.restaurant = restaurant;
-        this.category = category;
         this.imageUrl = imageUrl;
         this.name = name;
         this.description = description;
         this.price = price;
         this.rating = rating;
         this.postedAt = LocalDateTime.now();
-        this.isAvailable = true;
+        this.categories = categories;
+        this.remainingQuantity = remaininngQuantity;
+        this.isAllow = false;
+        this.categories = categories;
+        this.ratingNumber = ratingNumber;
     }
 
     // Getters and setters
@@ -79,14 +88,6 @@ public class Product {
 
     public void setRestaurant(Restaurant restaurant) {
         this.restaurant = restaurant;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
     }
 
     public String getImageUrl() {
@@ -137,19 +138,35 @@ public class Product {
         this.rating = rating;
     }
 
-    public boolean isAvailable() {
-        return isAvailable;
+    public List<String> getCategories() {
+        return categories;
     }
 
-    public void setAvailable(boolean available) {
-        isAvailable = available;
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
 
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
+    public long getRemainingQuantity() {
+        return remainingQuantity;
     }
 
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
+    public void setRemainingQuantity(long remainingQuantity) {
+        this.remainingQuantity = remainingQuantity;
+    }
+
+    public boolean isAllow() {
+        return isAllow;
+    }
+
+    public void setAllow(boolean allow) {
+        isAllow = allow;
+    }
+
+    public long getRatingNumber() {
+        return ratingNumber;
+    }
+
+    public void setRatingNumber(long ratingNumber) {
+        this.ratingNumber = ratingNumber;
     }
 }

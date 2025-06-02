@@ -31,6 +31,14 @@ public class CartService {
         return cartItemRepository.findByUser(user);
     }
 
+    public CartItem getCartItemById(int cartItemId) {
+        CartItem cartItem = cartItemRepository.findByCartItemId(cartItemId);
+        if (cartItem == null) {
+            throw new AppServiceException("Không tìm thấy mục giỏ hàng");
+        }
+        return cartItem;
+    }
+
     public CartItem addToCart(User user, Product product, int quantity) {
         validateUser(user);
         validateProduct(product);

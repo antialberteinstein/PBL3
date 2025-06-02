@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
-import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
+import dut.gianguhohi.shoppiefood.models.misc.Branch;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "orders")
@@ -24,11 +25,14 @@ public class Order {
     private Shipper shipper;
 
     @ManyToOne
-    @JoinColumn(name = "restaurant_id", nullable = false)
-    private Restaurant restaurant;
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "time_confirmed")
+    private LocalDateTime timeConfirmed;
 
     @Column(name = "time_start")
     private LocalDateTime timeStart;
@@ -37,32 +41,32 @@ public class Order {
     private LocalDateTime timeDelivered;
 
     @Column(nullable = false)
-    private int status;
+    private String status;
 
     @Column(name = "total_amount", nullable = false)
     private long totalAmount;
 
-    @Column(name = "shipping_address", nullable = false)
-    private String shippingAddress;
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
+    @Column(name = "delivery_address", nullable = false)
+    private String deliveryAddress;
+
     public Order() {
         this.createdAt = LocalDateTime.now();
+        this.orderItems = new ArrayList<>();
     }
 
-    public Order(User customer, Shipper shipper, Restaurant restaurant, LocalDateTime timeStart, LocalDateTime timeDelivered, 
-                int status, long totalAmount, String shippingAddress) {
+    public Order(User customer, Shipper shipper, Branch branch,
+                String status, long totalAmount, String deliveryAddress) {
+        this();
         this.customer = customer;
         this.shipper = shipper;
-        this.restaurant = restaurant;
-        this.timeStart = timeStart;
-        this.timeDelivered = timeDelivered;
+        this.branch = branch;
         this.status = status;
         this.totalAmount = totalAmount;
-        this.shippingAddress = shippingAddress;
-        this.createdAt = LocalDateTime.now();
+        this.deliveryAddress = deliveryAddress;
+
     }
 
     // Getters and setters
@@ -106,11 +110,11 @@ public class Order {
         this.timeDelivered = timeDelivered;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -122,20 +126,22 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
-    public String getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
-
     public List<OrderItem> getOrderItems() {
         return orderItems;
     }
 
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
+    public void appendOrderItem(OrderItem orderItem) {
+        if (this.orderItems == null) {
+            this.orderItems = new ArrayList<>();
+        }
+        this.orderItems.add(orderItem);
+        orderItem.setOrder(this); // Set the order reference in the OrderItem
+    }
+
+    public void removeOrderItem(OrderItem orderItem) {
+        if (this.orderItems != null) {
+            this.orderItems.remove(orderItem);
+        }
     }
 
     public Shipper getShipper() {
@@ -146,11 +152,27 @@ public class Order {
         this.shipper = shipper;
     }
 
-    public Restaurant getRestaurant() {
-        return restaurant;
+    public Branch getBranch() {
+        return branch;
     }
 
-    public void setRestaurant(Restaurant restaurant) {
-        this.restaurant = restaurant;
+    public void setBranch(Branch branch) {
+        this.branch = branch;
+    }
+
+    public LocalDateTime getTimeConfirmed() {
+        return timeConfirmed;
+    }
+
+    public void setTimeConfirmed(LocalDateTime timeConfirmed) {
+        this.timeConfirmed = timeConfirmed;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 }

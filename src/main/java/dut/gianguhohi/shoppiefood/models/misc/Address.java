@@ -75,4 +75,8 @@ public class Address {
     public void setCity(String city) {
         this.city = city;
     }
+
+    public String getFullAddress() {
+        return addressLine2 + ", " + addressLine1 + ", " + ward + ", " + city;
+    }
 }

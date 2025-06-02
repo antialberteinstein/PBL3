@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import dut.gianguhohi.shoppiefood.repositories.Products.ProductRepository;
+import dut.gianguhohi.shoppiefood.models.Product.Product;
 
 @Transactional
 @Service
@@ -31,8 +33,20 @@ public class RestaurantService {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAll();
+    }
+
+    public Page<Product> getProductsByRestaurant(Restaurant restaurant, int page, int size) {
+        if (restaurant == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nhà hàng không hợp lệ");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findByRestaurant(restaurant, pageable);
     }
 
     public List<Restaurant> getBySeller(User seller) {
@@ -55,6 +69,31 @@ public class RestaurantService {
         validateRestaurant(name, description, seller);
 
         Restaurant restaurant = new Restaurant(name, description, seller);
+        return restaurantRepository.save(restaurant);
+    }
+
+    public Restaurant update(
+        int id,
+        String name,
+        String description,
+        String backgroundUrl
+    ) {
+        if (id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID nhà hàng không hợp lệ");
+        }
+
+        Restaurant restaurant = restaurantRepository.findByRestaurantId(id);
+        if (restaurant == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhà hàng");
+        }
+
+        validateRestaurant(name, description, restaurant.getSeller());
+
+        restaurant.setRestaurantName(name);
+        restaurant.setDescription(description);
+        if (backgroundUrl != null && !backgroundUrl.trim().isEmpty()) {
+            restaurant.setBackgroundUrl(backgroundUrl);
+        }
         return restaurantRepository.save(restaurant);
     }
 
