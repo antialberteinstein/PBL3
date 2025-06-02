@@ -1,0 +1,481 @@
+/* Shipper Profile Styles */Add commentMore actions
+
+/* Thêm vào đầu file để reset các style có thể gây xung đột */
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+}
+
+/* Làm cho nội dung chiếm toàn màn hình */
+.content-wrapper, .content-wrapper .main-content, [layout\:fragment="content"] {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Override base styles that may cause conflicts */
+.content-wrapper .main-content {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+body .container {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    float: none;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    width: 100%; /* Thêm width: 100% */
+    margin: 20px auto;
+    background: var(--card-background);
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Container mới */
+.profile-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    background: var(--background-color);
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, var(--accent1-color), var(--secondary-color));
+    color: white;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1.5" fill="white" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.1"/></svg>');
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid white;
+    margin: 0 auto 15px;
+    background: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    position: relative;
+    z-index: 1;
+}
+
+.shipper-name {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.shipper-id {
+    font-size: 1em;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+}
+
+/* Bố cục 2 cột mới */
+.two-column-layout {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Columns */
+.column {
+    padding: 20px;
+}
+
+.info-column {
+    width: 30%;
+    min-width: 300px;
+}
+
+.feedback-column {
+    width: 70%;
+    border-left: 1px solid var(--border-color);
+}
+
+/* Main content */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Giữ nguyên tỉ lệ 1:2 */
+    gap: 25px;
+    padding: 30px;
+    width: 100%; /* Đảm bảo sử dụng 100% chiều rộng container */
+}
+
+/* Info section */
+.info-section {
+    background: var(--card-background);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--text1-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text2-color);
+}
+
+.info-value {
+    font-weight: bold;
+    color: var(--text1-color);
+}
+
+/* Status badge */
+.status-badge {
+    background: var(--primary-color);
+    color: var(--text1-color);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.status-badge.offline {
+    background: var(--accent1-color);
+    color: white;
+}
+
+/* Rating */
+.rating-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stars {
+    color: var(--primary-color);
+    font-size: 1.2em;
+}
+
+.rating-number {
+    font-weight: bold;
+    color: var(--text1-color);
+}
+
+/* Feedback section */
+.feedback-section {
+    background: var(--card-background);
+    border-radius: 10px;
+    padding: 25px;
+    height: calc(100% - 50px); /* Điều chỉnh chiều cao */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent1-color));
+    color: white;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+/* Feedback list */
+.feedback-list {
+    max-height: 550px;
+    overflow-y: auto;
+}
+
+.feedback-item {
+    background: var(--background-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--primary-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feedback-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.customer-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.customer-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.customer-name {
+    font-weight: bold;
+    color: var(--text1-color);
+}
+
+.feedback-date {
+    color: var(--text2-color);
+    font-size: 0.9em;
+}
+
+.feedback-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.feedback-text {
+    color: var(--text2-color);
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* Performance chart */
+.performance-chart {
+    background: var(--background-color);
+    border-radius: 10px;
+    padding: 25px;
+    margin-top: 25px;
+}
+
+.chart-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.chart-label {
+    width: 100px;
+    font-weight: 600;
+    color: var(--text2-color);
+}
+
+.chart-progress {
+    flex: 1;
+    height: 18px;
+    background: var(--border-color);
+    border-radius: 9px;
+    overflow: hidden;
+    margin: 0 12px;
+}
+
+.chart-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 9px;
+    transition: width 0.8s ease;
+}
+
+.chart-value {
+    font-weight: bold;
+    color: var(--text1-color);
+    min-width: 40px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .feedback-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .shipper-name {
+        font-size: 1.8em;
+    }
+}
+
+/* Responsive design - chuyển sang layout stacking trên màn hình nhỏ */
+@media (max-width: 992px) {
+    .two-column-layout {
+        flex-direction: column;
+    }
+    
+    .column {
+        width: 100% !important;
+    }
+    
+    .info-column {
+        min-width: unset;
+    }
+    
+    .feedback-column {
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+    }
+}
+
+/* Icon styling */
+.icon {
+    font-size: 1.2em;
+}
+
+/* Scrollbar styling */
+.feedback-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.feedback-list::-webkit-scrollbar-track {
+    background: var(--background-color);
+    border-radius: 10px;
+}
+
+.feedback-list::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 10px;
+}
+
+.feedback-list::-webkit-scrollbar-thumb:hover {
+    background: var(--accent1-color);
+}
+
+/* Thêm CSS để khắc phục vấn đề với content-wrapper */
+.content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-wrapper .main-content {
+    width: 100%;
+    padding: 0;
+}
+
+/* Chỉnh layout fragment content */
+[layout\:fragment="content"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Media queries điều chỉnh */
+@media (max-width: 1200px) {
+    .container {
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        max-width: 96%;
+        margin: 15px auto;
+    }
+    
+    .main-content {
+        grid-template-columns: 1fr 1.5fr; /* Điều chỉnh tỉ lệ cho màn hình nhỏ hơn */
+        gap: 20px;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+        margin: 10px auto;
+    }
+    
+    .main-content {
+        grid-template-columns: 1fr; /* Stack vertically on mobile */
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .header {
+        padding: 20px;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .shipper-name {
+        font-size: 1.6em;
+    }
+    
+    .feedback-stats {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */Add commentMore actions
+    }
+}
