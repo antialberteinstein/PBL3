@@ -1,17 +1,15 @@
-package dut.gianguhohi.shoppiefood.services;
+package dut.gianguhohi.shoppiefood.services.user;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.Orders.CartItem;
-import dut.gianguhohi.shoppiefood.repositories.Orders.CartItemRepository;
-import jakarta.transaction.Transactional;
 import dut.gianguhohi.shoppiefood.models.Product.Product;
-import dut.gianguhohi.shoppiefood.utils.AppServiceException;
-import dut.gianguhohi.shoppiefood.repositories.Products.ProductRepository;
-import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
-import dut.gianguhohi.shoppiefood.repositories.Users.RestaurantRepository;
+import dut.gianguhohi.shoppiefood.repositories.Orders.CartItemRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @Transactional
 @Service
@@ -19,13 +17,10 @@ public class CartService {
 
     @Autowired
     private CartItemRepository cartItemRepository;
-    
-    @Autowired
-    private ProductRepository productRepository;
-    
-    @Autowired
-    private RestaurantRepository restaurantRepository;
 
+    // ==========================
+    // == Cart Query Methods   ==
+    // ==========================
     public List<CartItem> getCartItemsByUser(User user) {
         validateUser(user);
         return cartItemRepository.findByUser(user);
@@ -34,17 +29,19 @@ public class CartService {
     public CartItem getCartItemById(int cartItemId) {
         CartItem cartItem = cartItemRepository.findByCartItemId(cartItemId);
         if (cartItem == null) {
-            throw new AppServiceException("Không tìm thấy mục giỏ hàng");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy mục giỏ hàng");
         }
         return cartItem;
     }
 
+    // ==========================
+    // == Cart CRUD Methods    ==
+    // ==========================
     public CartItem addToCart(User user, Product product, int quantity) {
         validateUser(user);
         validateProduct(product);
         validateQuantity(quantity);
 
-        // Check if item already exists in cart
         CartItem existing = cartItemRepository.findByUserAndProduct(user, product);
         if (existing != null) {
             existing.setQuantity(existing.getQuantity() + quantity);
@@ -77,38 +74,41 @@ public class CartService {
         cartItemRepository.deleteAll(items);
     }
 
-    /* Validation phase */
+    // ==========================
+    // == Cart Calculation     ==
+    // ==========================
+    public int getTotalAmount(User user) {
+        validateUser(user);
+        List<CartItem> items = cartItemRepository.findByUser(user);
+        return items.stream()
+                .mapToInt(item -> (int) (item.getProduct().getPrice() * item.getQuantity()))
+                .sum();
+    }
+
+    // ==========================
+    // == Validation Methods   ==
+    // ==========================
     private void validateUser(User user) {
         if (user == null) {
-            throw new AppServiceException("Người dùng không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Người dùng không hợp lệ");
         }
     }
 
     private void validateProduct(Product product) {
         if (product == null) {
-            throw new AppServiceException("Sản phẩm không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sản phẩm không hợp lệ");
         }
     }
 
     private void validateQuantity(int quantity) {
         if (quantity <= 0) {
-            throw new AppServiceException("Số lượng phải lớn hơn 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số lượng phải lớn hơn 0");
         }
     }
 
     private void validateCartItem(CartItem cartItem) {
         if (cartItem == null) {
-            throw new AppServiceException("CartItem không hợp lệ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CartItem không hợp lệ");
         }
-    }
-
-    public Object getCartItems() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCartItems'");
-    }
-
-    public Object getTotalAmount() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTotalAmount'");
     }
 }

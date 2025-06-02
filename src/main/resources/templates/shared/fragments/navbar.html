@@ -2,8 +2,8 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
+            <!-- Sidebar Toggle Button (only if logged in) -->
             <div th:if="${session.role != null}">
-                <!-- Sidebar Toggle Button - Chỉ để mở sidebar -->
                 <button id="sidebarToggleBtn" class="menu-toggle me-2" type="button" aria-label="Toggle sidebar">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -22,9 +22,15 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Trang chủ</a>
-                    </li>
+                    </li>   
                     <li class="nav-item" th:if="${session.role == 'user'}">
-                        <a class="nav-link" href="/user/orders">Đơn hàng</a>
+                        <a class="nav-link" href="/user/order/active">Đơn hàng</a>
+                    </li>
+                    <li class="nav-item" th:if="${session.role == 'restaurant'}">
+                        <a class="nav-link" href="/restaurant/order/active">Đơn hàng mới</a>
+                    </li>
+                    <li class="nav-item" th:if="${session.role == 'shipper'}">
+                        <a class="nav-link" href="/shipper/order/active">Đơn giao hàng</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about">Về chúng tôi</a>
@@ -33,24 +39,35 @@
                 
                 <!-- Right side items -->
                 <ul class="navbar-nav">
-                    <!-- Thay thế liên kết giỏ hàng bằng phần tử div chứa cart fragment -->
-                    <li class="nav-item" >
-                        <div class="nav-link" style="cursor: pointer;" th:if="${session.role != null && session.role == 'user'}">
-                            <!-- Nhúng fragment cart vào đây -->
+                    <!-- Cart fragment for logged-in users -->
+                    <li class="nav-item" th:if="${session.role == 'user'}">
+                        <div class="nav-link" style="cursor: pointer;">
                             <div th:replace="~{shared/fragments/cart :: cart}"></div>
                         </div>
                     </li>
-                    <li class="nav-item" th:if="${session.user == null}">
+                    <!-- Show login/register if not logged in -->
+                    <li class="nav-item" th:if="${session.userName == null}">
                         <a class="nav-link" href="/auth/login">Đăng nhập</a>
                     </li>
-                    <li class="nav-item" th:if="${session.user == null}">
+                    <li class="nav-item" th:if="${session.userName == null}">
                         <a class="nav-link" href="/auth/register">Đăng ký</a>
                     </li>
-                    <li class="nav-item" th:if="${session.user != null && session.role == 'user'}">
+                    <!-- Show user profile if logged in -->
+                    <li class="nav-item" th:if="${session.userName != null && session.role == 'user'}">
                         <a class="nav-link" href="/user/profile">
                             <i class="fas fa-user"></i> 
-                            <span th:text="${session.user.name}">Tên người dùng</span>
+                            <span th:text="${session.userName}">Tên người dùng</span>
                         </a>
+                    </li>
+                    <!-- Logout link for logged in users -->
+                    <li class="nav-item" th:if="${session.userName != null && session.role == 'user'}">
+                        <a class="nav-link" href="/auth/logout">Đăng xuất</a>
+                    </li>
+                    <li class="nav-item" th:if="${session.role == 'restaurant'}">
+                        <a class="nav-link" href="/restaurant/exit">Thoát</a>
+                    </li>
+                    <li class="nav-item" th:if="${session.role == 'shipper'}">
+                        <a class="nav-link" href="/shipper/exit">Thoát</a>
                     </li>
                 </ul>
             </div>

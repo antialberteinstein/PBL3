@@ -1,27 +1,29 @@
 package dut.gianguhohi.shoppiefood.utils;
 
 import java.util.regex.Pattern;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 public class Validator {
     public static void validateId(int id, String message) {
         if (id <= 0) {
-            throw new AppServiceException(message);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }
 
     public static void validateString(String str, String message) {
         if (str == null || str.trim().isEmpty()) {
-            throw new AppServiceException(message);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }
 
     public static void validateObject(Object obj, String message) {
         if (obj == null) {
-            throw new AppServiceException(message);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }
 
-        // Validation patterns
+    // Validation patterns
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{10}$");
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
@@ -33,7 +35,7 @@ public class Validator {
     public static void validateEmail(String email, String emptyMessage, String invalidMessage) {
         validateString(email, emptyMessage);
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new AppServiceException(invalidMessage);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, invalidMessage);
         }
     }
 
@@ -44,7 +46,7 @@ public class Validator {
     public static void validatePhoneNumber(String phoneNumber, String emptyMessage, String invalidMessage) {
         validateString(phoneNumber, emptyMessage);
         if (!PHONE_PATTERN.matcher(phoneNumber).matches()) {
-            throw new AppServiceException(invalidMessage);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, invalidMessage);
         }
     }
 
@@ -55,7 +57,7 @@ public class Validator {
     public static void validatePassword(String password, String emptyMessage, String invalidMessage) {
         validateString(password, emptyMessage);
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            throw new AppServiceException(invalidMessage);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, invalidMessage);
         }
     }
 
@@ -66,7 +68,7 @@ public class Validator {
     public static void validateName(String name, String emptyMessage, String invalidLengthMessage) {
         validateString(name, emptyMessage);
         if (name.length() < 2 || name.length() > 50) {
-            throw new AppServiceException(invalidLengthMessage);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, invalidLengthMessage);
         }
     }
 }

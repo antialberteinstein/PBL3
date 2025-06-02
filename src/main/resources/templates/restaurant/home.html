@@ -1,23 +1,720 @@
 <!DOCTYPE html>
-<html layout:decorate="~{shared/layout/base}">
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+
 <head>
-    <title layout:title="Nhà hàng"></title>
+    <title>Chi tiết nhà hàng</title>
+    <!-- =========================
+         🎨 PAGE-SPECIFIC CSS
+         ========================= -->
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/restaurant/profile.css}">
+    </th:block>
 </head>
+<body>
 <div layout:fragment="content">
-    <div class="container user-main">
-        <div class="user-orders">
-            <div class="order-item">
-                <div class="order-info">
-                    <div class="order-name">Bún đậu mắm tôm</div>
-                    <div class="order-price">162,000 VNĐ</div>
+    <!-- =========================
+         🏠 RESTAURANT INFO
+         ========================= -->
+    <div class="content-container p-4">
+        <div class="restaurant-info-card">
+            <img th:if="${restaurant != null && restaurant.backgroundUrl != null}"
+                th:src="${restaurant.backgroundUrl} + '?v=' + ${#dates.createNow().time}" class="restaurant-image">
+            <div class="restaurant-details" th:if="${restaurant != null}">
+                <div class="d-flex align-items-center mb-2">
+                    <h1 class="restaurant-name me-3" th:text="${restaurant.restaurantName}">Nhà hàng ngon nhất Đà Nẵng</h1>
+                    <button class="btn btn-sm btn-outline-primary" id="editRestaurantBtn" th:if="${session.role == 'restaurant' and isOwner}">
+                        <i class="fas fa-edit"></i> Cập nhật thông tin
+                    </button>
                 </div>
-                <div class="order-actions">
-                    <button class="btn btn-warning">Xem thông tin</button>
-                    <button class="btn btn-primary nbtn-primary">Nhận đơn</button>
-                    <button class="btn btn-danger">Từ chối</button>
+                <p class="restaurant-description" th:text="${restaurant.description}">
+                    Nhà hàng phục vụ các món ăn đặc sản với hương vị truyền thống. Thực đơn đa dạng từ các món khai vị đến món tráng miệng, đáp ứng mọi nhu cầu của thực khách.
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- =========================
+                 🏢 BRANCHES PANE
+                 ========================= -->
+            <div class="col-md-6 mb-4">
+                <h3 class="section-title">Các chi nhánh</h3>
+                <div class="text-end mb-4" th:if="${session.role == 'restaurant' && isOwner}">
+                    <button class="add-branch-btn" data-bs-toggle="modal" data-bs-target="#addBranchModal">
+                        <i class="fas fa-plus me-2"></i>Thêm chi nhánh mới
+                    </button>
+                </div>
+                <div class="branches-list" id="branchesList"></div>
+                <div id="branchesPaging" class="mt-3"></div>
+            </div>
+
+            <!-- =========================
+                 🍔 PRODUCTS PANE
+                 ========================= -->
+            <div class="col-md-6 mb-4">
+                <h3 class="section-title">Các sản phẩm</h3>
+                <div class="text-end mb-4" th:if="${session.role == 'restaurant' && isOwner}">
+                    <button class="btn btn-outline-primary" id="addProductBtn">
+                        <i class="fas fa-plus me-2"></i>Thêm sản phẩm mới
+                    </button>
+                </div>
+                <div class="products-list" id="productsList"></div>
+                <div id="productsPaging" class="mt-3"></div>
+            </div>
+        </div>
+
+        <!-- =========================
+             🏢 BRANCH MODAL
+             ========================= -->
+        <div class="modal fade" id="addBranchModal" tabindex="-1" aria-labelledby="addBranchModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBranchModalLabel">Thêm chi nhánh mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addBranchForm">
+                            <input type="hidden" id="branchId" name="branchId" value="">
+                            <div class="mb-3">
+                                <label for="branchName" class="form-label">Tên chi nhánh</label>
+                                <input type="text" class="form-control" id="branchName" name="branchName" placeholder="Chi nhánh Trung tâm">
+                            </div>
+                            <div class="mb-3">
+                                <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="0123456789">
+                            </div>
+                            <div class="mb-3">
+                                <label for="startTime" class="form-label">Giờ mở cửa</label>
+                                <input type="time" class="form-control" id="startTime" name="startTime" placeholder="08:00">
+                            </div>
+                            <div class="mb-3">
+                                <label for="endTime" class="form-label">Giờ đóng cửa</label>
+                                <input type="time" class="form-control" id="endTime" name="endTime" placeholder="22:00">
+                            </div>
+                            <div class="mb-3">
+                                <label for="addressLine1" class="form-label">Address Line 1 (Số nhà, đường)</label>
+                                <input type="text" class="form-control" id="addressLine1" name="addressLine1" placeholder="123 Lê Lợi">
+                            </div>
+                            <div class="mb-3">
+                                <label for="addressLine2" class="form-label">Address Line 2 (Tòa nhà, lầu)</label>
+                                <input type="text" class="form-control" id="addressLine2" name="addressLine2" placeholder="">
+                            </div>
+                            <div class="mb-3">
+                                <label for="ward" class="form-label">Phường/Xã</label>
+                                <input type="text" class="form-control" id="ward" name="ward" placeholder="Hòa Khánh">
+                            </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">Thành phố</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="Đà Nẵng">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary" id="saveBranchBtn">Lưu chi nhánh</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- =========================
+             🍔 PRODUCT MODAL
+             ========================= -->
+        <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="productForm">
+                        <input type="hidden" id="productId" name="productId" value="">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="productModalLabel">Thêm sản phẩm mới</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="productName" class="form-label">Tên sản phẩm</label>
+                                <input type="text" class="form-control" id="productName" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productDescription" class="form-label">Mô tả</label>
+                                <textarea class="form-control" id="productDescription" name="description" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productPrice" class="form-label">Giá (VNĐ)</label>
+                                <input type="number" class="form-control" id="productPrice" name="price" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productQuantity" class="form-label">Số lượng còn lại</label>
+                                <input type="number" class="form-control" id="productQuantity" name="remainingQuantity" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productImage" class="form-label">Ảnh sản phẩm</label>
+                                <input type="file" class="form-control" id="productImage" accept="image/*">
+                                <input type="hidden" id="productImageUrl" name="imageUrl">
+                                <div id="productPreviewImage" class="mt-2"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary" id="saveProductBtn">Lưu sản phẩm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================
+             🏢 RESTAURANT EDIT MODAL
+             ========================= -->
+        <div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-labelledby="editRestaurantModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="editRestaurantForm">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editRestaurantModalLabel">Cập nhật thông tin nhà hàng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="restaurantName" class="form-label">Tên nhà hàng</label>
+                                <input type="text" class="form-control" id="restaurantName" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="restaurantDescription" class="form-label">Mô tả</label>
+                                <textarea class="form-control" id="restaurantDescription" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="restaurantImage" class="form-label">Ảnh nền nhà hàng</label>
+                                <input type="file" class="form-control" id="restaurantImage" accept="image/*">
+                                <input type="hidden" id="backgroundUrl" name="backgroundUrl">
+                                <div id="previewImage" class="mt-2"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================
+             🔔 TOAST NOTIFICATION
+             ========================= -->
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 2000">
+            <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto" id="toastTitle">Thông báo</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" id="toastMessage"></div>
+            </div>
+        </div>
+
+        <!-- =========================
+             🚀 PAGE SCRIPTS
+             ========================= -->
+        <script th:inline="javascript">
+        // =========================
+        // 🚀 PAGE INITIALIZATION
+        // =========================
+        document.addEventListener('DOMContentLoaded', function() {
+            // =========================
+            // 🔗 CONSTANTS & ELEMENTS
+            // =========================
+            const restaurantId = [[${restaurant.restaurantId}]];
+            const userRole = [[${session.role}]];
+            const isOwner = [[${isOwner}]];
+
+            const notificationToast = new bootstrap.Toast(document.getElementById('notificationToast'));
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const addBranchForm = document.getElementById('addBranchForm');
+            const addBranchModalEl = document.getElementById('addBranchModal');
+            const addBranchModal = new bootstrap.Modal(addBranchModalEl);
+            const branchesList = document.getElementById('branchesList');
+            const saveBranchBtn = document.getElementById('saveBranchBtn');
+            const branchesPaging = document.getElementById('branchesPaging');
+            const productsList = document.getElementById('productsList');
+            const productsPaging = document.getElementById('productsPaging');
+            const productModalEl = document.getElementById('productModal');
+            const productModal = new bootstrap.Modal(productModalEl);
+            const productForm = document.getElementById('productForm');
+            const productImageInput = document.getElementById('productImage');
+            const productImageUrlInput = document.getElementById('productImageUrl');
+            const productPreviewImage = document.getElementById('productPreviewImage');
+            const editRestaurantBtn = document.getElementById('editRestaurantBtn');
+            const editRestaurantModalEl = document.getElementById('editRestaurantModal');
+            const editRestaurantModal = new bootstrap.Modal(editRestaurantModalEl);
+            const editRestaurantForm = document.getElementById('editRestaurantForm');
+            const restaurantImageInput = document.getElementById('restaurantImage');
+            const backgroundUrlInput = document.getElementById('backgroundUrl');
+            const previewImage = document.getElementById('previewImage');
+
+            // =========================
+            // 🍞 TOAST HELPERS
+            // =========================
+            function toastError(msg = 'Có lỗi xảy ra!') {
+                toastTitle.textContent = 'Lỗi';
+                toastTitle.className = 'me-auto text-danger';
+                toastMessage.textContent = msg;
+                notificationToast.show();
+            }
+            function toastSuccess(msg = 'Thành công!') {
+                toastTitle.textContent = 'Thành công';
+                toastTitle.className = 'me-auto text-success';
+                toastMessage.textContent = msg;
+                notificationToast.show();
+            }
+
+            // =========================
+            // 🏢 BRANCHES LOGIC
+            // =========================
+            function renderBranches(data) {
+                const branches = data.branches || [];
+                const totalPages = data.totalPages || 1;
+                const currentPage = data.page || 1;
+
+                if (!branches.length) {
+                    branchesList.innerHTML = `<div class="text-center text-muted">Chưa có chi nhánh nào cho nhà hàng này.</div>`;
+                } else {
+                    branchesList.innerHTML = branches.map(branch => `
+                        <div class="branch-item d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <div class="branch-name fw-bold">${branch.branchName}</div>
+                                    <div class="branch-address text-muted">
+                                        ${[branch.addressLine2, branch.addressLine1, branch.ward, branch.city].filter(Boolean).join(', ') || 'Không có địa chỉ'}
+                                    </div>
+                                    <div class="branch-meta mt-1 small text-secondary">
+                                        <div>Số điện thoại: ${branch.phoneNumber || 'Chưa cập nhật'}</div>
+                                        <div>Giờ mở cửa: 
+                                            ${branch.startTime ? branch.startTime : '??'} - 
+                                            ${branch.endTime ? branch.endTime : '??'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                ${
+                                    userRole === 'restaurant' && isOwner
+                                    ? `
+                                        <button class="btn btn-sm btn-outline-primary me-2 update-branch-btn" data-id="${branch.branchId}" title="Cập nhật">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-branch-btn" data-id="${branch.branchId}" title="Xóa">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    `
+                                    : ''
+                                }
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Paging
+                let pagingHtml = '';
+                if (totalPages > 1) {
+                    pagingHtml = `<nav><ul class="pagination justify-content-center">`;
+                    for (let i = 1; i <= totalPages; i++) {
+                        pagingHtml += `
+                            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                <a class="page-link branch-page-link" href="#" data-page="${i}">${i}</a>
+                            </li>
+                        `;
+                    }
+                    pagingHtml += `</ul></nav>`;
+                }
+                branchesPaging.innerHTML = pagingHtml;
+            }
+
+            function loadBranches(page = 1) {
+                fetch(`/api/restaurant/${restaurantId}/branch?page=${page}&size=5`)
+                    .then(res => res.json())
+                    .then(renderBranches)
+                    .catch(() => toastError('Không thể tải danh sách chi nhánh!'));
+            }
+
+            function resetBranchForm() {
+                addBranchForm.reset();
+                addBranchForm.branchId.value = '';
+                document.getElementById('addBranchModalLabel').textContent = 'Thêm chi nhánh mới';
+                saveBranchBtn.textContent = 'Lưu chi nhánh';
+            }
+
+            branchesList.addEventListener('click', function(e) {
+                if (e.target.closest('.update-branch-btn')) {
+                    const branchId = e.target.closest('.update-branch-btn').dataset.id;
+                    fetch(`/api/restaurant/branch/${branchId}`)
+                        .then(res => res.json())
+                        .then(branch => {
+                            if (branch) {
+                                addBranchForm.branchId.value = branch.branchId;
+                                addBranchForm.branchName.value = branch.branchName;
+                                addBranchForm.phoneNumber.value = branch.phoneNumber || '';
+                                addBranchForm.startTime.value = branch.startTime || '';
+                                addBranchForm.endTime.value = branch.endTime || '';
+                                addBranchForm.addressLine1.value = branch.addressLine1 || '';
+                                addBranchForm.addressLine2.value = branch.addressLine2 || '';
+                                addBranchForm.ward.value = branch.ward || '';
+                                addBranchForm.city.value = branch.city || '';
+                                document.getElementById('addBranchModalLabel').textContent = 'Cập nhật chi nhánh';
+                                saveBranchBtn.textContent = 'Cập nhật';
+                                addBranchModal.show();
+                            }
+                        });
+                }
+                if (e.target.closest('.delete-branch-btn')) {
+                    const branchId = e.target.closest('.delete-branch-btn').dataset.id;
+                    if (confirm('Bạn có chắc chắn muốn xóa chi nhánh này?')) {
+                        fetch(`/api/restaurant/branch/${branchId}`, { method: 'DELETE' })
+                            .then(res => {
+                                if (!res.ok) throw new Error();
+                                toastSuccess('Đã xóa chi nhánh thành công!');
+                                loadBranches();
+                            })
+                            .catch(() => toastError('Không thể xóa chi nhánh!'));
+                    }
+                }
+            });
+
+            addBranchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(addBranchForm);
+                const branchId = formData.get('branchId');
+                const url = branchId
+                    ? `/api/restaurant/${restaurantId}/branch/${branchId}`
+                    : `/api/restaurant/${restaurantId}/branch`;
+                const method = branchId ? 'PUT' : 'POST';
+
+                if (
+                    !formData.get('branchName')?.trim() ||
+                    !formData.get('ward')?.trim() ||
+                    !formData.get('city')?.trim()
+                ) {
+                    toastError('Vui lòng điền đầy đủ thông tin chi nhánh');
+                    return;
+                }
+
+                const data = {
+                    branchName: formData.get('branchName'),
+                    phoneNumber: formData.get('phoneNumber'),
+                    startTime: formData.get('startTime'),
+                    endTime: formData.get('endTime'),
+                    addressLine1: formData.get('addressLine1'),
+                    addressLine2: formData.get('addressLine2'),
+                    ward: formData.get('ward'),
+                    city: formData.get('city')
+                };
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
+                .then(() => {
+                    addBranchModal.hide();
+                    toastSuccess(branchId ? 'Cập nhật chi nhánh thành công!' : 'Đã thêm chi nhánh mới thành công!');
+                    loadBranches();
+                    resetBranchForm();
+                })
+                .catch(() => toastError(branchId ? 'Không thể cập nhật chi nhánh!' : 'Không thể thêm chi nhánh!'));
+            });
+
+            const addBranchBtn = document.querySelector('.add-branch-btn');
+            if (addBranchBtn)
+                addBranchBtn.addEventListener('click', function() {
+                    resetBranchForm();
+                });
+
+            branchesPaging.addEventListener('click', function(e) {
+                if (e.target.classList.contains('branch-page-link')) {
+                    e.preventDefault();
+                    const page = parseInt(e.target.dataset.page);
+                    loadBranches(page);
+                }
+            });
+
+            // =========================
+            // 🏪 RESTAURANT INFO LOGIC
+            // =========================
+            if (editRestaurantBtn) {
+                editRestaurantBtn.addEventListener('click', function() {
+                    editRestaurantForm.restaurantName.value = /*[[${restaurant.restaurantName}]]*/ '';
+                    editRestaurantForm.restaurantDescription.value = /*[[${restaurant.description}]]*/ '';
+                    backgroundUrlInput.value = /*[[${restaurant.backgroundUrl}]]*/ '';
+                    if (backgroundUrlInput.value) {
+                        previewImage.innerHTML = `<img src="${backgroundUrlInput.value}" class="img-fluid rounded" style="max-height:150px;">`;
+                    } else {
+                        previewImage.innerHTML = '';
+                    }
+                    editRestaurantModal.show();
+                });
+            }
+
+            restaurantImageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" style="max-height:150px;">`;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            editRestaurantForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const file = restaurantImageInput.files[0];
+                const oldImage = backgroundUrlInput.value;
+
+                function doUpdate(imageUrl) {
+                    const data = {
+                        name: editRestaurantForm.restaurantName.value,
+                        description: editRestaurantForm.restaurantDescription.value,
+                        backgroundUrl: imageUrl || oldImage || ''
+                    };
+                    fetch(`/api/restaurant`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        return res.json();
+                    })
+                    .then(() => {
+                        toastSuccess('Cập nhật thông tin nhà hàng thành công!');
+                        editRestaurantModal.hide();
+                        location.reload();
+                    })
+                    .catch(() => toastError('Không thể cập nhật thông tin nhà hàng!'));
+                }
+
+                if (file) {
+                    const uploadData = new FormData();
+                    uploadData.append('file', file);
+                    fetch('/api/image/upload', {
+                        method: 'POST',
+                        body: uploadData
+                    })
+                    .then(res => res.ok ? res.text() : Promise.reject())
+                    .then(url => {
+                        if (oldImage) {
+                            fetch('/api/image/delete?path=' + encodeURIComponent(oldImage), { method: 'DELETE' }).catch(() => {});
+                        }
+                        doUpdate(url.replace(/"/g, ''));
+                    })
+                    .catch(() => {
+                        toastError('Không thể upload ảnh!');
+                    });
+                } else {
+                    doUpdate();
+                }
+            });
+
+            // =========================
+            // 🍔 PRODUCTS LOGIC
+            // =========================
+            function renderProducts(data) {
+                const products = data.products || [];
+                const totalPages = data.totalPages || 1;
+                const currentPage = data.page || 1;
+
+                if (!products.length) {
+                    productsList.innerHTML = `<div class="text-center text-muted">Chưa có sản phẩm nào cho nhà hàng này.</div>`;
+                } else {
+                    productsList.innerHTML = products.map(product => `
+                        <div class="product-item d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+                            <div class="d-flex align-items-center">
+                                <img src="${product.imageUrl || '/images/no-image.png'}" class="rounded me-3" style="width:60px;height:60px;object-fit:cover;">
+                                <div>
+                                    <div class="fw-bold">${product.name}</div>
+                                    <div class="text-muted small">${product.description || ''}</div>
+                                    <div class="text-secondary small">Giá: ${product.price} đ</div>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2 update-product-btn" data-id="${product.productId}" title="Cập nhật">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-product-btn" data-id="${product.productId}" title="Xóa">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                let pagingHtml = '';
+                if (totalPages > 1) {
+                    pagingHtml = `<nav><ul class="pagination justify-content-center">`;
+                    for (let i = 1; i <= totalPages; i++) {
+                        pagingHtml += `
+                            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                <a class="page-link product-page-link" href="#" data-page="${i}">${i}</a>
+                            </li>
+                        `;
+                    }
+                    pagingHtml += `</ul></nav>`;
+                }
+                productsPaging.innerHTML = pagingHtml;
+            }
+
+            function loadProducts(page = 1) {
+                fetch(`/api/restaurant/${restaurantId}/products?page=${page}&size=5`)
+                    .then(res => res.json())
+                    .then(renderProducts)
+                    .catch(() => {
+                        productsList.innerHTML = `<div class="text-danger">Không thể tải danh sách sản phẩm!</div>`;
+                    });
+            }
+
+            productsPaging.addEventListener('click', function(e) {
+                if (e.target.classList.contains('product-page-link')) {
+                    e.preventDefault();
+                    const page = parseInt(e.target.dataset.page);
+                    loadProducts(page);
+                }
+            });
+
+            document.getElementById('addProductBtn').addEventListener('click', function() {
+                productForm.reset();
+                productForm.productId.value = '';
+                productImageUrlInput.value = '';
+                productPreviewImage.innerHTML = '';
+                document.getElementById('productModalLabel').textContent = 'Thêm sản phẩm mới';
+                document.getElementById('saveProductBtn').textContent = 'Lưu sản phẩm';
+                productModal.show();
+            });
+
+            productImageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    productPreviewImage.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" style="max-height:120px;">`;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            productsList.addEventListener('click', function(e) {
+                if (e.target.closest('.update-product-btn')) {
+                    const productId = e.target.closest('.update-product-btn').dataset.id;
+                    fetch(`/api/restaurant/${restaurantId}/products/${productId}`)
+                        .then(res => res.json())
+                        .then(product => {
+                            productForm.reset();
+                            productForm.productId.value = product.productId;
+                            productForm.name.value = product.name || '';
+                            productForm.description.value = product.description || '';
+                            productForm.price.value = product.price || '';
+                            productForm.remainingQuantity.value = product.remainingQuantity || '';
+                            productImageUrlInput.value = product.imageUrl || '';
+                            productPreviewImage.innerHTML = product.imageUrl
+                                ? `<img src="${product.imageUrl}" class="img-fluid rounded" style="max-height:120px;">`
+                                : '';
+                            document.getElementById('productModalLabel').textContent = 'Cập nhật sản phẩm';
+                            document.getElementById('saveProductBtn').textContent = 'Cập nhật';
+                            productModal.show();
+                        });
+                }
+                if (e.target.closest('.delete-product-btn')) {
+                    const productId = e.target.closest('.delete-product-btn').dataset.id;
+                    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+                        fetch(`/api/restaurant/${restaurantId}/products/${productId}`, { method: 'DELETE' })
+                            .then(res => {
+                                if (!res.ok) throw new Error();
+                                toastSuccess('Đã xóa sản phẩm thành công!');
+                                loadProducts();
+                            })
+                            .catch(() => toastError('Không thể xóa sản phẩm!'));
+                    }
+                }
+            });
+
+            productForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const file = productImageInput.files[0];
+                const oldImageUrl = productImageUrlInput.value;
+                const isUpdate = !!productForm.productId.value;
+                const url = isUpdate
+                    ? `/api/restaurant/${restaurantId}/products/${productForm.productId.value}`
+                    : `/api/restaurant/${restaurantId}/products`;
+                const method = isUpdate ? 'PUT' : 'POST';
+
+                function doSubmit(imageUrl) {
+                    const data = {
+                        name: productForm.name.value,
+                        description: productForm.description.value,
+                        price: Number(productForm.price.value),
+                        remainingQuantity: Number(productForm.remainingQuantity.value),
+                        imageUrl: imageUrl || oldImageUrl || ''
+                        // Add categories if needed
+                    };
+
+                    fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        return res.json();
+                    })
+                    .then(() => {
+                        productModal.hide();
+                        toastSuccess(isUpdate ? 'Cập nhật sản phẩm thành công!' : 'Đã thêm sản phẩm mới thành công!');
+                        loadProducts();
+                    })
+                    .catch(() => toastError(isUpdate ? 'Không thể cập nhật sản phẩm!' : 'Không thể thêm sản phẩm!'));
+                }
+
+                if (file) {
+                    const uploadData = new FormData();
+                    uploadData.append('file', file);
+                    fetch('/api/image/upload', {
+                        method: 'POST',
+                        body: uploadData
+                    })
+                    .then(res => res.ok ? res.text() : Promise.reject())
+                    .then(url => {
+                        if (oldImageUrl) {
+                            fetch('/api/image/delete?path=' + encodeURIComponent(oldImageUrl), { method: 'DELETE' }).catch(() => {});
+                        }
+                        doSubmit(url.replace(/"/g, ''));
+                    })
+                    .catch(() => {
+                        toastError('Không thể upload ảnh!');
+                    });
+                } else {
+                    doSubmit();
+                }
+            });
+
+            // =========================
+            // 🚦 INITIAL LOAD
+            // =========================
+            loadBranches();
+            loadProducts();
+        });
+        </script>
     </div>
 </div>
+</body>
 </html>

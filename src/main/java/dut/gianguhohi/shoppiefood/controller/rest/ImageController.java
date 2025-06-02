@@ -17,26 +17,25 @@ public class ImageController {
 
     private static final String UPLOAD_DIR = "uploads";
 
+    // ==========================
+    // == Upload Image         ==
+    // ==========================
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("No file selected");
         }
         try {
-            // Create upload directory if not exists
             File uploadDir = new File(UPLOAD_DIR);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
 
-            // Clean file name
             String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename());
             Path filePath = Paths.get(UPLOAD_DIR, fileName);
 
-            // Save file
             Files.copy(file.getInputStream(), filePath);
 
-            // Return relative path
             String imagePath = "/" + UPLOAD_DIR + "/" + fileName;
             return ResponseEntity.ok().body(imagePath);
 
@@ -45,15 +44,15 @@ public class ImageController {
         }
     }
 
-
+    // ==========================
+    // == Delete Image         ==
+    // ==========================
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteImage(@RequestParam("path") String path) {
-        // Only allow deletion inside the uploads directory for safety
         if (path == null || !path.startsWith("/uploads/")) {
             return ResponseEntity.badRequest().body("Invalid path");
         }
         try {
-            // Remove leading slash if present
             String relativePath = path.startsWith("/") ? path.substring(1) : path;
             File file = new File(relativePath);
             if (file.exists() && file.isFile()) {
