@@ -2,6 +2,7 @@ package dut.gianguhohi.shoppiefood.repositories.Orders;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import dut.gianguhohi.shoppiefood.models.Orders.Order;
 import java.util.List;
@@ -40,4 +41,14 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     Page<Order> getShipperActiveOrders(Shipper shipper, Pageable pageable);
 
     Order findByOrderId(int orderId);
+
+    // Thay các phương thức sau
+    List<Order> findByBranch_Restaurant_RestaurantIdAndStatusOrderByCreatedAtDesc(int restaurantId, String status);
+    List<Order> findByStatusAndShipperIsNullOrderByCreatedAtAsc(String status);
+    List<Order> findByShipperAndStatusOrderByCreatedAtDesc(Shipper shipper, String status);
+    List<Order> findByShipperAndStatusOrderByTimeDeliveredDesc(Shipper shipper, String status);
+
+    // Hoặc sửa @Query
+    @Query("SELECT o FROM Order o WHERE o.customer = :user AND o.status IN (:statusList) ORDER BY o.timeDelivered DESC")
+Page<Order> getCustomerHistory(User user, @Param("statusList") List<String> statusList, Pageable pageable);
 }

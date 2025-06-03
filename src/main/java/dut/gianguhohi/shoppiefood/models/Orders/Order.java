@@ -7,6 +7,7 @@ import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import dut.gianguhohi.shoppiefood.models.misc.Branch;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Entity
 @Table(name = "orders")
@@ -21,7 +22,7 @@ public class Order {
     private User customer;
 
     @ManyToOne
-    @JoinColumn(name = "shipper_id", nullable = false)
+    @JoinColumn(name = "shipper_id", nullable = true)
     private Shipper shipper;
 
     @ManyToOne
@@ -40,11 +41,23 @@ public class Order {
     @Column(name = "time_delivered")
     private LocalDateTime timeDelivered;
 
+    @Column(name = "estimated_delivery_time")
+    private Date estimatedDeliveryTime;
+
     @Column(nullable = false)
     private String status;
 
     @Column(name = "total_amount", nullable = false)
     private long totalAmount;
+
+    @Column(name = "note")
+    private String note;
+
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+
+    @Column(name = "cancelled_date")
+    private LocalDateTime cancelledDate;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
@@ -174,5 +187,41 @@ public class Order {
 
     public void setDeliveryAddress(String deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+    public Date getEstimatedDeliveryTime() {
+        return estimatedDeliveryTime;
+    }
+    public void setEstimatedDeliveryTime(Date estimatedDelivery) {
+        this.estimatedDeliveryTime = estimatedDelivery;
+    }
+    public String getCancelReason() {
+        return cancelReason;
+    }
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    public void setCancelledDate(Date date) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCancelledDate'");
+    }
+    public LocalDateTime getCancelledDate() {
+        return cancelledDate;
+    }
+    public void setEstimatedDeliveryTime(LocalDateTime estimatedDelivery) {
+    this.estimatedDeliveryTime = new Date(
+        estimatedDelivery.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+    );
+}
+    public void setCancelledDate(LocalDateTime cancelledDate) {
+        this.cancelledDate = cancelledDate;
     }
 }
