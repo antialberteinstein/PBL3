@@ -45,6 +45,8 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    
+
     public List<Product> search(String pattern) {
         validateSearchPattern(pattern);
         return productRepository.findByNameContains(pattern);

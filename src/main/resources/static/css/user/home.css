@@ -1,0 +1,216 @@
+/* Tùy chỉnh các thành phần giao diện */
+.search-section {
+    background-color: rgba(255, 212, 59, 0.1);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.search-section .input-group {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.search-section input {
+    border: 1px solid #f0f0f0;
+    border-right: none;
+    padding: 12px 20px;
+    border-radius: 8px 0 0 8px;
+}
+
+.search-section button {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #333;
+    font-weight: 500;
+    padding: 12px 25px;
+    border-radius: 0 8px 8px 0;
+}
+
+.search-section button:hover {
+    background-color: #FFCB38;
+    border-color: #FFCB38;
+}
+
+.category-section {
+    margin-bottom: 30px;
+}
+
+.category-section h4 {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+    position: relative;
+    padding-left: 15px;
+}
+
+.category-section h4::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 20px;
+    background-color: var(--primary-color);
+    border-radius: 3px;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.category-badge.active {
+    background-color: var(--primary-color) !important;
+    color: #333;
+}
+
+.category-badge:not(.active) {
+    background-color: #e9ecef;
+    color: #333;
+}
+
+.category-badge:hover:not(.active) {
+    background-color: #dee2e6;
+}
+
+/* Styling the food cards */
+.food-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.food-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.food-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.food-card .card-body {
+    padding: 20px;
+}
+
+.food-card .card-title {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.food-card .card-text {
+    color: #6c757d;
+    font-size: 14px;
+    margin-bottom: 15px;
+    height: 60px;
+    overflow: hidden;
+}
+
+.food-card .price {
+    font-weight: bold;
+    color: #e74c3c;
+    font-size: 18px;
+}
+
+.food-card .btn-add-cart {
+    border-color: var(--primary-color);
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.food-card .btn-add-cart:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #333;
+}
+
+.restaurant-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    color: #333;
+    font-weight: 500;
+}
+
+.rating {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.rating .stars {
+    color: #ffc107;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.rating .count {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.popular-tag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #ff6b6b;
+    color: white;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.new-tag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #51cf66;
+    color: white;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* No products message */
+.no-products {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 10px;
+    margin-top: 30px;
+}
+
+.no-products i {
+    font-size: 48px;
+    color: #adb5bd;
+    margin-bottom: 15px;
+}
+
+.no-products p {
+    font-size: 18px;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
