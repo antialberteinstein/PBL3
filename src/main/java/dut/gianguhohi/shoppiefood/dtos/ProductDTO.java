@@ -17,6 +17,8 @@ public class ProductDTO {
     private Long ratingNumber;
     private Long remainingQuantity;
     private Boolean isAllow;
+    private String restaurantName;
+    private String rejectedReason;
 
     public ProductDTO() {}
 
@@ -34,6 +36,8 @@ public class ProductDTO {
         this.remainingQuantity = product.getRemainingQuantity();
         this.isAllow = product.isAllow();
         this.ratingNumber = product.getRatingNumber();
+        this.restaurantName = product.getRestaurant() != null ? product.getRestaurant().getRestaurantName() : null;
+        this.rejectedReason = product.getRejectedReason();
     }
 
     // Getters and setters
@@ -72,4 +76,10 @@ public class ProductDTO {
 
     public Long getRatingNumber() { return ratingNumber; }
     public void setRatingNumber(Long ratingNumber) { this.ratingNumber = ratingNumber; }
+
+    public String getRestaurantName() { return restaurantName; }
+    public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }
+
+    public String getRejectedReason() { return rejectedReason; }
+    public void setRejectedReason(String rejectedReason) { this.rejectedReason = rejectedReason; }
 }

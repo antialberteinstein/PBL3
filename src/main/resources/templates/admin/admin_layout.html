@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - ShoppieFood Admin">ShoppieFood Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        :root {
+            --matrix-green: #00ff41;
+            --matrix-dark-green: #008f11;
+            --matrix-bg: #0d1117;
+            --matrix-card-bg: #161b22;
+            --matrix-border: #30363d;
+            --matrix-text: #c9d1d9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: var(--matrix-bg);
+            color: var(--matrix-text);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Matrix Rain Effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .matrix-char {
+            position: absolute;
+            color: var(--matrix-green);
+            font-size: 14px;
+            animation: matrixFall linear infinite;
+        }
+
+        @keyframes matrixFall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--matrix-card-bg), #1a2332);
+            border-bottom: 2px solid var(--matrix-green);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--matrix-green) !important;
+            text-shadow: 0 0 10px var(--matrix-green);
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--matrix-text) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--matrix-green) !important;
+            text-shadow: 0 0 5px var(--matrix-green);
+        }
+
+        /* Main Container */
+        .main-container {
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-card {
+            background: linear-gradient(135deg, var(--matrix-card-bg), #1a2332);
+            border: 1px solid var(--matrix-border);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .dashboard-card:hover {
+            border-color: var(--matrix-green);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card:hover::before {
+            left: 100%;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            color: var(--matrix-green);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px var(--matrix-green);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--matrix-green);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .card-description {
+            color: var(--matrix-text);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .matrix-btn {
+            background: linear-gradient(45deg, var(--matrix-dark-green), var(--matrix-green));
+            border: none;
+            color: #000;
+            font-weight: 700;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .matrix-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .matrix-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--matrix-green);
+        }
+
+        .matrix-btn:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, var(--matrix-card-bg), #1a2332);
+            border: 1px solid var(--matrix-border);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--matrix-green);
+            text-shadow: 0 0 10px var(--matrix-green);
+        }
+
+        .stat-label {
+            color: var(--matrix-text);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-card {
+                padding: 1.5rem;
+            }
+            
+            .card-icon {
+                font-size: 2rem;
+            }
+            
+            .card-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .matrix-loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+
+        .matrix-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--matrix-border);
+            border-top: 3px solid var(--matrix-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Glitch Effect for headings */
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-anim-1 0.3s infinite linear alternate-reverse;
+            color: #ff0040;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-anim-2 0.3s infinite linear alternate-reverse;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(132px, 9999px, 142px, 0); }
+            5% { clip: rect(17px, 9999px, 94px, 0); }
+            10% { clip: rect(40px, 9999px, 66px, 0); }
+            15% { clip: rect(87px, 9999px, 82px, 0); }
+            20% { clip: rect(137px, 9999px, 61px, 0); }
+            25% { clip: rect(34px, 9999px, 14px, 0); }
+            30% { clip: rect(133px, 9999px, 74px, 0); }
+            35% { clip: rect(76px, 9999px, 107px, 0); }
+            40% { clip: rect(59px, 9999px, 130px, 0); }
+            45% { clip: rect(29px, 9999px, 84px, 0); }
+            50% { clip: rect(22px, 9999px, 67px, 0); }
+            55% { clip: rect(67px, 9999px, 62px, 0); }
+            60% { clip: rect(10px, 9999px, 105px, 0); }
+            65% { clip: rect(78px, 9999px, 115px, 0); }
+            70% { clip: rect(105px, 9999px, 13px, 0); }
+            75% { clip: rect(15px, 9999px, 75px, 0); }
+            80% { clip: rect(66px, 9999px, 39px, 0); }
+            85% { clip: rect(133px, 9999px, 73px, 0); }
+            90% { clip: rect(36px, 9999px, 128px, 0); }
+            95% { clip: rect(68px, 9999px, 103px, 0); }
+            100% { clip: rect(14px, 9999px, 100px, 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(129px, 9999px, 36px, 0); }
+            5% { clip: rect(36px, 9999px, 4px, 0); }
+            10% { clip: rect(85px, 9999px, 66px, 0); }
+            15% { clip: rect(91px, 9999px, 91px, 0); }
+            20% { clip: rect(148px, 9999px, 138px, 0); }
+            25% { clip: rect(38px, 9999px, 122px, 0); }
+            30% { clip: rect(69px, 9999px, 54px, 0); }
+            35% { clip: rect(98px, 9999px, 71px, 0); }
+            40% { clip: rect(146px, 9999px, 34px, 0); }
+            45% { clip: rect(134px, 9999px, 43px, 0); }
+            50% { clip: rect(102px, 9999px, 80px, 0); }
+            55% { clip: rect(119px, 9999px, 44px, 0); }
+            60% { clip: rect(106px, 9999px, 99px, 0); }
+            65% { clip: rect(141px, 9999px, 74px, 0); }
+            70% { clip: rect(20px, 9999px, 78px, 0); }
+            75% { clip: rect(133px, 9999px, 79px, 0); }
+            80% { clip: rect(78px, 9999px, 52px, 0); }
+            85% { clip: rect(35px, 9999px, 39px, 0); }
+            90% { clip: rect(67px, 9999px, 70px, 0); }
+            95% { clip: rect(71px, 9999px, 103px, 0); }
+            100% { clip: rect(83px, 9999px, 40px, 0); }
+        }
+    </style>
+    <th:block layout:fragment="head"></th:block>
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <div class="matrix-bg" id="matrixBg"></div>
+
+    <!-- Loading Spinner -->
+    <div class="matrix-loader" id="loader">
+        <div class="matrix-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand glitch" href="#" data-text="SHOPPIE FOOD">
+                <i class="fas fa-code"></i> SHOPPIE FOOD
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#notifications">
+                            <i class="fas fa-bell"></i> Thông báo
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#profile">
+                            <i class="fas fa-user"></i> Hồ sơ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#logout">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-container" style="margin-top: 100px;">
+        <div layout:fragment="content"></div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header" style="background: var(--matrix-card-bg); color: var(--matrix-text); border-bottom: 1px solid var(--matrix-green);">
+                <i class="fas fa-info-circle text-success me-2"></i>
+                <strong class="me-auto">Admin Page</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" style="background: var(--matrix-card-bg); color: var(--matrix-text);" id="toastBody">
+                Thông báo từ hệ thống
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <th:block layout:fragment="script"></th:block>
+    <script>
+                // Matrix Rain Effect
+        function createMatrixRain() {
+            const matrixBg = document.getElementById('matrixBg');
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            for (let i = 0; i < 100; i++) {
+                const char = document.createElement('div');
+                char.className = 'matrix-char';
+                char.textContent = chars[Math.floor(Math.random() * chars.length)];
+                char.style.left = Math.random() * 100 + '%';
+                char.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                char.style.animationDelay = Math.random() * 2 + 's';
+                matrixBg.appendChild(char);
+            }
+        }
+
+        // Navigation function
+        function navigateTo(path) {
+            showLoader();
+            setTimeout(() => {
+                window.location.href = path;
+                hideLoader();
+            }, 1000);
+        }
+
+        // Show/Hide Loader
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const toastBody = document.getElementById('toastBody');
+            const toast = document.getElementById('liveToast');
+            const toastHeader = toast.querySelector('.toast-header i');
+            
+            toastBody.textContent = message;
+            
+            // Update icon based on type
+            toastHeader.className = `fas me-2 ${getIconClass(type)}`;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        function getIconClass(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle text-success';
+                case 'warning': return 'fa-exclamation-triangle text-warning';
+                case 'danger': return 'fa-exclamation-circle text-danger';
+                default: return 'fa-info-circle text-info';
+            }
+        }
+
+        // Animate statistics
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach((stat, index) => {
+                const finalValue = parseInt(stat.textContent.replace(/,/g, ''));
+                let current = 0;
+                const increment = finalValue / 50;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= finalValue) {
+                        current = finalValue;
+                        clearInterval(timer);
+                    }
+                    stat.textContent = Math.floor(current).toLocaleString();
+                }, 50 + (index * 10));
+            });
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            createMatrixRain();
+            setTimeout(animateStats, 500);
+            
+            // Add pulse effect to cards
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+
+        // Add particle effect on hover
+        document.querySelectorAll('.matrix-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Add typing effect to the main title
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function typing() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typing, speed);
+                }
+            }
+            typing();
+        }
+
+                // Add real-time clock
+        function updateClock() {
+            const now = new Date();
+            const clockElement = document.getElementById('realtimeClock');
+            if (clockElement) {
+                clockElement.textContent =
+                    now.toLocaleTimeString('vi-VN') + ' | ' +
+                    now.toLocaleDateString('vi-VN');
+            }
+        }
+        setInterval(updateClock, 1000);
+
+        // Optionally, add a clock somewhere in your HTML, for example:
+        // <div id="realtimeClock" class="text-end mb-3" style="font-size:1.1rem;color:var(--matrix-green);"></div>
+
+        // Optionally, add typing effect to the main title on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const title = document.querySelector('h1.glitch');
+            if (title) {
+                typeWriter(title, title.getAttribute('data-text'), 60);
+            }
+            updateClock();
+        });
+    </script>
+</body>
+</html>

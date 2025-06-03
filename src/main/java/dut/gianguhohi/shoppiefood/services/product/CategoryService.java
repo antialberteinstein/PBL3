@@ -1,7 +1,9 @@
 package dut.gianguhohi.shoppiefood.services.product;
 
 import dut.gianguhohi.shoppiefood.models.Product.Category;
+import dut.gianguhohi.shoppiefood.models.Product.ProductCategory;
 import dut.gianguhohi.shoppiefood.repositories.Products.CategoryRepository;
+import dut.gianguhohi.shoppiefood.repositories.Products.ProductCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,6 +16,9 @@ public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ProductCategoryRepository pCatRepository;
 
     // Create
     public Category create(String name) {
@@ -47,6 +52,12 @@ public class CategoryService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy danh mục"));
     }
 
+    public long countProducts(Category category) {
+        return pCatRepository.countByCategory(category);
+    }
+
+
+
     // Update
     public Category update(int id, String newName) {
         Category category = getById(id);
@@ -63,6 +74,14 @@ public class CategoryService {
     // Delete
     public void delete(int id) {
         Category category = getById(id);
+        // Get and delete all the productCategories.
+        List<ProductCategory> lst = pCatRepository.findByCategory(category);
+        if (lst != null && !lst.isEmpty()) {
+            for (ProductCategory pc : lst) {
+                pCatRepository.delete(pc);
+            }
+        }
+
         categoryRepository.delete(category);
     }
 }

@@ -114,7 +114,6 @@ public class ProductService {
         long ratingNumber = 0;
 
         Product product = new Product(restaurant, imageUrl, name, description, price, rating, ratingNumber, remainingQuantity);
-        product.setAllow(true);
         product = productRepository.save(product);
 
         // Handle categories using CategoryService
@@ -153,6 +152,8 @@ public class ProductService {
         existingProduct.setDescription(description);
         existingProduct.setPrice(price);
         existingProduct.setRemainingQuantity(remainingQuantity);
+
+        existingProduct.setAllow(null);  // Chuyển sang chờ duyệt.
 
         // Get current and new category sets
         List<ProductCategory> oldLinks = productCategoryRepository.findByProduct(existingProduct);

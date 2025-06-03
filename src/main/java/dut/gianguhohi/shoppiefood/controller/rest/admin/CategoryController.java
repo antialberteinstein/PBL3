@@ -25,20 +25,39 @@ public class CategoryController {
 
     // Get all categories
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAll());
+    public ResponseEntity<?> getAllCategories() {
+        List<Category> categories = categoryService.getAll();
+        List<Map<String, Object>> response = categories.stream().map(category -> {
+            long nproducts = categoryService.countProducts(category);
+            return Map.of(
+                    "category", category,
+                    "nproducts", nproducts
+            );
+        }).toList();
+
+        return ResponseEntity.ok(response);
     }
 
     // Get category by id
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable int id) {
-        return ResponseEntity.ok(categoryService.getById(id));
+    public ResponseEntity<?> getCategoryById(@PathVariable int id) {
+        Category category = categoryService.getById(id);
+        long nproducts = categoryService.countProducts(category);
+        return ResponseEntity.ok(Map.of(
+                "category", category,
+                "nproducts", nproducts
+        ));
     }
 
     // Get category by name
     @GetMapping("/by-name")
-    public ResponseEntity<Category> getCategoryByName(@RequestParam String name) {
-        return ResponseEntity.ok(categoryService.getByName(name));
+    public ResponseEntity<?> getCategoryByName(@RequestParam String name) {
+        Category category = categoryService.getByName(name);
+        long nproducts = categoryService.countProducts(category);
+        return ResponseEntity.ok(Map.of(
+                "category", category,
+                "nproducts", nproducts
+        ));
     }
 
     // Update category
