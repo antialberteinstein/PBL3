@@ -83,22 +83,12 @@ public class AdminController {
     }
 
     @GetMapping("/user")
-    public String user(HttpSession session, Model model,
-                    @RequestParam(defaultValue = "0") int page,
-                    @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepo.findAll(pageable);
-        model.addAttribute("userPage", userPage);
+    public String user(HttpSession session, Model model) {
         return "admin/user";
     }
 
     @GetMapping("/order")
-    public String order(HttpSession session, Model model,
-                        @RequestParam(defaultValue = "0") int page,
-                        @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Order> orderPage = orderRepo.findAll(pageable);
-        model.addAttribute("orderPage", orderPage);
+    public String order(HttpSession session, Model model) {
         return "admin/order";
     }
 

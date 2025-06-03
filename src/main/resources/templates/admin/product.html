@@ -17,12 +17,13 @@
         </div>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- Split horizontally: Category left, Product right -->
+    <div class="row">
+        <!-- ════════════════════════════════════════════════════════════════════ -->
     <!-- 🟩 CATEGORY MANAGEMENT                                             -->
     <!-- ════════════════════════════════════════════════════════════════════ -->
-    <div class="dashboard-card mb-5">
-        <div class="row">
-            <div class="col-md-4">
+        <div class="col-md-4">
+            <div class="dashboard-card mb-4">
                 <h4 class="card-title"><i class="fas fa-tags"></i> Quản lý Danh mục</h4>
                 <!-- Create Category Form -->
                 <form id="createCategoryForm" class="mb-3 d-flex">
@@ -36,8 +37,6 @@
                     <button type="submit" class="matrix-btn"><i class="fas fa-save"></i> Lưu</button>
                     <button type="button" class="btn btn-secondary ms-2" id="cancelUpdateCategoryBtn">Hủy</button>
                 </form>
-            </div>
-            <div class="col-md-8">
                 <!-- Category List Table -->
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -56,20 +55,16 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ════════════════════════════════════════════════════════════════════ -->
+            <!-- ════════════════════════════════════════════════════════════════════ -->
     <!-- 🟩 PRODUCT MANAGEMENT & MODERATION                                 -->
     <!-- ════════════════════════════════════════════════════════════════════ -->
-    <div class="dashboard-card">
-        <div class="row">
-            <div class="col-12">
+        <div class="col-md-8">
+            <div class="dashboard-card">
                 <h4 class="card-title"><i class="fas fa-box"></i> Quản lý Sản phẩm & Kiểm duyệt</h4>
-            </div>
-            <div class="col-12 mb-3">
-                <input type="text" class="form-control" id="productSearchInput" placeholder="Tìm kiếm sản phẩm...">
-            </div>
-            <div class="col-12">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="productSearchInput" placeholder="Tìm kiếm sản phẩm...">
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>

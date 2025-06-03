@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="admin/admin_layout.html">
+<head>
+    <title>Quản lý đơn hàng - ShoppieFood Admin</title>
+    <style>
+        .order-status-badge {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .order-status-pending { background: #222; color: #ffc107; }
+        .order-status-confirmed { background: #222; color: #17a2b8; }
+        .order-status-delivering { background: #222; color: #0dcaf0; }
+        .order-status-delivered { background: #222; color: var(--matrix-green); }
+        .order-status-cancelled { background: #222; color: #ff0040; }
+        .order-action-btn { min-width: 90px; }
+        .order-product-img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--matrix-green);}
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="glitch" data-text="QUẢN LÝ ĐƠN HÀNG" style="color: var(--matrix-green);">QUẢN LÝ ĐƠN HÀNG</h2>
+        </div>
+    </div>
+    <div class="dashboard-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <i class="fas fa-receipt card-icon"></i>
+                <span class="card-title">Danh sách đơn hàng</span>
+            </div>
+            <div>
+                <input type="text" id="orderSearchInput" class="form-control" placeholder="Tìm kiếm theo tên khách, nhà hàng, trạng thái..." style="width: 300px;">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Khách hàng</th>
+                        <th>Nhà hàng</th>
+                        <th>Món đầu tiên</th>
+                        <th>Shipper</th>
+                        <th>Ngày tạo</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng tiền</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="orderTableBody">
+                    <!-- Orders will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul class="pagination justify-content-center" id="orderPagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+<script>
+const orderTableBody = document.getElementById('orderTableBody');
+const orderPagination = document.getElementById('orderPagination');
+const orderSearchInput = document.getElementById('orderSearchInput');
+let orderPage = 0;
+let orderSize = 10;
+let orderSearch = '';
+
+function getStatusBadge(status) {
+    status = (status || '').toLowerCase();
+    if (status === 'pending') return '<span class="order-status-badge order-status-pending">Chờ xác nhận</span>';
+    if (status === 'confirmed') return '<span class="order-status-badge order-status-confirmed">Đã xác nhận</span>';
+    if (status === 'delivering') return '<span class="order-status-badge order-status-delivering">Đang giao</span>';
+    if (status === 'delivered') return '<span class="order-status-badge order-status-delivered">Đã giao</span>';
+    if (status === 'cancelled') return '<span class="order-status-badge order-status-cancelled">Đã hủy</span>';
+    return `<span class="order-status-badge">${status}</span>`;
+}
+
+function loadOrders(page = 0, search = '') {
+    orderPage = page;
+    orderSearch = search;
+    let url = `/api/admin/orders?page=${page}&size=${orderSize}`;
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            let orders = data.orders || [];
+            orderTableBody.innerHTML = '';
+            let filtered = orders;
+            if (search) {
+                const s = search.toLowerCase();
+                filtered = orders.filter(o =>
+                    (o.customerName && o.customerName.toLowerCase().includes(s)) ||
+                    (o.restaurantName && o.restaurantName.toLowerCase().includes(s)) ||
+                    (o.status && o.status.toLowerCase().includes(s))
+                );
+            }
+            filtered.forEach((order, idx) => {
+                orderTableBody.innerHTML += `
+                    <tr>
+                        <td>${(data.currentPage * orderSize) + idx + 1}</td>
+                        <td>
+                            <div>${order.customerName || ''}</div>
+                            <div class="text-muted small">#${order.customerId || ''}</div>
+                        </td>
+                        <td>
+                            <div>${order.restaurantName || ''}</div>
+                            <div class="text-muted small">#${order.restaurantId || ''}</div>
+                        </td>
+                        <td>
+                            <img src="${order.firstProductImageUrl || '/images/no-image.png'}" class="order-product-img me-2" alt="">
+                            <span>${order.firstProductName || ''}</span>
+                        </td>
+                        <td>
+                            ${order.shipperName ? `<div>${order.shipperName}</div><div class="text-muted small">#${order.shipperId}</div>` : '<span class="text-muted">Chưa có</span>'}
+                        </td>
+                        <td>${order.createdAt ? order.createdAt.replace('T', ' ').substring(0, 16) : ''}</td>
+                        <td>${getStatusBadge(order.status)}</td>
+                        <td><span class="text-danger fw-bold">${order.totalAmount?.toLocaleString('vi-VN') || 0} VNĐ</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info order-action-btn" onclick="viewOrder(${order.orderId})">
+                                <i class="fas fa-eye"></i> Xem
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            // Pagination
+            orderPagination.innerHTML = '';
+            for (let i = 0; i < (data.totalPages || 1); i++) {
+                orderPagination.innerHTML += `
+                    <li class="page-item ${i === data.currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadOrders(${i}, orderSearchInput.value);return false;">${i + 1}</a>
+                    </li>
+                `;
+            }
+        });
+}
+
+function viewOrder(orderId) {
+    showNotification('Xem chi tiết đơn hàng #' + orderId, 'info');
+    // TODO: Hiển thị modal chi tiết đơn hàng
+}
+
+orderSearchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        loadOrders(0, orderSearchInput.value);
+    }
+});
+orderSearchInput.addEventListener('input', function() {
+    if (!this.value) loadOrders(0, '');
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadOrders();
+});
+</script>
+</th:block>
+</body>
+</html>
