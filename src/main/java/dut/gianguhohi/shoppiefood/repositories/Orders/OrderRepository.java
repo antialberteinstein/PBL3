@@ -21,11 +21,11 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     Page<Order> getCustomerHistory(User user, Pageable pageable);
 
     // Customer active: sort by createdAt DESC
-    @Query("SELECT o FROM Order o WHERE o.customer = :user AND o.status IN ('confirmed', 'in_progress') ORDER BY o.createdAt DESC")
+    @Query("SELECT o FROM Order o WHERE o.customer = :user AND o.status IN ('pending', 'confirmed', 'in_progress') ORDER BY o.createdAt DESC")
     Page<Order> getCustomerActiveOrders(User user, Pageable pageable);
 
     // Restaurant history: sort by timeDelivered DESC
-    @Query("SELECT o FROM Order o WHERE o.branch = :branch AND o.status IN ('delivered', 'cancelled', 'refunded', 'in_progress') ORDER BY o.timeDelivered DESC")
+    @Query("SELECT o FROM Order o WHERE o.branch = :branch AND o.status IN ('delivered', 'cancelled', 'refunded') ORDER BY o.timeDelivered DESC")
     Page<Order> getBranchHistory(Branch branch, Pageable pageable);
 
     // Restaurant active: sort by createdAt DESC
@@ -47,8 +47,4 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Order> findByStatusAndShipperIsNullOrderByCreatedAtAsc(String status);
     List<Order> findByShipperAndStatusOrderByCreatedAtDesc(Shipper shipper, String status);
     List<Order> findByShipperAndStatusOrderByTimeDeliveredDesc(Shipper shipper, String status);
-
-    // Hoặc sửa @Query
-    @Query("SELECT o FROM Order o WHERE o.customer = :user AND o.status IN (:statusList) ORDER BY o.timeDelivered DESC")
-Page<Order> getCustomerHistory(User user, @Param("statusList") List<String> statusList, Pageable pageable);
 }
