@@ -44,17 +44,23 @@ public class Product {
     private long remainingQuantity;
 
     // Có vượt qua kiểm duyệt không?
-    @Column(name = "is_alow")
-    private boolean isAllow;
+    @Column(name = "is_allow")
+    private Boolean isAllow;
+    // null nếu chưa duyệt, true nếu duyệt, false nếu từ chối.
+
+    // Vì sao từ chối.
+    @Column(name = "rejected_reason")
+    private String rejectedReason;
 
     public Product() {
         this.postedAt = LocalDateTime.now();
-        this.isAllow = true;  // Chưa có chức năng kiểm duyệt.
+        this.isAllow = null; // Chưa duyệt
+        this.rejectedReason = null; // Không có lý do từ chối
     }
 
     public Product(Restaurant restaurant, String imageUrl, String name, 
                   String description, long price, float rating, long ratingNumber,
-                  long remaininngQuantity) {
+                  long remainingQuantity) {
         this();
         this.restaurant = restaurant;
         this.imageUrl = imageUrl;
@@ -139,11 +145,11 @@ public class Product {
         this.remainingQuantity = remainingQuantity;
     }
 
-    public boolean isAllow() {
+    public Boolean isAllow() {
         return isAllow;
     }
 
-    public void setAllow(boolean allow) {
+    public void setAllow(Boolean allow) {
         isAllow = allow;
     }
 
@@ -153,5 +159,13 @@ public class Product {
 
     public void setRatingNumber(long ratingNumber) {
         this.ratingNumber = ratingNumber;
+    }
+
+    public String getRejectedReason() {
+        return rejectedReason;
+    }
+
+    public void setRejectedReason(String rejectedReason) {
+        this.rejectedReason = rejectedReason;
     }
 }

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Dashboard</title>
+    <th:block layout:fragment="head"></th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container main-container" style="margin-top: 100px;">
+            <!-- Welcome Section -->
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h1 class="glitch" data-text="HỆ THỐNG QUẢN TRỊ WEB GIAO HÀNG ONLINE - SHOPPIE FOOD" style="font-size: 3rem; color: var(--matrix-green); text-shadow: 0 0 20px var(--matrix-green);">
+                        HỆ THỐNG QUẢN TRỊ WEB GIAO HÀNG ONLINE - SHOPPIE FOOD
+                    </h1>
+                    <p style="font-size: 1.2rem; margin-top: 1rem;">Chào mừng đến với bảng điều khiển quản trị viên</p>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="row">
+                    <div class="col-md-2 stat-item">
+                        <div class="stat-number" id="totalProducts" th:text="${numberOfProducts}">1,234</div>
+                        <div class="stat-label">Sản phẩm</div>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <div class="stat-number" id="totalUsers" th:text="${numberOfUsers}">5,678</div>
+                        <div class="stat-label">Người dùng</div>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <div class="stat-number" id="totalOrders" th:text="${numberOfOrders}">2,345</div>
+                        <div class="stat-label">Đơn hàng</div>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <div class="stat-number" id="totalRestaurants" th:text="${numberOfRestaurants}">89</div>
+                        <div class="stat-label">Nhà hàng</div>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <div class="stat-number" id="totalPayments" th:text="${numberOfPayments}">9,876</div>
+                        <div class="stat-label">Thanh toán</div>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <div class="stat-number" id="totalFeedbacks" th:text="${numberOfFeedbacks}">456</div>
+                        <div class="stat-label">Phản hồi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Cards -->
+            <div class="row">
+                <!-- Product Management -->
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <h3 class="card-title">Quản lý Sản phẩm</h3>
+                        <p class="card-description">
+                            Quản lý toàn bộ sản phẩm, kiểm duyệt sản phẩm, xem chi tiết sản phẩm, quản lý danh mục
+                        </p>
+                        <button class="matrix-btn" onclick="navigateTo('/admin/product')">
+                            <i class="fas fa-arrow-right"></i> Truy cập
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Management -->
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="card-title">Quản lý Người dùng</h3>
+                        <p class="card-description">
+                            Quản lý tài khoản người dùng, vô hiệu hóa, xóa tài khoản người dùng.
+                        </p>
+                        <button class="matrix-btn" onclick="navigateTo('/admin/user')">
+                            <i class="fas fa-arrow-right"></i> Truy cập
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Order Management -->
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h3 class="card-title">Quản lý Đơn hàng</h3>
+                        <p class="card-description">
+                            Liệt kê danh sách các đơn hàng, các thông tin liên quan
+                        </p>
+                        <button class="matrix-btn" onclick="navigateTo('/admin/order')">
+                            <i class="fas fa-arrow-right"></i> Truy cập
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Restaurant Management -->
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <h3 class="card-title">Quản lý Nhà hàng</h3>
+                        <p class="card-description">
+                            Quản lý thông tin nhà hàng, liệt kê danh sách nhà hàng, xem chi tiết nhà hàng
+                        </p>
+                        <button class="matrix-btn" onclick="navigateTo('/admin/restaurant')">
+                            <i class="fas fa-arrow-right"></i> Truy cập
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Payment Management -->
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h3 class="card-title">Quản lý Thanh toán</h3>
+                        <p class="card-description">
+                            Theo dõi giao dịch thanh toán, xem báo cáo thống kê doanh thu.
+                        </p>
+                        <button class="matrix-btn" onclick="navigateTo('/admin/payment')">
+                            <i class="fas fa-arrow-right"></i> Truy cập
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feedback Management -->
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="card-title">Quản lý Phản hồi</h3>
+                        <p class="card-description">
+                            Xem và phản hồi ý kiến khách hàng, kiểm duyệt các phản hồi nhạy cảm.
+                        </p>
+                        <button class="matrix-btn" onclick="navigateTo('/admin/feedback')">
+                            <i class="fas fa-arrow-right"></i> Truy cập
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Discount Management -->
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <h3 class="card-title">Quản lý Khuyến mãi</h3>
+                        <p class="card-description">
+                            Tạo và quản lý các chương trình khuyến mãi, mã giảm giá và ưu đãi đặc biệt.
+                        </p>
+                        <button class="matrix-btn" onclick="navigateTo('/admin/discount')">
+                            <i class="fas fa-arrow-right"></i> Truy cập
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="dashboard-card text-center">
+                        <h3 class="card-title">Thao tác nhanh</h3>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <button class="matrix-btn w-100" onclick="showNotification('Tạo báo cáo mới', 'success')">
+                                    <i class="fas fa-chart-bar"></i> Tạo báo cáo
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="matrix-btn w-100" onclick="showNotification('Sao lưu dữ liệu', 'info')">
+                                    <i class="fas fa-database"></i> Sao lưu
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="matrix-btn w-100" onclick="showNotification('Cập nhật hệ thống', 'warning')">
+                                    <i class="fas fa-sync-alt"></i> Cập nhật
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button class="matrix-btn w-100" onclick="showNotification('Kiểm tra bảo mật', 'danger')">
+                                    <i class="fas fa-shield-alt"></i> Bảo mật
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block layout:fragment="script"></th:block>
+</body>
+</html>

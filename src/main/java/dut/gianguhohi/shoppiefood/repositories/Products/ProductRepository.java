@@ -16,6 +16,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :pattern, '%'))")
     List<Product> findByNameContains(String pattern);
+    
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :pattern, '%')) OR LOWER(p.description) LIKE LOWER(CONCAT('%', :pattern, '%'))")
+    Page<Product> findByNameOrDescriptionContains(String pattern, Pageable pageable);
 
     Product findByProductId(int productId);
 

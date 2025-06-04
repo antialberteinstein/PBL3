@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Quản lý Sản phẩm & Danh mục</title>
+    <th:block layout:fragment="head"></th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- 🟩 MATRIX PRODUCT & CATEGORY MANAGEMENT DASHBOARD                   -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="glitch" data-text="QUẢN LÝ SẢN PHẨM & DANH MỤC" style="color: var(--matrix-green);">QUẢN LÝ SẢN PHẨM & DANH MỤC</h2>
+        </div>
+    </div>
+
+    <!-- Split horizontally: Category left, Product right -->
+    <div class="row">
+        <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- 🟩 CATEGORY MANAGEMENT                                             -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+        <div class="col-md-4">
+            <div class="dashboard-card mb-4">
+                <h4 class="card-title"><i class="fas fa-tags"></i> Quản lý Danh mục</h4>
+                <!-- Create Category Form -->
+                <form id="createCategoryForm" class="mb-3 d-flex">
+                    <input type="text" class="form-control me-2" id="categoryNameInput" placeholder="Tên danh mục mới" required>
+                    <button type="submit" class="matrix-btn"><i class="fas fa-plus"></i> Thêm</button>
+                </form>
+                <!-- Update Category Form (hidden by default) -->
+                <form id="updateCategoryForm" class="mb-3 d-flex d-none">
+                    <input type="hidden" id="updateCategoryId">
+                    <input type="text" class="form-control me-2" id="updateCategoryNameInput" placeholder="Tên danh mục" required>
+                    <button type="submit" class="matrix-btn"><i class="fas fa-save"></i> Lưu</button>
+                    <button type="button" class="btn btn-secondary ms-2" id="cancelUpdateCategoryBtn">Hủy</button>
+                </form>
+                <!-- Category List Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tên danh mục</th>
+                            <th>Số sản phẩm</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody id="categoryTableBody">
+                        <!-- Categories will be loaded here by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- 🟩 PRODUCT MANAGEMENT & MODERATION                                 -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+        <div class="col-md-8">
+            <div class="dashboard-card">
+                <h4 class="card-title"><i class="fas fa-box"></i> Quản lý Sản phẩm & Kiểm duyệt</h4>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="productSearchInput" placeholder="Tìm kiếm sản phẩm...">
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Nhà hàng</th>
+                            <th>Giá</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                        <!-- Products will be loaded here by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <nav>
+                    <ul class="pagination justify-content-center" id="productPagination">
+                        <!-- Pagination items will be loaded here by JS -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: #111; color: #0f0;">
+        <div class="modal-header">
+            <h5 class="modal-title" id="productDetailModalLabel">Chi tiết sản phẩm</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+            <div class="col-md-5 text-center mb-3">
+                <img id="modalProductImage" src="" alt="Product Image" class="img-fluid rounded" style="max-height: 250px; background: #222;">
+            </div>
+            <div class="col-md-7">
+                <h4 id="modalProductName"></h4>
+                <p id="modalProductDescription"></p>
+                <ul class="list-group list-group-flush" style="background: transparent;">
+                <li class="list-group-item bg-transparent text-success"><b>Danh mục:</b> <span id="modalProductCategories"></span></li>
+                <li class="list-group-item bg-transparent text-success"><b>Nhà hàng:</b> <span id="modalProductRestaurant"></span></li>
+                <li class="list-group-item bg-transparent text-success"><b>Giá:</b> <span id="modalProductPrice"></span></li>
+                <li class="list-group-item bg-transparent text-success"><b>Đánh giá:</b> <span id="modalProductRating"></span></li>
+                <li class="list-group-item bg-transparent text-success"><b>Số lượng còn lại:</b> <span id="modalProductQuantity"></span></li>
+                <li class="list-group-item bg-transparent text-success"><b>Ngày đăng:</b> <span id="modalProductPostedAt"></span></li>
+                <li class="list-group-item bg-transparent text-success"><b>Trạng thái:</b> <span id="modalProductStatus"></span></li>
+                </ul>
+                <div id="moderationSection" class="mt-3 d-none">
+                <textarea id="rejectReasonInput" class="form-control mb-2" placeholder="Lý do từ chối (nếu có)"></textarea>
+                <button id="approveBtn" class="btn btn-matrix me-2"><i class="fas fa-check"></i> Duyệt</button>
+                <button id="rejectBtn" class="btn btn-outline-danger"><i class="fas fa-times"></i> Từ chối</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+<script>
+/* ════════════════════════════════════════════════════════════════════ */
+/* 🟩 CATEGORY MANAGEMENT JS                                           */
+/* ════════════════════════════════════════════════════════════════════ */
+function loadCategories() {
+    fetch('/api/admin/category')
+        .then(res => res.json())
+        .then(categories => {
+            const tbody = document.getElementById('categoryTableBody');
+            tbody.innerHTML = '';
+            categories.forEach((catObj, idx) => {
+                const cat = catObj.category;
+                const nproducts = catObj.nproducts;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${cat.name}</td>
+                        <td>
+                            <span class="badge bg-secondary">${nproducts} sản phẩm</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-matrix me-1" onclick="showUpdateCategory(${cat.id}, '${cat.name}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${cat.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+}
+document.getElementById('createCategoryForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('categoryNameInput').value.trim();
+    if (!name) return;
+    fetch('/api/admin/category', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({name})
+    })
+    .then(res => res.ok ? loadCategories() : showNotification('Không thể thêm danh mục!', 'danger'));
+    this.reset();
+});
+function showUpdateCategory(id, name) {
+    document.getElementById('updateCategoryId').value = id;
+    document.getElementById('updateCategoryNameInput').value = name;
+    document.getElementById('updateCategoryForm').classList.remove('d-none');
+    document.getElementById('createCategoryForm').classList.add('d-none');
+}
+document.getElementById('updateCategoryForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('updateCategoryId').value;
+    const name = document.getElementById('updateCategoryNameInput').value.trim();
+    fetch(`/api/admin/category/${id}?name=${encodeURIComponent(name)}`, {
+        method: 'PUT'
+    })
+    .then(res => res.ok ? loadCategories() : showNotification('Không thể cập nhật danh mục!', 'danger'));
+    this.classList.add('d-none');
+    document.getElementById('createCategoryForm').classList.remove('d-none');
+});
+document.getElementById('cancelUpdateCategoryBtn').addEventListener('click', function() {
+    document.getElementById('updateCategoryForm').classList.add('d-none');
+    document.getElementById('createCategoryForm').classList.remove('d-none');
+});
+function deleteCategory(id) {
+    if (!confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
+    fetch(`/api/admin/category/${id}`, {method: 'DELETE'})
+        .then(res => res.ok ? loadCategories() : showNotification('Không thể xóa danh mục!', 'danger'));
+}
+loadCategories();
+
+/* ════════════════════════════════════════════════════════════════════ */
+/* 🟩 PRODUCT MANAGEMENT & MODERATION JS                               */
+/* ════════════════════════════════════════════════════════════════════ */
+let productPage = 0;
+function loadProducts(page = 0, search = '') {
+    fetch(`/api/admin/products?page=${page}&size=10&search=${encodeURIComponent(search)}`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = '';
+            (data.products || []).forEach((prod, idx) => {
+                let statusHtml;
+                if (prod.isAllow === true) {
+                    statusHtml = '<span class="badge bg-success">Đã duyệt</span>';
+                } else if (prod.isAllow === false) {
+                    statusHtml = '<span class="badge bg-danger">Đã từ chối</span>';
+                } else {
+                    statusHtml = '<span class="badge bg-warning text-dark">Chờ duyệt</span>';
+                }
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${(data.page * 10) + idx + 1}</td>
+                        <td>${prod.name}</td>
+                        <td>${(prod.categories && prod.categories.length) ? prod.categories.join(', ') : ''}</td>
+                        <td>${prod.restaurantName || ''}</td>
+                        <td>${prod.price?.toLocaleString('vi-VN') || ''}₫</td>
+                        <td>
+                            ${statusHtml}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info me-1" onclick='showProductDetail(${JSON.stringify(prod)})'>
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            // Pagination
+            const pag = document.getElementById('productPagination');
+            pag.innerHTML = '';
+            for (let i = 0; i < (data.totalPages || 1); i++) {
+                pag.innerHTML += `
+                    <li class="page-item ${i === data.page ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadProducts(${i}, document.getElementById('productSearchInput').value);return false;">${i + 1}</a>
+                    </li>
+                `;
+            }
+        });
+}
+function moderateProduct(productId) {
+    if (!confirm('Duyệt sản phẩm này?')) return;
+    fetch(`/api/admin/products/allow?productId=${productId}`, {method: 'PUT'})
+        .then(res => res.ok ? loadProducts(productPage, document.getElementById('productSearchInput').value) : showNotification('Không thể duyệt sản phẩm!', 'danger'));
+}
+document.getElementById('productSearchInput').addEventListener('input', function() {
+    loadProducts(0, this.value);
+});
+
+let currentProductId = null;
+
+function showProductDetail(prod) {
+    if (typeof prod === "string") prod = JSON.parse(prod);
+
+    currentProductId = prod.productId;
+    const imgEl = document.getElementById('modalProductImage');
+    if (imgEl) {
+        imgEl.src = prod.imageUrl || '/images/no-image.png';
+    } else {
+        console.error('modalProductImage not found in DOM!');
+    }
+
+    const nameEl = document.getElementById('modalProductName');
+    if (nameEl) {
+        nameEl.textContent = prod.name || '';
+    } else {
+        console.error('modalProductName not found in DOM!');
+    }
+
+    const descEl = document.getElementById('modalProductDescription');
+    if (descEl) {
+        descEl.textContent = prod.description || '';
+    } else {
+        console.error('modalProductDescription not found in DOM!');
+    }
+
+    const catEl = document.getElementById('modalProductCategories');
+    if (catEl) {
+        catEl.textContent = (prod.categories && prod.categories.length) ? prod.categories.join(', ') : '';
+    } else {
+        console.error('modalProductCategories not found in DOM!');
+    }
+
+    const restEl = document.getElementById('modalProductRestaurant');
+    if (restEl) {
+        restEl.textContent = prod.restaurantName || '';
+    } else {
+        console.error('modalProductRestaurant not found in DOM!');
+    }
+
+    const priceEl = document.getElementById('modalProductPrice');
+    if (priceEl) {
+        priceEl.textContent = prod.price ? prod.price.toLocaleString('vi-VN') + '₫' : '';
+    } else {
+        console.error('modalProductPrice not found in DOM!');
+    }
+
+    const ratingEl = document.getElementById('modalProductRating');
+    if (ratingEl) {
+        ratingEl.textContent = prod.rating !== undefined ? `${prod.rating} (${prod.ratingNumber} đánh giá)` : '';
+    } else {
+        console.error('modalProductRating not found in DOM!');
+    }
+
+    const qtyEl = document.getElementById('modalProductQuantity');
+    if (qtyEl) {
+        qtyEl.textContent = prod.remainingQuantity !== undefined ? prod.remainingQuantity : '';
+    } else {
+        console.error('modalProductQuantity not found in DOM!');
+    }
+
+    const postedAtEl = document.getElementById('modalProductPostedAt');
+    if (postedAtEl) {
+        postedAtEl.textContent = prod.postedAt ? new Date(prod.postedAt).toLocaleString('vi-VN') : '';
+    } else {
+        console.error('modalProductPostedAt not found in DOM!');
+    }
+
+    const statusEl = document.getElementById('modalProductStatus');
+    if (statusEl) {
+        statusEl.innerHTML = prod.isAllow
+            ? '<span class="badge bg-success">Đã duyệt</span>'
+            : '<span class="badge bg-warning text-dark">Chờ duyệt</span>';
+    } else {
+        console.error('modalProductStatus not found in DOM!');
+    }
+
+    // Show moderation section only if not approved yet
+    const moderationSection = document.getElementById('moderationSection');
+    if (moderationSection) {
+        moderationSection.classList.toggle('d-none', !!prod.isAllow);
+    } else {
+        console.error('moderationSection not found in DOM!');
+    }
+
+    // Clear reason input
+    const rejectReasonInput = document.getElementById('rejectReasonInput');
+    if (rejectReasonInput) {
+        rejectReasonInput.value = '';
+    } else {
+        console.error('rejectReasonInput not found in DOM!');
+    }
+
+    // Approve button
+    const approveBtn = document.getElementById('approveBtn');
+    if (approveBtn) {
+        approveBtn.onclick = function() {
+            if (!currentProductId) return;
+            if (!confirm('Duyệt sản phẩm này?')) return;
+            fetch(`/api/admin/products/allow?productId=${currentProductId}`, {method: 'PUT'})
+                .then(res => res.ok ? loadProducts(productPage, document.getElementById('productSearchInput').value) : showNotification('Không thể duyệt sản phẩm!', 'danger'));
+            bootstrap.Modal.getInstance(document.getElementById('productDetailModal')).hide();
+        };
+    } else {
+        console.error('approveBtn not found in DOM!');
+    }
+
+    // Reject button
+    const rejectBtn = document.getElementById('rejectBtn');
+    if (rejectBtn) {
+        rejectBtn.onclick = function() {
+            if (!currentProductId) return;
+            const reason = rejectReasonInput ? rejectReasonInput.value.trim() : '';
+            if (!reason) {
+                alert('Vui lòng nhập lý do từ chối!');
+                return;
+            }
+            if (!confirm('Từ chối sản phẩm này?')) return;
+            fetch(`/api/admin/products/reject?productId=${currentProductId}&reason=${encodeURIComponent(reason)}`, {method: 'PUT'})
+                .then(res => res.ok ? loadProducts(productPage, document.getElementById('productSearchInput').value) : showNotification('Không thể từ chối sản phẩm!', 'danger'));
+            bootstrap.Modal.getInstance(document.getElementById('productDetailModal')).hide();
+        };
+    } else {
+        console.error('rejectBtn not found in DOM!');
+    }
+
+    // Show modal (Bootstrap 5)
+    const modal = new bootstrap.Modal(document.getElementById('productDetailModal'));
+    modal.show();
+}
+
+loadProducts();
+</script>
+</th:block>
+</body>
+</html>
