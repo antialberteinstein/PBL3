@@ -319,10 +319,90 @@
             95% { clip: rect(71px, 9999px, 103px, 0); }
             100% { clip: rect(83px, 9999px, 40px, 0); }
         }
+
+        /* Sidebar styles */
+        .matrix-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 320px;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--matrix-card-bg), #1a2332);
+            border-right: 2px solid var(--matrix-green);
+            z-index: 1050;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            padding-top: 80px;
+        }
+        .matrix-sidebar.show {
+            transform: translateX(0);
+        }
+        .matrix-sidebar .sidebar-link {
+            display: block;
+            color: var(--matrix-text);
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+        }
+        .matrix-sidebar .sidebar-link:hover, .matrix-sidebar .sidebar-link.active {
+            color: var(--matrix-green);
+            background: #161b22;
+            border-left: 4px solid var(--matrix-green);
+        }
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: var(--matrix-green);
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            box-shadow: 0 0 10px var(--matrix-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar-toggle-btn:hover {
+            background: #00ff90;
+        }
+        @media (max-width: 768px) {
+            .matrix-sidebar { width: 80vw; }
+        }
+        body.sidebar-open {
+            overflow: hidden;
+        }
     </style>
     <th:block layout:fragment="head"></th:block>
 </head>
 <body>
+    <!-- Sidebar Toggle Button (only if logged in) -->
+    <button th:if="${session.adminId != null}" class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar (only if logged in) -->
+    <div th:if="${session.adminId != null}" class="matrix-sidebar" id="matrixSidebar">
+        <a class="sidebar-link" href="/admin/dashboard"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+        <a class="sidebar-link" href="/admin/product"><i class="fas fa-box me-2"></i> Quản lý Sản phẩm</a>
+        <a class="sidebar-link" href="/admin/user"><i class="fas fa-users me-2"></i> Quản lý Người dùng</a>
+        <a class="sidebar-link" href="/admin/order"><i class="fas fa-shopping-cart me-2"></i> Quản lý Đơn hàng</a>
+        <a class="sidebar-link" href="/admin/restaurant"><i class="fas fa-utensils me-2"></i> Quản lý Nhà hàng</a>
+        <a class="sidebar-link" href="/admin/payment"><i class="fas fa-credit-card me-2"></i> Quản lý Thanh toán</a>
+        <a class="sidebar-link" href="/admin/feedback"><i class="fas fa-comments me-2"></i> Quản lý Phản hồi</a>
+        <a class="sidebar-link" href="/admin/discount"><i class="fas fa-percentage me-2"></i> Quản lý Khuyến mãi</a>
+        <hr style="border-color: var(--matrix-green); margin: 1rem 0;">
+        <a class="sidebar-link" href="/admin/logout"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
+    </div>
+
     <!-- Matrix Rain Background -->
     <div class="matrix-bg" id="matrixBg"></div>
 
@@ -334,7 +414,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand glitch" href="#" data-text="SHOPPIE FOOD">
+            <a class="navbar-brand glitch" href="/admin" data-text="SHOPPIE FOOD">
                 <i class="fas fa-code"></i> SHOPPIE FOOD
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -342,24 +422,21 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#dashboard">
+                    <!-- Show Dashboard/Logout if logged in -->
+                    <li class="nav-item" th:if="${session.adminId != null}">
+                        <a class="nav-link" href="/admin/dashboard">
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#notifications">
-                            <i class="fas fa-bell"></i> Thông báo
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#profile">
-                            <i class="fas fa-user"></i> Hồ sơ
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#logout">
+                    <li class="nav-item" th:if="${session.adminId != null}">
+                        <a class="nav-link" href="/admin/logout">
                             <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </a>
+                    </li>
+                    <!-- Show Login if not logged in -->
+                    <li class="nav-item" th:if="${session.adminId == null}">
+                        <a class="nav-link" href="/admin/login">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
                         </a>
                     </li>
                 </ul>
@@ -389,6 +466,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <th:block layout:fragment="script"></th:block>
     <script>
+        // Sidebar toggle logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('matrixSidebar');
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            if (sidebar && toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    console.log('Sidebar toggle clicked');
+                    sidebar.classList.toggle('show');
+                    document.body.classList.toggle('sidebar-open');
+                });
+                // Optional: close sidebar when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('show') && !sidebar.contains(e.target) && e.target !== toggleBtn) {
+                        sidebar.classList.remove('show');
+                        document.body.classList.remove('sidebar-open');
+                    }
+                });
+            }
+        });
+
                 // Matrix Rain Effect
         function createMatrixRain() {
             const matrixBg = document.getElementById('matrixBg');
