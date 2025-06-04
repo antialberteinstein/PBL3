@@ -3,7 +3,6 @@ package dut.gianguhohi.shoppiefood.services;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import dut.gianguhohi.shoppiefood.repositories.Orders.OrderRepository;
-import dut.gianguhohi.shoppiefood.repositories.Users.RestaurantRepository;
 import dut.gianguhohi.shoppiefood.repositories.Users.ShipperRepository;
 import dut.gianguhohi.shoppiefood.repositories.Users.UserRepository;
 import dut.gianguhohi.shoppiefood.repositories.misc.BranchRepository;
@@ -41,9 +39,6 @@ public class OrderService {
     
     @Autowired
     private ShipperRepository shipperRepository;
-    
-    @Autowired
-    private RestaurantRepository restaurantRepository;
 
     // ==========================
     // == Order Query Methods  ==
@@ -163,30 +158,30 @@ public class OrderService {
         Order order = new Order();
         order.setCustomer(user);
         order.setBranch(branch);
-        // Set các thông tin khác của đơn hàng
-        order.setStatus(OrderStatusType.PENDING);
-        order.setCreatedAt(LocalDateTime.now());
-        order.setNote(note);
+        // Set các thông tin khác của đơn hàng  
+        order.setStatus(OrderStatusType.PENDING);   
+        order.setCreatedAt(LocalDateTime.now());        
+        order.setNote(note);    
         
         // Lưu đơn hàng
-        return orderRepository.save(order);
+        return orderRepository.save(order); 
     }
     
     /**
      * Xác nhận đơn hàng
      */
-    @Transactional
+    @Transactional  
     public Order confirmOrder(int orderId, Integer estimateMinutes) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findById(orderId) 
             .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
         if (!order.getStatus().equals(OrderStatusType.PENDING)) {
             throw new RuntimeException("Chỉ có thể xác nhận đơn hàng khi trạng thái là 'đang chờ xác nhận'");
-        }
+        }   
         
         order.setStatus(OrderStatusType.CONFIRMED);
-        order.setTimeConfirmed(LocalDateTime.now());
-        
+        order.setTimeConfirmed(LocalDateTime.now());        
+            
         // Nếu có thông tin thời gian ước tính
         if (estimateMinutes != null) {
             // Logic để tính thời gian giao hàng ước tính

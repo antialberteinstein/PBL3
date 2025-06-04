@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import dut.gianguhohi.shoppiefood.models.Orders.Order;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.Users.User;
-import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
