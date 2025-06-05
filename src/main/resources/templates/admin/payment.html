@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Quản lý thanh toán - ShoppieFood Admin</title>
+    <style>
+        .payment-amount { color: var(--matrix-green); font-weight: bold; }
+        .payment-action-btn { min-width: 90px; }
+        .dashboard-card { margin-bottom: 2rem; }
+        .chart-container { background: var(--matrix-card-bg); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="glitch" data-text="QUẢN LÝ THANH TOÁN" style="color: var(--matrix-green);">QUẢN LÝ THANH TOÁN</h2>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mb-3">
+        <div class="btn-group" role="group" aria-label="Thống kê theo">
+            <button type="button" class="btn btn-outline-success period-btn active" data-period="day">Theo ngày</button>
+            <button type="button" class="btn btn-outline-success period-btn" data-period="week">Theo tuần</button>
+            <button type="button" class="btn btn-outline-success period-btn" data-period="month">Theo tháng</button>
+            <button type="button" class="btn btn-outline-success period-btn" data-period="quarter">Theo quý</button>
+            <button type="button" class="btn btn-outline-success period-btn" data-period="year">Theo năm</button>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="text-center" style="color:var(--matrix-green)">Tổng tiền thanh toán</h5>
+                <canvas id="paymentBarChart" height="180"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="text-center" style="color:var(--matrix-green)">Phân phối số lượng giao dịch</h5>
+                <canvas id="paymentLineChart" height="180"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="text-center" style="color:var(--matrix-green)">Tỷ lệ tổng tiền</h5>
+                <canvas id="paymentPieChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Table -->
+    <div class="dashboard-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <i class="fas fa-credit-card card-icon"></i>
+                <span class="card-title">Danh sách thanh toán</span>
+            </div>
+            <div>
+                <input type="text" id="paymentSearchInput" class="form-control" placeholder="Tìm kiếm theo ngày, số tiền..." style="width: 250px;">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Số tiền</th>
+                        <th>Ngày thanh toán</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                    <!-- Payments will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul class="pagination justify-content-center" id="paymentPagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+<script>
+const paymentTableBody = document.getElementById('paymentTableBody');
+const paymentPagination = document.getElementById('paymentPagination');
+const paymentSearchInput = document.getElementById('paymentSearchInput');
+let paymentPage = 0;
+let paymentSize = 10;
+let paymentSearch = '';
+let allPayments = []; // For charting
+let currentPeriod = 'day';
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    // Handles both "YYYY-MM-DD HH:mm:ss" and "YYYY-MM-DDTHH:mm:ss.ssssss"
+    let [datePart, timePart] = dateStr.split(/[ T]/);
+    if (!datePart || !timePart) return dateStr;
+    // Remove milliseconds if present
+    timePart = timePart.split('.')[0];
+    const [year, month, day] = datePart.split('-');
+    return `${day}/${month}/${year} ${timePart}`;
+}
+
+function loadPayments(page = 0, search = '') {
+    paymentPage = page;
+    paymentSearch = search;
+    let url = `http://157.245.52.20:8082/api/payment?page=${page}&size=${paymentSize}`;
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            let payments = data.payments || data.content || [];
+            if (!Array.isArray(payments)) payments = [];
+            if (page === 0) allPayments = []; // Reset for charting
+            allPayments = allPayments.concat(payments);
+
+            paymentTableBody.innerHTML = '';
+            let filtered = payments;
+            if (search) {
+                const s = search.toLowerCase();
+                filtered = payments.filter(p =>
+                    (p.amount && p.amount.toString().includes(s)) ||
+                    (p.createdAt && formatDate(p.createdAt).toLowerCase().includes(s))
+                );
+            }
+            filtered.forEach((payment, idx) => {
+                paymentTableBody.innerHTML += `
+                    <tr>
+                        <td>${(data.currentPage || data.pageable?.pageNumber || 0) * paymentSize + idx + 1}</td>
+                        <td class="payment-amount">${payment.amount?.toLocaleString('vi-VN') || 0} VNĐ</td>
+                        <td>${formatDate(payment.createdAt)}</td>
+                    </tr>
+                `;
+            });
+            // Pagination
+            let totalPages = data.totalPages || data.pageable?.totalPages || 1;
+            let currentPage = data.currentPage ?? data.pageable?.pageNumber ?? 0;
+            paymentPagination.innerHTML = '';
+            for (let i = 0; i < totalPages; i++) {
+                paymentPagination.innerHTML += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadPayments(${i}, paymentSearchInput.value);return false;">${i + 1}</a>
+                    </li>
+                `;
+            }
+            // Only fetch all pages for charting once (first load)
+            if (page === 0 && totalPages > 1) {
+                for (let i = 1; i < totalPages; i++) {
+                    fetch(`http://157.245.52.20/api/payment?page=${i}&size=${paymentSize}`)
+                        .then(res => res.json())
+                        .then(d => {
+                            let more = d.payments || d.content || [];
+                            if (Array.isArray(more)) {
+                                allPayments = allPayments.concat(more);
+                                if (i === totalPages - 1) drawCharts();
+                            }
+                        });
+                }
+            } else if (page === 0) {
+                drawCharts();
+            }
+        });
+}
+
+paymentSearchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        loadPayments(0, paymentSearchInput.value);
+    }
+});
+paymentSearchInput.addEventListener('input', function() {
+    if (!this.value) loadPayments(0, '');
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadPayments();
+});
+
+// Toggle period buttons
+document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentPeriod = this.getAttribute('data-period');
+        drawCharts();
+    });
+});
+
+// Chart.js
+function getPeriodKey(dateObj, period) {
+    const y = dateObj.getFullYear();
+    const m = dateObj.getMonth() + 1;
+    const d = dateObj.getDate();
+    switch (period) {
+        case 'day': return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        case 'week': {
+            // ISO week number
+            const temp = new Date(dateObj);
+            temp.setHours(0,0,0,0);
+            temp.setDate(temp.getDate() + 4 - (temp.getDay()||7));
+            const yearStart = new Date(temp.getFullYear(),0,1);
+            const weekNo = Math.ceil((((temp - yearStart) / 86400000) + 1)/7);
+            return `${y}-W${String(weekNo).padStart(2, '0')}`;
+        }
+        case 'month': return `${y}-${String(m).padStart(2, '0')}`;
+        case 'quarter': return `${y}-Q${Math.floor((m-1)/3)+1}`;
+        case 'year': return `${y}`;
+        default: return '';
+    }
+}
+
+let barChart, lineChart, pieChart;
+function drawCharts() {
+    // Group by selected period
+    const grouped = {};
+    allPayments.forEach(p => {
+        if (!p.createdAt) return;
+        const dateObj = new Date(p.createdAt.replace(' ', 'T'));
+        const key = getPeriodKey(dateObj, currentPeriod);
+        if (!grouped[key]) grouped[key] = { total: 0, count: 0 };
+        grouped[key].total += p.amount || 0;
+        grouped[key].count += 1;
+    });
+    const labels = Object.keys(grouped).sort();
+    const totals = labels.map(l => grouped[l].total);
+    const counts = labels.map(l => grouped[l].count);
+
+    // Format labels for display
+    function formatLabel(label) {
+        if (currentPeriod === 'day') {
+            const [y, m, d] = label.split('-');
+            return `${d}/${m}/${y}`;
+        }
+        if (currentPeriod === 'week') {
+            const [y, w] = label.split('-W');
+            return `Tuần ${w}/${y}`;
+        }
+        if (currentPeriod === 'month') {
+            const [y, m] = label.split('-');
+            return `${m}/${y}`;
+        }
+        if (currentPeriod === 'quarter') {
+            const [y, q] = label.split('-Q');
+            return `Q${q}/${y}`;
+        }
+        if (currentPeriod === 'year') {
+            return label;
+        }
+        return label;
+    }
+
+    // ... (rest of your chart code, just replace labels: ... with labels: labels.map(formatLabel), in all three charts)
+    // Example for bar chart:
+    if (barChart) barChart.destroy();
+    barChart = new Chart(document.getElementById('paymentBarChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels.map(formatLabel),
+            datasets: [{
+                label: 'Tổng tiền (VNĐ)',
+                data: totals,
+                backgroundColor: 'rgba(0,255,65,0.5)',
+                borderColor: 'rgba(0,255,65,1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#00ff41' }, grid: { color: '#30363d' } },
+                y: { ticks: { color: '#00ff41' }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+
+    // Line Chart: Number of payments per period
+    if (lineChart) lineChart.destroy();
+    lineChart = new Chart(document.getElementById('paymentLineChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels.map(formatLabel),
+            datasets: [{
+                label: 'Số giao dịch',
+                data: counts,
+                fill: false,
+                borderColor: '#00ffff',
+                backgroundColor: '#00ffff',
+                tension: 0.2
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#00ff41' }, grid: { color: '#30363d' } },
+                y: { ticks: { color: '#00ff41' }, grid: { color: '#30363d' } }
+            }
+        }
+    });
+
+    // Pie Chart: Distribution of total amount per period
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart(document.getElementById('paymentPieChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: labels.map(formatLabel),
+            datasets: [{
+                data: totals,
+                backgroundColor: labels.map((_, i) =>
+                    `hsl(${(i * 360 / labels.length)}, 100%, 40%)`
+                ),
+                borderColor: '#161b22',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { labels: { color: '#00ff41' } }
+            }
+        }
+    });
+}
+</script>
+</th:block>
+</body>
+</html>

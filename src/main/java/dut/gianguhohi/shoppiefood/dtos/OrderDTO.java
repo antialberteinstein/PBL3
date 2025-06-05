@@ -49,7 +49,7 @@ public class OrderDTO {
         this.timeDelivered = order.getTimeDelivered();
         this.status = order.getStatus();
         this.totalAmount = order.getTotalAmount();
-        
+        this.deliveryAddress = order.getDeliveryAddress();
         
 
     }

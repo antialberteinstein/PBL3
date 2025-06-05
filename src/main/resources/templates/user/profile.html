@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin tài khoản</title>
+    <link rel="stylesheet" th:href="@{/css/user/profile.css}">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="profile-container">
+            <div class="profile-header">
+                <h2>Thông Tin Cá Nhân</h2>
+                <button class="edit-button"><i class="fas fa-edit"></i> Chỉnh sửa</button>
+            </div>
+            
+            <!-- Avatar section -->
+            <div class="avatar-section">
+                <div class="avatar-container">
+                    <img th:src="${session.user != null && session.user.avatar != null ? session.user.avatar : '/images/default-avatar.png'}" 
+                         alt="Avatar" class="avatar-image">
+                    <div class="avatar-overlay">
+                        <label for="avatar-upload" class="avatar-upload-label">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="avatar-upload" class="avatar-upload-input" accept="image/*">
+                    </div>
+                </div>
+                <h3 class="user-name" th:text="${session.user != null ? session.user.name : 'Phan Minh Hiếu'}">Phan Minh Hiếu</h3>
+                <p class="user-since">Thành viên siêu cấp Vippro</p>
+            </div>
+            
+            <!-- Profile content section -->
+            <div class="profile-content">
+                <!-- Thông tin cá nhân -->
+                <div class="info-field">
+                    <div class="info-label">
+                        <i class="fas fa-user"></i>
+                        <span>Họ và tên</span>
+                    </div>
+                    <div class="info-value" th:text="${session.user != null ? session.user.name : 'Phan Minh Hiếu'}">Phan Minh Hiếu</div>
+                </div>
+                
+                <div class="info-field">
+                    <div class="info-label">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </div>
+                    <div class="info-value" th:text="${session.user != null ? session.user.email : 'Hieuphan30112005@gmail.com'}">Hieuphan30112005@gmail.com</div>
+                </div>
+                
+                <div class="info-field">
+                    <div class="info-label">
+                        <i class="fas fa-phone"></i>
+                        <span>Số điện thoại</span>
+                    </div>
+                    <div class="info-value" th:text="${session.user != null ? session.user.phone : '0123456789'}">0123456789</div>
+                </div>
+                
+                <div class="info-field">
+                    <div class="info-label">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>Ngày sinh</span>
+                    </div>
+                    <div class="info-value" th:text="${session.user != null ? session.user.birthday : '30/11/2005'}">30/11/2005</div>
+                </div>
+                
+                <div class="info-field">
+                    <div class="info-label">
+                        <i class="fas fa-lock"></i>
+                        <span>Mật khẩu</span>
+                    </div>
+                    <div class="info-value password-value">••••••••••</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="script">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Avatar upload preview
+                const avatarUpload = document.getElementById('avatar-upload');
+                const avatarImage = document.querySelector('.avatar-image');
+                
+                avatarUpload.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            avatarImage.src = e.target.result;
+                        }
+                        
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

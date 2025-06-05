@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Quản lý người dùng - ShoppieFood Admin</title>
+    <style>
+        .user-status-active { color: var(--matrix-green); font-weight: bold; }
+        .user-status-disabled { color: #ff0040; font-weight: bold; }
+        .user-action-btn { min-width: 90px; }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="glitch" data-text="QUẢN LÝ NGƯỜI DÙNG" style="color: var(--matrix-green);">QUẢN LÝ NGƯỜI DÙNG</h2>
+        </div>
+    </div>
+    <div class="dashboard-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <i class="fas fa-users card-icon"></i>
+                <span class="card-title">Danh sách người dùng</span>
+            </div>
+            <div>
+                <input type="text" id="userSearchInput" class="form-control" placeholder="Tìm kiếm theo tên, email..." style="width: 250px;">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Users will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul class="pagination justify-content-center" id="userPagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+<script>
+const userTableBody = document.getElementById('userTableBody');
+const userPagination = document.getElementById('userPagination');
+const userSearchInput = document.getElementById('userSearchInput');
+let userPage = 0;
+let userSize = 10;
+let userSearch = '';
+
+function loadUsers(page = 0, search = '') {
+    userPage = page;
+    userSearch = search;
+    let url = `/api/admin/users?page=${page}&size=${userSize}`;
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            let users = data.users || [];
+            userTableBody.innerHTML = '';
+            let filtered = users;
+            if (search) {
+                const s = search.toLowerCase();
+                filtered = users.filter(u =>
+                    (u.name && u.name.toLowerCase().includes(s)) ||
+                    (u.email && u.email.toLowerCase().includes(s))
+                );
+            }
+            filtered.forEach((user, idx) => {
+                userTableBody.innerHTML += `
+                    <tr>
+                        <td>${(data.currentPage * userSize) + idx + 1}</td>
+                        <td>${user.name || ''}</td>
+                        <td>${user.email || ''}</td>
+                        <td>
+                            ${user.enabled !== false
+                                ? '<span class="user-status-active">Đang hoạt động</span>'
+                                : '<span class="user-status-disabled">Đã vô hiệu hóa</span>'}
+                        </td>
+                        <td>${user.createdAt ? new Date(user.createdAt).toLocaleString('vi-VN') : ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-warning user-action-btn" ${user.enabled === false ? 'disabled' : ''} onclick="disableUser(${user.id})">
+                                <i class="fas fa-user-slash"></i> Vô hiệu hóa
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger user-action-btn" onclick="deleteUser(${user.id})">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            // Pagination
+            userPagination.innerHTML = '';
+            for (let i = 0; i < (data.totalPages || 1); i++) {
+                userPagination.innerHTML += `
+                    <li class="page-item ${i === data.currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadUsers(${i}, userSearchInput.value);return false;">${i + 1}</a>
+                    </li>
+                `;
+            }
+        });
+}
+
+function disableUser(id) {
+    if (!confirm('Bạn có chắc chắn muốn vô hiệu hóa người dùng này?')) return;
+    fetch(`/api/admin/users/${id}/disable`, { method: 'PUT' })
+        .then(res => res.json())
+        .then(data => {
+            showNotification(data.message || 'Đã vô hiệu hóa người dùng', 'warning');
+            loadUsers(userPage, userSearchInput.value);
+        });
+}
+
+function deleteUser(id) {
+    if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+    fetch(`/api/admin/users/${id}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+            showNotification(data.message || 'Đã xóa người dùng', 'danger');
+            loadUsers(userPage, userSearchInput.value);
+        });
+}
+
+userSearchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        loadUsers(0, userSearchInput.value);
+    }
+});
+userSearchInput.addEventListener('input', function() {
+    if (!this.value) loadUsers(0, '');
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadUsers();
+});
+</script>
+</th:block>
+</body>
+</html>

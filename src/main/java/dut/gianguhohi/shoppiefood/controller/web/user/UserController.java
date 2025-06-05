@@ -41,6 +41,24 @@ public class UserController {
         return "user/home";
     }
 
+    @GetMapping("/profile")
+    public String profile(Model model) {
+        Object userIdObj = session.getAttribute("userId");
+        if (userIdObj == null) {
+            return "redirect:/auth/login";
+        }
+        Integer userId = (Integer) userIdObj;
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+        User user = userService.readById(userId);
+        if (user == null) {
+            return "redirect:/auth/login";
+        }
+        model.addAttribute("user", user);
+        return "user/profile";
+    }
+
     @GetMapping("/order")
     public String userOrders(Model model) {
         // You can fetch userId and orders here if needed

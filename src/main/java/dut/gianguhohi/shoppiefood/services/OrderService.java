@@ -141,27 +141,31 @@ public class OrderService {
     /**
      * Tạo đơn hàng mới
      */
-    @Transactional
     public Order createOrder(int userId, int branchId, int addressId, Object items, String note) {
         // Logic tạo đơn hàng sẽ được triển khai tại đây
         // Bao gồm kiểm tra user, restaurant, address tồn tại
         // Kiểm tra các món hàng hợp lệ
         // Tính toán tổng tiền, v.v.
         
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+        User user = userRepository.findByUserId(userId);
+        
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng");
+        }
 
-        Branch branch = branchRepository.findById(branchId)
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy chi nhánh"));
+        Branch branch = branchRepository.findByBranchId(branchId);
+        if (branch == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi nhánh");
+        }
 
         // Tạo đơn hàng với trạng thái pending
         Order order = new Order();
         order.setCustomer(user);
         order.setBranch(branch);
-        // Set các thông tin khác của đơn hàng  
-        order.setStatus(OrderStatusType.PENDING);   
-        order.setCreatedAt(LocalDateTime.now());        
-        order.setNote(note);    
+        // Set các thông tin khác của đơn hàng
+        order.setStatus(OrderStatusType.PENDING);
+        order.setCreatedAt(LocalDateTime.now());
+        order.setNote(note);
         
         // Lưu đơn hàng
         return orderRepository.save(order); 
@@ -170,14 +174,14 @@ public class OrderService {
     /**
      * Xác nhận đơn hàng
      */
-    @Transactional  
+    @Transactional
     public Order confirmOrder(int orderId, Integer estimateMinutes) {
-        Order order = orderRepository.findById(orderId) 
+        Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
         if (!order.getStatus().equals(OrderStatusType.PENDING)) {
             throw new RuntimeException("Chỉ có thể xác nhận đơn hàng khi trạng thái là 'đang chờ xác nhận'");
-        }   
+        }
         
         order.setStatus(OrderStatusType.CONFIRMED);
         order.setTimeConfirmed(LocalDateTime.now());        
@@ -195,41 +199,83 @@ public class OrderService {
     /**
      * Gán shipper cho đơn hàng
      */
-    @Transactional
+    /**
+     * Gán shipper cho đơn hàng (chỉ gán shipper, không đổi trạng thái)
+     */
     public Order assignShipperToOrder(int orderId, int shipperId) {
         Order order = getOrderById(orderId);
-        
+
         if (!order.getStatus().equals(OrderStatusType.CONFIRMED)) {
-            throw new RuntimeException("Chỉ có thể nhận đơn hàng khi trạng thái là 'đã xác nhận'");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Chỉ có thể gán shipper khi đơn hàng đã được xác nhận"
+            );
         }
-        
+
         if (order.getShipper() != null) {
-            throw new RuntimeException("Đơn hàng đã được shipper khác nhận");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Đơn hàng đã được shipper khác nhận"
+            );
         }
-        
-        Shipper shipper = shipperRepository.findById(shipperId)
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy shipper"));
-            
+
+        Shipper shipper = shipperRepository.findByShipperId(shipperId);
+        if (shipper == null) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Không tìm thấy shipper với ID: " + shipperId
+            );
+        }
+
         order.setShipper(shipper);
+        // Không đổi trạng thái ở đây
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Shipper bắt đầu giao hàng (đổi trạng thái sang IN_PROGRESS)
+     */
+    public Order shipperStartDelivery(int orderId, int shipperId) {
+        Order order = getOrderById(orderId);
+
+        if (!order.getStatus().equals(OrderStatusType.CONFIRMED)) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Chỉ có thể bắt đầu giao hàng khi đơn hàng đã được xác nhận"
+            );
+        }
+
+        if (order.getShipper() == null || order.getShipper().getShipperId() != shipperId) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Shipper không hợp lệ hoặc chưa được gán cho đơn hàng này"
+            );
+        }
+
         order.setStatus(OrderStatusType.IN_PROGRESS);
         order.setTimeStart(LocalDateTime.now());
-        
+
         return orderRepository.save(order);
     }
     
     /**
      * Hủy gán shipper cho đơn hàng
      */
-    @Transactional
     public Order unassignShipperFromOrder(int orderId, String reason) {
         Order order = getOrderById(orderId);
         
         if (order.getShipper() == null) {
-            throw new RuntimeException("Đơn hàng chưa được gán cho shipper nào");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Đơn hàng này chưa có shipper nào nhận"
+            );
         }
         
         if (order.getStatus().equals(OrderStatusType.IN_PROGRESS)) {
-            throw new RuntimeException("Không thể hủy gán shipper khi đơn hàng đang được giao");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Không thể hủy gán shipper khi đơn hàng đang trong quá trình giao hàng"
+            );
         }
         
         // Ghi log lý do hủy gán
@@ -245,12 +291,14 @@ public class OrderService {
     /**
      * Xác nhận đã giao hàng
      */
-    @Transactional
     public Order markOrderAsDelivered(int orderId) {
         Order order = getOrderById(orderId);
         
         if (!order.getStatus().equals(OrderStatusType.IN_PROGRESS)) {
-            throw new RuntimeException("Chỉ có thể xác nhận giao hàng khi trạng thái là 'đang giao hàng'");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Chỉ có thể đánh dấu đơn hàng là đã giao khi trạng thái là 'đang giao hàng'"
+            );
         }
         
         order.setStatus(OrderStatusType.DELIVERED);
@@ -262,16 +310,21 @@ public class OrderService {
     /**
      * Hủy đơn hàng bởi người dùng
      */
-    @Transactional
     public Order cancelOrder(int orderId, String reason, User user) {
         Order order = getOrderById(orderId);
         
         if (order.getCustomer().getUserId() != user.getUserId()) {
-            throw new RuntimeException("Bạn không có quyền hủy đơn hàng này");
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Đơn hàng này không thuộc về của bạn"
+            );
         }
         
         if (!order.getStatus().equals(OrderStatusType.PENDING)) {
-            throw new RuntimeException("Chỉ có thể hủy đơn hàng khi trạng thái là 'đang chờ xác nhận'");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Chỉ có thể hủy đơn hàng khi trạng thái là 'đang chờ xác nhận'"
+            );
         }
         
         order.setStatus(OrderStatusType.CANCELLED);
@@ -284,18 +337,23 @@ public class OrderService {
     /**
      * Hủy đơn hàng bởi nhà hàng
      */
-    @Transactional
     public Order cancelOrderByRestaurant(int orderId, String reason, Restaurant restaurant) {
         Order order = getOrderById(orderId);
         
         // Kiểm tra chi nhánh có thuộc restaurant không
         if (order.getBranch().getRestaurant().getRestaurantId() != restaurant.getRestaurantId()) {
-            throw new RuntimeException("Đơn hàng này không thuộc về nhà hàng của bạn");
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Đơn hàng này không thuộc về nhà hàng của bạn"
+            );
         }
         
         if (!order.getStatus().equals(OrderStatusType.PENDING) && 
             !order.getStatus().equals(OrderStatusType.CONFIRMED)) {
-            throw new RuntimeException("Chỉ có thể hủy đơn hàng khi trạng thái là 'đang chờ xác nhận' hoặc 'đã xác nhận'");
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Chỉ có thể hủy đơn hàng khi trạng thái là 'đang chờ xác nhận' hoặc 'đã xác nhận'"
+            );
         }
         
         order.setStatus(OrderStatusType.CANCELLED);
