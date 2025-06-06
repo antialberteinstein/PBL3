@@ -102,22 +102,10 @@
                         </div>
                         
                         <div class="info-item">
-                            <span class="info-label">Khu vực hoạt động:</span>
-                            <span class="info-value">Quận Hải Châu, Quận Thanh Khê, Quận Liên Chiểu</span>
-                        </div>
-                        
-                        <div class="info-item">
                             <span class="info-label">Ngày tham gia:</span>
                             <span class="info-value">15/03/2023</span>
                         </div>
                         
-                        <div class="info-item">
-                            <span class="info-label">Đánh giá tổng:</span>
-                            <div class="rating-display">
-                                <span class="stars">★★★★★</span>
-                                <span class="rating-number">4.8/5</span>
-                            </div>
-                        </div>
 
                         <!-- Biểu đồ hiệu suất -->
                         <div class="performance-chart">
@@ -153,91 +141,13 @@
                     </div>
                 </div>
                 
-                <!-- Right column - Feedback Section -->
-                <div class="column feedback-column">
-                    <div class="feedback-section">
-                        <h2 class="section-title">
-                            <i class="fas fa-comments"></i>
-                            Đánh Giá Từ Khách Hàng
-                        </h2>
-                        
-                        <!-- Thống kê feedback -->
-                        <div class="feedback-stats">
-                            <div class="stat-card">
-                                <div class="stat-number">287</div>
-                                <div class="stat-label">Tổng đánh giá</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">4.8</div>
-                                <div class="stat-label">Điểm trung bình</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">245</div>
-                                <div class="stat-label">5 sao</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">98%</div>
-                                <div class="stat-label">Hài lòng</div>
-                            </div>
-                        </div>
-
-                        <!-- Danh sách feedback -->
-                        <div class="feedback-list" id="feedbackList">
-                            <!-- Feedback items sẽ được thêm bằng JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Fragment for script -->
     <th:block layout:fragment="script">
         <script>
             // Dữ liệu mẫu cho feedback (mô phỏng dữ liệu từ backend)
             const feedbackData = [
-                {
-                    customerName: "Trần Thị Lan",
-                    customerAvatar: "L",
-                    rating: 5,
-                    date: "20/05/2024",
-                    comment: "Shipper rất nhiệt tình và giao hàng đúng giờ. Món ăn vẫn còn nóng khi nhận được. Sẽ đặt lại!"
-                },
-                {
-                    customerName: "Lê Văn Đức",
-                    customerAvatar: "D",
-                    rating: 5,
-                    date: "19/05/2024",
-                    comment: "Giao hàng nhanh chóng, thái độ lịch sự. Rất hài lòng với dịch vụ."
-                },
-                {
-                    customerName: "Phạm Thị Mai",
-                    customerAvatar: "M",
-                    rating: 4,
-                    date: "18/05/2024",
-                    comment: "Shipper giao hàng đúng địa chỉ, nhưng hơi chậm so với dự kiến. Tuy nhiên thái độ rất tốt."
-                },
-                {
-                    customerName: "Hoàng Minh Tuấn",
-                    customerAvatar: "T",
-                    rating: 5,
-                    date: "17/05/2024",
-                    comment: "Xuất sắc! Giao hàng siêu nhanh, đóng gói cẩn thận. Shipper rất chuyên nghiệp."
-                },
-                {
-                    customerName: "Vũ Thị Hương",
-                    customerAvatar: "H",
-                    rating: 5,
-                    date: "16/05/2024",
-                    comment: "Shipper gọi điện xác nhận trước khi giao, rất chu đáo. Sẽ giới thiệu cho bạn bè."
-                },
-                {
-                    customerName: "Ngô Văn Hải",
-                    customerAvatar: "H",
-                    rating: 4,
-                    date: "15/05/2024",
-                    comment: "Dịch vụ tốt, giao đúng giờ. Chỉ có điều shipper hơi khó liên lạc."
-                }
+                
             ];
 
             // Hàm tạo sao đánh giá

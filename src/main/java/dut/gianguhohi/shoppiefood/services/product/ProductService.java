@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import jakarta.transaction.Transactional;
+
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -238,6 +241,59 @@ public class ProductService {
         }
         product.setRemainingQuantity(newQuantity);
         productRepository.save(product);
+    }
+
+    public Page<Product> filterProducts(
+            Integer categoryId,
+            String search,
+            Long minPrice,
+            Long maxPrice,
+            Float minRating,
+            String sortBy,
+            String sortDir,
+            int page,
+            int size
+    ) {
+        Pageable pageable;
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        if ("popular".equalsIgnoreCase(sortBy)) {
+            pageable = PageRequest.of(page, size);
+            Page<Object[]> result = productRepository.findProductsWithPopularity(
+                    categoryId, search, minPrice, maxPrice, minRating, pageable
+            );
+            // Map Object[] to Product and set popularity
+            java.util.List<Product> products = result.getContent().stream()
+                    .map(arr -> {
+                        Product p = (Product) arr[0];
+                        Long pop = (Long) arr[1];
+                        p.setPopularity(pop != null ? pop : 0);
+                        return p;
+                    }).collect(Collectors.toList());
+            return new PageImpl<>(products, pageable, result.getTotalElements());
+        }
+
+        // Other sorts
+        Sort sort;
+        switch (sortBy == null ? "" : sortBy) {
+            case "price":
+                sort = Sort.by(direction, "price");
+                break;
+            case "rating":
+                sort = Sort.by(direction, "rating");
+                break;
+            case "time":
+            case "postedAt":
+                sort = Sort.by(direction, "postedAt");
+                break;
+            default:
+                sort = Sort.by(Sort.Direction.DESC, "postedAt");
+        }
+        pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.filterProducts(
+                categoryId, search, minPrice, maxPrice, minRating, pageable
+        );
     }
 
     // ==========================

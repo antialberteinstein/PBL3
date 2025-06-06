@@ -47,7 +47,7 @@ public class AdminController {
     @Autowired
     private AdminRepository adminRepo;
 
-    private final int TEMP_NUMBER_OF_FEEDBACKS = 2231;
+    private final int TEMP_NUMBER_OF_FEEDBACKS = 0;
     private final int TEMP_NUMBER_OF_PAYMENTS = 946;
 
     // ==========================
@@ -78,6 +78,7 @@ public class AdminController {
     // ==========================
     // == Admin Home           ==
     // ==========================
+
     @GetMapping("/home")
     public String home(HttpSession session, Model model) {
         return "redirect:/admin/dashboard";

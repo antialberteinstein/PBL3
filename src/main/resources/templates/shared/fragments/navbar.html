@@ -24,13 +24,13 @@
                         <a class="nav-link" href="/">Trang chủ</a>
                     </li>   
                     <li class="nav-item" th:if="${session.role == 'user'}">
-                        <a class="nav-link" href="/user/order/active">Đơn hàng</a>
+                        <a class="nav-link" href="/user/order">Đơn hàng</a>
                     </li>
                     <li class="nav-item" th:if="${session.role == 'restaurant'}">
-                        <a class="nav-link" href="/restaurant/order/active">Đơn hàng mới</a>
+                        <a class="nav-link" href="/restaurant/order">Đơn hàng mới</a>
                     </li>
                     <li class="nav-item" th:if="${session.role == 'shipper'}">
-                        <a class="nav-link" href="/shipper/order/active">Đơn giao hàng</a>
+                        <a class="nav-link" href="/shipper/order">Đơn giao hàng</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about">Về chúng tôi</a>

@@ -24,13 +24,9 @@
         <!-- Categories Section -->
         <div class="category-section mt-4">
             <h4>Danh mục</h4>
-            <div class="d-flex flex-wrap">
+            <div class="d-flex flex-wrap" id="categoryBadges">
                 <span class="category-badge active" data-category="all">Tất cả</span>
-                <span class="category-badge" data-category="main">Món chính</span>
-                <span class="category-badge" data-category="dessert">Tráng miệng</span>
-                <span class="category-badge" data-category="drink">Đồ uống</span>
-                <span class="category-badge" data-category="fast-food">Đồ ăn nhanh</span>
-                <span class="category-badge" data-category="vegetarian">Món chay</span>
+                <!-- Categories will be loaded here -->
             </div>
         </div>
 
@@ -72,250 +68,151 @@
         </div>
 
         <!-- Food List/Grid -->
-        <div class="row" id="foodList">
-            <!-- Món 1 - Bún đậu mắm tôm -->
-            <div class="col-md-4 mb-4">
-                <div class="card food-card" data-category="main" data-price="35000" data-popularity="126">
-                    <div class="popular-tag">Phổ biến</div>
-                    <img src="/images/Food/bundau.png" class="card-img-top food-image" alt="Bún đậu mắm tôm">
-                    <div class="restaurant-badge">Nhà hàng Cá chà bặc</div>
-                    <div class="card-body food-info">
-                        <h5 class="card-title food-name">Bún đậu mắm tôm</h5>
-                        <p class="card-text">Bún đậu đầy đặn với đậu phụ chiên giòn, chả cốm thơm ngon, kèm nước mắm tôm đặc trưng.</p>
-                        <div class="rating">
-                            <div class="stars">★★★★★</div>
-                            <div class="count">(126)</div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price food-price">35,000đ</span>
-                            <button class="btn btn-outline-primary btn-add-cart" onclick="addToCart(1, 'Bún đậu mắm tôm', 35000, '/images/Food/bundau.png', 'Nhà hàng Cá chà bặc')">Đặt món</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Món 2 - Bún bò Huế -->
-            <div class="col-md-4 mb-4">
-                <div class="card food-card" data-category="main" data-price="45000" data-popularity="98">
-                    <img src="/images/Food/bunbo.png" class="card-img-top food-image" alt="Bún bò Huế">
-                    <div class="restaurant-badge">Nhà hàng Huế Ngon</div>
-                    <div class="card-body food-info">
-                        <h5 class="card-title food-name">Bún bò Huế</h5>
-                        <p class="card-text">Bún bò Huế đậm đà với nước lèo thơm ngon, bò mềm, giò heo và các loại rau thơm kèm theo.</p>
-                        <div class="rating">
-                            <div class="stars">★★★★☆</div>
-                            <div class="count">(98)</div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price food-price">45,000đ</span>
-                            <button class="btn btn-outline-primary btn-add-cart" onclick="addToCart(2, 'Bún bò Huế', 45000, '/images/Food/bunbo.png', 'Nhà hàng Huế Ngon')">Đặt món</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Món 3 - Trà sữa trân châu -->
-            <div class="col-md-4 mb-4">
-                <div class="card food-card" data-category="drink" data-price="30000" data-popularity="156">
-                    <div class="new-tag">Mới</div>
-                    <img src="/images/Food/trasua.png" class="card-img-top food-image" alt="Trà sữa trân châu">
-                    <div class="restaurant-badge">Tiệm trà Honey</div>
-                    <div class="card-body food-info">
-                        <h5 class="card-title food-name">Trà sữa trân châu đường đen</h5>
-                        <p class="card-text">Trà sữa thơm ngon với trân châu đường đen dẻo ngọt, ít đường, topping phong phú.</p>
-                        <div class="rating">
-                            <div class="stars">★★★★★</div>
-                            <div class="count">(156)</div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price food-price">30,000đ</span>
-                            <button class="btn btn-outline-primary btn-add-cart" onclick="addToCart(3, 'Trà sữa trân châu đường đen', 30000, '/images/Food/trasua.png', 'Tiệm trà Honey')">Đặt món</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Món 4 - Bánh mì thịt -->
-            <div class="col-md-4 mb-4">
-                <div class="card food-card" data-category="fast-food" data-price="20000" data-popularity="205">
-                    <div class="popular-tag">Phổ biến</div>
-                    <img src="/images/Food/banhmi.png" class="card-img-top food-image" alt="Bánh mì thịt">
-                    <div class="restaurant-badge">Bánh Mì Hiếu Phan</div>
-                    <div class="card-body food-info">
-                        <h5 class="card-title food-name">Bánh mì thịt đặc biệt</h5>
-                        <p class="card-text">Bánh mì giòn với nhiều loại thịt, pate, rau và đồ chua truyền thống.</p>
-                        <div class="rating">
-                            <div class="stars">★★★★☆</div>
-                            <div class="count">(205)</div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price food-price">20,000đ</span>
-                            <button class="btn btn-outline-primary btn-add-cart" onclick="addToCart(4, 'Bánh mì thịt đặc biệt', 20000, '/images/Food/banhmi.png', 'Bánh Mì Hiếu Phan')">Đặt món</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Món 5 - Cơm gà Hội An -->
-            <div class="col-md-4 mb-4">
-                <div class="card food-card" data-category="main" data-price="40000" data-popularity="87">
-                    <img src="/images/Food/comga.png" class="card-img-top food-image" alt="Cơm gà Hội An">
-                    <div class="restaurant-badge">Nhà hàng Hội An Xưa</div>
-                    <div class="card-body food-info">
-                        <h5 class="card-title food-name">Cơm gà Hội An</h5>
-                        <p class="card-text">Cơm gà thơm ngon với gà ta xé nhỏ, ăn kèm với rau thơm và nước mắm chua ngọt đặc trưng.</p>
-                        <div class="rating">
-                            <div class="stars">★★★★☆</div>
-                            <div class="count">(87)</div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price food-price">40,000đ</span>
-                            <button class="btn btn-outline-primary btn-add-cart" onclick="addToCart(5, 'Cơm gà Hội An', 40000, '/images/Food/comga.png', 'Nhà hàng Hội An Xưa')">Đặt món</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Món 6 - Chè thái -->
-            <div class="col-md-4 mb-4">
-                <div class="card food-card" data-category="dessert" data-price="25000" data-popularity="132">
-                    <img src="/images/Food/chethai.png" class="card-img-top food-image" alt="Chè thái">
-                    <div class="restaurant-badge">Tiệm chè Liên</div>
-                    <div class="card-body food-info">
-                        <h5 class="card-title food-name">Chè thái thập cẩm</h5>
-                        <p class="card-text">Chè thái mát lạnh với nhiều topping như thạch, trái cây, nước cốt dừa thơm béo.</p>
-                        <div class="rating">
-                            <div class="stars">★★★★★</div>
-                            <div class="count">(132)</div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="price food-price">25,000đ</span>
-                            <button class="btn btn-outline-primary btn-add-cart" onclick="addToCart(6, 'Chè thái thập cẩm', 25000, '/images/Food/chethai.png', 'Tiệm chè Liên')">Đặt món</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="row" id="foodList"></div>
     </div>
-</div>
-
 <!-- Script for filtering, searching, and sorting -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Category badges
-    const categoryBadges = document.querySelectorAll('.category-badge');
-    const foodCards = document.querySelectorAll('.food-card');
+function renderCategories(categories) {
+    const container = document.getElementById('categoryBadges');
+    // Keep the "Tất cả" badge
+    container.innerHTML = '<span class="category-badge active" data-category="all">Tất cả</span>';
+    categories.forEach(cat => {
+        container.innerHTML += `<span class="category-badge" data-category="${cat.id}">${cat.name}</span>`;
+    });
+
+    // Re-attach event listeners for new badges
+    const badges = container.querySelectorAll('.category-badge');
+    badges.forEach(badge => {
+        badge.addEventListener('click', function() {
+            badges.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            fetchAndRenderProducts(getFilterParams());
+        });
+    });
+}
+
+function renderProducts(products) {
+    console.log("DEBUG");
+    console.log(products);
     const foodList = document.getElementById('foodList');
+    foodList.innerHTML = '';
+    if (!products.length) {
+        foodList.innerHTML = '<div class="col-12 text-center text-muted">Không tìm thấy món ăn phù hợp</div>';
+        return;
+    }
+    products.forEach(product => {
+        const categories = product.categories ? product.categories.join(', ') : '';
+        foodList.innerHTML += `
+        <div class="col-md-4 mb-4">
+            <div class="card food-card" data-category="${categories}" data-price="${product.price}" data-popularity="${product.popularity || 0}">
+                <img src="${product.imageUrl || '/images/no-image.png'}" class="card-img-top food-image" alt="${product.name}">
+                <div class="restaurant-badge">${product.restaurantName || ''}</div>
+                <div class="card-body food-info">
+                    <h5 class="card-title food-name">${product.name}</h5>
+                    <p class="card-text">${product.description || ''}</p>
+                    <div class="rating">
+                        <div class="stars">${'★'.repeat(Math.round(product.rating || 0)).padEnd(5, '☆')}</div>
+                        <div class="count">(${product.ratingNumber || 0})</div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="price food-price">${product.price.toLocaleString('vi-VN')}đ</span>
+                        <button class="btn btn-outline-primary btn-add-cart"
+                            onclick="addToCart(${product.productId}, '${product.name}', ${product.price}, '${product.imageUrl}', '${product.restaurantName}')">Đặt món</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+}
+
+function getFilterParams() {
+    const selectedBadge = document.querySelector('.category-badge.active');
+    let categoryId = null;
+    if (selectedBadge && selectedBadge.dataset.category !== 'all') {
+        categoryId = selectedBadge.dataset.category;
+    }
+    let minPrice = null, maxPrice = null;
+    const priceVal = document.getElementById('priceFilter').value;
+    switch (priceVal) {
+        case "1": maxPrice = 30000; break;
+        case "2": minPrice = 30000; maxPrice = 50000; break;
+        case "3": minPrice = 50000; maxPrice = 100000; break;
+        case "4": minPrice = 100000; break;
+    }
+    let minRating = null;
+    const ratingVal = document.getElementById('ratingFilter').value;
+    if (ratingVal) minRating = parseInt(ratingVal);
+    let sortBy = "postedAt", sortDir = "desc";
+    const sortVal = document.getElementById('sortOrder').value;
+    switch (sortVal) {
+        case "price_asc": sortBy = "price"; sortDir = "asc"; break;
+        case "price_desc": sortBy = "price"; sortDir = "desc"; break;
+        case "popularity": sortBy = "popular"; sortDir = "desc"; break;
+        case "newest": sortBy = "postedAt"; sortDir = "desc"; break;
+        case "oldest": sortBy = "postedAt"; sortDir = "asc"; break;
+        case "rating": sortBy = "rating"; sortDir = "desc"; break;
+        case "rating_low": sortBy = "rating"; sortDir = "asc"; break;
+    }
+    return {
+        categoryId,
+        search: document.getElementById('searchInput').value.trim(),
+        minPrice,
+        maxPrice,
+        minRating,
+        sortBy,
+        sortDir
+    };
+}
+
+function fetchAndRenderProducts(params = {}) {
+    Object.keys(params).forEach(k => (params[k] == null || params[k] === '') && delete params[k]);
+    const query = new URLSearchParams(params).toString();
+    fetch('/api/products?' + query)
+        .then(res => res.json())
+        .then(data => {
+            renderProducts(data.content || []);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Page loaded, fetching products and categories");
+    fetchAndRenderProducts();
+    fetch('/api/categories')
+        .then(res => res.json())
+        .then(data => renderCategories(data));
+
+    // Remove this block, let renderCategories handle badge listeners
+    // const categoryBadges = document.querySelectorAll('.category-badge');
+    // categoryBadges.forEach(badge => {
+    //     badge.addEventListener('click', function() {
+    //         categoryBadges.forEach(b => b.classList.remove('active'));
+    //         this.classList.add('active');
+    //         fetchAndRenderProducts(getFilterParams());
+    //     });
+    // });
+
+    document.getElementById('priceFilter').addEventListener('change', function() {
+        fetchAndRenderProducts(getFilterParams());
+    });
+    document.getElementById('ratingFilter').addEventListener('change', function() {
+        fetchAndRenderProducts(getFilterParams());
+    });
+    document.getElementById('sortOrder').addEventListener('change', function() {
+        fetchAndRenderProducts(getFilterParams());
+    });
+
     const searchBtn = document.getElementById('searchBtn');
     const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const priceFilter = document.getElementById('priceFilter');
-    const sortOrder = document.getElementById('sortOrder');
-
-    // Category badge click
-    categoryBadges.forEach(badge => {
-        badge.addEventListener('click', function() {
-            categoryBadges.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            filterAndDisplay();
-        });
-    });
-
-    // Dropdown filters
-    [categoryFilter, priceFilter, sortOrder].forEach(select => {
-        select.addEventListener('change', filterAndDisplay);
-    });
-
-    // Search
     if (searchBtn && searchInput) {
-        searchBtn.addEventListener('click', filterAndDisplay);
+        searchBtn.addEventListener('click', function() {
+            fetchAndRenderProducts(getFilterParams());
+        });
         searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') filterAndDisplay();
+            if (e.key === 'Enter') fetchAndRenderProducts(getFilterParams());
         });
     }
-
-    function filterAndDisplay() {
-        const selectedBadge = document.querySelector('.category-badge.active');
-        const badgeCategory = selectedBadge ? selectedBadge.getAttribute('data-category') : 'all';
-        const dropdownCategory = categoryFilter.value;
-        const priceVal = priceFilter.value;
-        const sortVal = sortOrder.value;
-        const searchTerm = searchInput.value.toLowerCase().trim();
-
-        let cards = Array.from(foodCards);
-
-        // Filter by badge or dropdown category
-        cards.forEach(card => {
-            let show = true;
-            const cardCategory = card.getAttribute('data-category');
-            if (badgeCategory !== 'all' && cardCategory !== badgeCategory) show = false;
-            if (dropdownCategory && cardCategory !== dropdownCategory) show = false;
-
-            // Filter by price
-            const price = parseInt(card.getAttribute('data-price') || '0');
-            if (priceVal === '1' && price >= 30000) show = false;
-            if (priceVal === '2' && (price < 30000 || price > 50000)) show = false;
-            if (priceVal === '3' && (price < 50000 || price > 100000)) show = false;
-            if (priceVal === '4' && price <= 100000) show = false;
-
-            // Filter by search
-            if (searchTerm) {
-                const title = card.querySelector('.food-name').textContent.toLowerCase();
-                const desc = card.querySelector('.card-text').textContent.toLowerCase();
-                const restaurant = card.querySelector('.restaurant-badge').textContent.toLowerCase();
-                if (!title.includes(searchTerm) && !desc.includes(searchTerm) && !restaurant.includes(searchTerm)) show = false;
-            }
-
-            card.closest('.col-md-4').style.display = show ? 'block' : 'none';
-        });
-
-        // Sort
-        if (sortVal) {
-            let sorted = cards.filter(card => card.closest('.col-md-4').style.display !== 'none');
-            if (sortVal === 'price_asc') {
-                sorted.sort((a, b) => parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price')));
-            } else if (sortVal === 'price_desc') {
-                sorted.sort((a, b) => parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price')));
-            } else if (sortVal === 'popularity') {
-                sorted.sort((a, b) => parseInt(b.getAttribute('data-popularity')) - parseInt(a.getAttribute('data-popularity')));
-            }
-            // Re-append sorted cards
-            sorted.forEach(card => foodList.appendChild(card.closest('.col-md-4')));
-        }
-
-        // No results message
-        checkNoResults();
-    }
-
-    function checkNoResults() {
-        const visibleCards = Array.from(foodCards).filter(card =>
-            card.closest('.col-md-4').style.display !== 'none'
-        );
-        let noResults = document.querySelector('.no-products');
-        if (visibleCards.length === 0) {
-            if (!noResults) {
-                noResults = document.createElement('div');
-                noResults.className = 'no-products';
-                noResults.innerHTML = `
-                    <i class="fas fa-search"></i>
-                    <p>Không tìm thấy món ăn phù hợp</p>
-                    <button class="btn btn-primary" id="resetSearchBtn">Xem tất cả món ăn</button>
-                `;
-                foodList.insertAdjacentElement('afterend', noResults);
-                document.getElementById('resetSearchBtn').addEventListener('click', function() {
-                    searchInput.value = '';
-                    foodCards.forEach(card => {
-                        card.closest('.col-md-4').style.display = 'block';
-                    });
-                    categoryBadges.forEach(b => b.classList.remove('active'));
-                    document.querySelector('.category-badge[data-category="all"]').classList.add('active');
-                    [categoryFilter, priceFilter, sortOrder].forEach(select => select.value = '');
-                    noResults.remove();
-                });
-            }
-        } else if (noResults) {
-            noResults.remove();
-        }
-    }
-
-    // Initial display
-    filterAndDisplay();
 });
 </script>
+</div>
 </body>
 </html>

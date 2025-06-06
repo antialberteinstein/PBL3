@@ -52,6 +52,17 @@ public class Product {
     @Column(name = "rejected_reason")
     private String rejectedReason;
 
+    @Transient
+    private long popularity;
+
+    public long getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(long popularity) {
+        this.popularity = popularity;
+    }
+
     public Product() {
         this.postedAt = LocalDateTime.now();
         this.isAllow = null; // Chưa duyệt

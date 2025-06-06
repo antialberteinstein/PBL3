@@ -73,6 +73,13 @@
                 initializeAddressPopup();
                 updateCartUI();
                 fetchCart();
+
+                const btnAddAddress = document.getElementById('btnAddAddress');
+                if (btnAddAddress) {
+                    btnAddAddress.onclick = function() {
+                        setupAddressModal(null);
+                    };
+                }
             });
 
             // ═══════════════════════════════════════════════════════════════════
@@ -265,8 +272,7 @@
                 fetch('/api/user-addresses')
                     .then(res => res.json())
                     .then(data => {
-                        // data.addresses is the array, data.defaultAddress is the default
-                        renderAddresses(data.addresses, data.defaultAddress);
+                        renderAddresses(data);
                     })
                     .catch(() => {
                         const container = document.getElementById('savedAddresses');
@@ -274,24 +280,24 @@
                     });
             }
 
-            function renderAddresses(addresses, defaultAddress) {
+            function renderAddresses(addresses) {
                 const container = document.getElementById('savedAddresses');
                 if (!container) return;
 
                 if (!addresses || addresses.length === 0) {
-                    container.innerHTML = `<div class="text-muted px-2 py-2">You don't have any addresses yet.</div>`;
+                    container.innerHTML = `<div class="text-muted px-2 py-2">Bạn chưa có địa chỉ, vui lòng thêm mới.</div>`;
                     return;
                 }
 
                 container.innerHTML = addresses.map(addr => `
-                    <div class="address-item${defaultAddress && addr.userAddressId === defaultAddress.userAddressId ? ' selected' : ''}">
+                    <div class="address-item">
                         <div class="address-radio">
-                            <input type="radio" name="selectedAddress" id="address${addr.userAddressId}" value="${addr.userAddressId}" ${defaultAddress && addr.userAddressId === defaultAddress.userAddressId ? 'checked' : ''}>
+                            <input type="radio" name="selectedAddress" id="address${addr.userAddressId}" value="${addr.userAddressId}">
                             <label for="address${addr.userAddressId}"></label>
                         </div>
                         <div class="address-content">
                             <div class="address-info">
-                                <div class="address-name">${addr.addressName || ''}${defaultAddress && addr.userAddressId === defaultAddress.userAddressId ? ' <span class="badge bg-success">Default</span>' : ''}</div>
+                                <div class="address-name">${addr.addressName || ''}</div>
                                 <div class="address-user">${addr.note ? addr.note + ' | ' : ''}${addr.phoneNumber || ''}</div>
                                 <div class="address-text">${addr.fullAddress || ''}</div>
                             </div>
@@ -301,7 +307,7 @@
                     </div>
                 `).join('');
 
-                attachAddressEvents(addresses, defaultAddress);
+                attachAddressEvents(addresses, null);
             }
 
             function attachAddressEvents(addresses, defaultAddress) {

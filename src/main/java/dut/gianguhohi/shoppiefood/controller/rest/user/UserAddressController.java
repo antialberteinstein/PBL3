@@ -141,14 +141,7 @@ public class UserAddressController {
         List<UserAddressDTO> addresses = addressService.getUserAddresses(user)
                 .stream().map(UserAddressDTO::new).collect(Collectors.toList());
         
-        UserAddressDTO defaultAddress = new UserAddressDTO(addressService.getUserDefaultAddress(user));
-
-        return ResponseEntity.ok(
-            Map.of(
-                "addresses", addresses,
-                "defaultAddress", defaultAddress
-            )
-        );
+        return ResponseEntity.ok(addresses);
     }
 
     // ==========================
