@@ -1,6 +1,8 @@
 package dut.gianguhohi.shoppiefood.models.Users;
 
 import jakarta.persistence.*;
+
+import java.util.Date;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.misc.UserAddress;
 
@@ -93,8 +95,8 @@ public class User {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public void setDateOfBirth(String birthdayDate) {
+        this.dateOfBirth = birthdayDate;
     }
 
     public String getAvatarUrl() {

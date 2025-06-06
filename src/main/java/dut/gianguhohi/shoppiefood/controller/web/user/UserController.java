@@ -47,16 +47,15 @@ public class UserController {
         if (userIdObj == null) {
             return "redirect:/auth/login";
         }
-        Integer userId = (Integer) userIdObj;
-        if (userId == null) {
+        
+        try {
+            Integer userId = (Integer) userIdObj;
+            User user = userService.readById(userId);
+            model.addAttribute("user", user);
+            return "user/profile";
+        } catch (Exception e) {
             return "redirect:/auth/login";
         }
-        User user = userService.readById(userId);
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
-        model.addAttribute("user", user);
-        return "user/profile";
     }
 
     @GetMapping("/order")

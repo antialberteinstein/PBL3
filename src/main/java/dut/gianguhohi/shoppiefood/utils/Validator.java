@@ -31,6 +31,7 @@ public class Validator {
     public static void validateEmail(String email) {
         validateEmail(email, "Email không được để trống", "Email không hợp lệ");
     }
+    
 
     public static void validateEmail(String email, String emptyMessage, String invalidMessage) {
         validateString(email, emptyMessage);
