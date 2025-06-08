@@ -75,9 +75,9 @@ public class ShipperController {
     // ==========================
     @GetMapping("/home")
     public String home(HttpSession session, Model model) {
-        /* if (session.getAttribute("shipper") == null) {
+        if (session.getAttribute("shipper") == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper không tồn tại");
-        } */
+        } 
         return "shipper/home";
     }
 }
