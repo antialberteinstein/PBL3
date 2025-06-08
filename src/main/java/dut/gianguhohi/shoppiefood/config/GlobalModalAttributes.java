@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import dut.gianguhohi.shoppiefood.services.ShipperService;
+import dut.gianguhohi.shoppiefood.models.Users.Shipper;
+
+
 
 @ControllerAdvice
 public class GlobalModalAttributes {
@@ -29,6 +33,10 @@ public class GlobalModalAttributes {
 
     @Autowired
     private HttpSession session;
+
+    @Autowired
+    private ShipperService shipperService;
+
 
     @ModelAttribute
     public void addGlobalAttributes(Model model) {
@@ -56,6 +64,20 @@ public class GlobalModalAttributes {
                     model.addAttribute("restaurantBackgroundUrl", restaurant.getBackgroundUrl());
                 }
             }
+
+            Object shipperIdObj = session.getAttribute("shipperId");
+            if (shipperIdObj != null) {
+                Integer shipperId = (Integer) shipperIdObj;
+                Shipper shipper = shipperService.getShipperById(shipperId);
+                if (shipper != null) {
+                    model.addAttribute("shipperId", shipper.getShipperId());
+                    model.addAttribute("shipperVehicleType", shipper.getVehicleType());
+                    model.addAttribute("shipperPlateNumber", shipper.getPlateNumber());
+                    model.addAttribute("shipperDriverLicense", shipper.getDriverLicense());
+                }
+            }
+
+
             Object roleObj = session.getAttribute("role");
 
             if (roleObj != null) {

@@ -27,7 +27,7 @@ public class ShipperService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Người dùng đã đăng ký làm shipper");
         }
 
-        Shipper shipper = new Shipper(user, vehicleType, vehicleNumber, driverLicense);
+        Shipper shipper = new Shipper(user, driverLicense, vehicleNumber, vehicleType);
         return shipperRepository.save(shipper);
     }
 
@@ -39,10 +39,11 @@ public class ShipperService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Người dùng không hợp lệ");
         }
         Shipper shipper = shipperRepository.findByUser(user);
-        if (shipper == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Người dùng này không phải là shipper");
-        }
         return shipper;
+    }
+
+    public Shipper getShipperById(int shipperId) {
+        return shipperRepository.findByShipperId(shipperId);
     }
 
     // ==========================
