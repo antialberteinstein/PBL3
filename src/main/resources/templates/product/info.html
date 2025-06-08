@@ -8,6 +8,35 @@
     <th:block layout:fragment="css">
         <link rel="stylesheet" th:href="@{/css/product/info.css}">
     </th:block>
+    <style>
+        .product-categories .badge {
+            font-size: 1em;
+            margin-right: 0.5em;
+            margin-bottom: 0.3em;
+        }
+        .feedback-section {
+            margin-top: 2rem;
+        }
+        .feedback-list {
+            margin-top: 1rem;
+        }
+        .feedback-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .feedback-rating {
+            color: #ffc107;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+        .feedback-content {
+            font-size: 1rem;
+            color: #333;
+        }
+    </style>
 </head>
 
 <body>
@@ -18,205 +47,100 @@
             <div class="col-lg-8">
                 <div class="product-details card shadow-sm">
                     <div class="card-header product-header">
-                        <h2 class="product-title" id="productName">Tên sản phẩm</h2>
+                        <h2 class="product-title" id="productName" th:text="${product.name}">Tên sản phẩm</h2>
                         <div class="product-price">
-                            <span class="price-value" id="productPrice">0 VND</span>
+                            <span class="price-value" id="productPrice" th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'COMMA')} + ' VND'">0 VND</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="product-image-container mb-4">
                             <img id="productImage"
-                                 src="/images/Food/bunmangga.png"
+                                 th:src="${product.imageUrl != null} ? ${product.imageUrl} : '/images/Food/bunmangga.png'"
                                  alt="Hình ảnh món ăn"
                                  class="product-image img-fluid rounded">
                         </div>
                         <div class="product-info">
                             <h5 class="section-title">Mô tả sản phẩm</h5>
-                            <p class="product-description" id="productDescription">Mô tả sản phẩm</p>
+                            <p class="product-description" id="productDescription" th:text="${product.description}">Mô tả sản phẩm</p>
+                            <h5 class="section-title mt-4">Danh mục</h5>
+                            <div class="product-categories">
+                                <span th:if="${#lists.isEmpty(product.categories)}">Không có danh mục</span>
+                                <span th:each="cat : ${product.categories}" class="badge bg-primary me-1" th:text="${cat}">Danh mục</span>
+                            </div>
                             <h5 class="section-title mt-4">Địa chỉ quán</h5>
-                            <p class="product-restaurant-address" id="restaurantAddress">Địa chỉ quán</p>
+                            <p class="product-restaurant-address" id="restaurantAddress" th:text="${product.restaurantName}">Địa chỉ quán</p>
                             <h5 class="section-title mt-4">Đánh giá</h5>
                             <div class="product-rating">
                                 <div class="stars" id="productStars">
                                     <!-- Stars will be rendered by JS -->
                                 </div>
-                                <span class="rating-value" id="productRating">(0/5)</span>
+                                <span class="rating-value" id="productRating" th:text="'(' + (${product.rating} ?: 0) + '/5)'">(0/5)</span>
                             </div>
                             <h5 class="section-title mt-4">Số lượng còn lại</h5>
-                            <div id="remainingQuantity">0</div>
+                            <div id="remainingQuantity" th:text="${product.remainingQuantity}">0</div>
+                            <!-- Đặt hàng button -->
+                            <div class="mt-4 d-flex justify-content-end">
+                                <script th:inline="javascript">
+                                    let product = {
+                                        id: [[${product.productId}]],
+                                        name: [[${product.name}]],
+                                        price: [[${product.price}]],
+                                        imageUrl: [[${product.imageUrl}]],
+                                        restaurantName: [[${product.restaurantName}]]
+                                    };
+                                </script>
+
+                                <button class="btn btn-primary btn-add-cart" onclick="addToCart(product.id, product.name, product.price, product.imageUrl, product.restaurantName)">
+                                    <i class="fas fa-shopping-cart"></i> Đặt hàng
+                                </button>
+                            </div>
+
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- Thông tin giao hàng và đặt hàng -->
-            <div class="col-lg-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Thông tin giao hàng</h5>
+
+                <!-- Feedback Section -->
+                <div class="feedback-section">
+                    <h5 class="section-title">Phản hồi của khách hàng</h5>
+                    <div id="feedbackList" class="feedback-list">
+                        <div>Đang tải phản hồi...</div>
                     </div>
-                    <!-- <div class="card-body"> -->
-                        <!-- <form id="orderForm"> -->
-                            <!-- <input type="hidden" name="productId" id="hiddenProductId" value=""> -->
-                            <!-- <div class="mb-3"> -->
-                                <!-- <label for="deliveryAddress" class="form-label">Chọn địa chỉ giao hàng:</label> -->
-                                <!-- <input type="text" class="form-control" id="deliveryAddress" -->
-                                       <!-- placeholder="54 Nguyễn Lương Bằng, Quận Liên Chiểu, TP.Đà Nẵng" readonly> -->
-                            <!-- </div> -->
-                            <!-- <div class="d-flex gap-2 mt-3"> -->
-                                <!-- <button type="button" id="addAddressBtn" class="btn btn-info flex-grow-1 text-white" -->
-                                        <!-- data-bs-toggle="modal" data-bs-target="#addAddressModal"> -->
-                                    <!-- Thêm địa chỉ giao hàng -->
-                                <!-- </button> -->
-                                <!-- <button type="button" id="orderBtn" class="btn btn-warning flex-grow-1"> -->
-                                    <!-- Đặt hàng -->
-                                <!-- </button> -->
-                            <!-- </div> -->
-                        <!-- </form> -->
-                    <!-- </div> -->
                 </div>
-                <!-- Sản phẩm liên quan (giữ nguyên hoặc render động nếu muốn) -->
             </div>
+            <!-- Thông tin giao hàng và đặt hàng đã bị xóa -->
         </div>
     </main>
-
-    <!-- Modal thêm địa chỉ -->
-    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAddressModalLabel">Thêm địa chỉ giao hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addAddressForm">
-                        <div class="mb-3">
-                            <label for="city" class="form-label">Thành phố:</label>
-                            <input type="text" class="form-control" id="city" name="city" placeholder="Đà Nẵng" value="Đà Nẵng">
-                        </div>
-                        <div class="mb-3">
-                            <label for="ward" class="form-label">Phường:</label>
-                            <input type="text" class="form-control" id="ward" name="ward" placeholder="Phường Xuân Hà" value="Phường Xuân Hà">
-                        </div>
-                        <div class="mb-3">
-                            <label for="addressLine1" class="form-label">Address Line 1 (Số nhà, đường):</label>
-                            <input type="text" class="form-control" id="addressLine1" name="addressLine1" placeholder="K179/08/12 Trần Cao Vân" value="K179/08/12 Trần Cao Vân">
-                        </div>
-                        <div class="mb-3">
-                            <label for="addressLine2" class="form-label">Address Line 2 (Tòa nhà, lầu/số phòng):</label>
-                            <input type="text" class="form-control" id="addressLine2" name="addressLine2" placeholder="Tòa Vincom, Phòng 902">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" id="saveAddressBtn" class="btn btn-primary">Lưu</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast thông báo -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        <div id="orderToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="me-auto" id="toastTitle">Thông báo</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body" id="toastMessage">
-                Đặt hàng thành công!
-            </div>
-        </div>
-    </div>
-</div>
-
-<th:block layout:fragment="script">
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
             // Lấy productId từ Thymeleaf
-            const productId = /*[[${productId}]]*/ 0;
+            const productId = /*[[${product.productId}]]*/ 0;
             if (!productId) return;
 
-            // Fetch product info from API
-            fetch(`/api/products/${productId}`)
+            // Fetch feedbacks and render
+            fetch(`http://157.245.52.20:9357/api/feedbacks/list/${productId}`)
                 .then(res => res.json())
-                .then(product => {
-                    document.getElementById('productName').textContent = product.name || 'Tên sản phẩm';
-                    document.getElementById('productPrice').textContent = (product.price ? product.price.toLocaleString('vi-VN') : '0') + ' VND';
-                    document.getElementById('productImage').src = product.imageUrl || '/images/Food/bunmangga.png';
-                    document.getElementById('productDescription').textContent = product.description || 'Không có mô tả';
-                    document.getElementById('restaurantAddress').textContent = product.restaurantAddress || '';
-                    document.getElementById('remainingQuantity').textContent = product.remainingQuantity ?? 0;
-                    document.getElementById('hiddenProductId').value = product.productId;
-
-                    // Render rating stars
-                    const stars = Math.round(product.rating ?? 0);
-                    let starHtml = '';
-                    for (let i = 1; i <= 5; i++) {
-                        starHtml += `<i class="fa${i <= stars ? 's' : 'r'} fa-star"></i>`;
+                .then(feedbacks => {
+                    const feedbackList = document.getElementById('feedbackList');
+                    if (!feedbacks || feedbacks.length === 0) {
+                        feedbackList.innerHTML = '<div>Chưa có phản hồi nào.</div>';
+                        return;
                     }
-                    document.getElementById('productStars').innerHTML = starHtml;
-                    document.getElementById('productRating').textContent = `(${product.rating ?? 0}/5)`;
+                    feedbackList.innerHTML = feedbacks.map(fb => `
+                        <div class="feedback-item">
+                            <div class="feedback-rating">
+                                ${'<i class="fas fa-star"></i>'.repeat(fb.rating)}
+                                ${'<i class="far fa-star"></i>'.repeat(5 - fb.rating)}
+                                <span class="ms-2 text-muted">(${fb.rating}/5)</span>
+                            </div>
+                            <div class="feedback-content">${fb.content}</div>
+                        </div>
+                    `).join('');
                 })
                 .catch(() => {
-                    document.getElementById('productName').textContent = 'Không thể tải thông tin sản phẩm';
+                    document.getElementById('feedbackList').innerHTML = '<div>Không thể tải phản hồi.</div>';
                 });
-
-            // Toast và modal xử lý giữ nguyên như cũ
-            const orderToast = new bootstrap.Toast(document.getElementById('orderToast'));
-            const toastTitle = document.getElementById('toastTitle');
-            const toastMessage = document.getElementById('toastMessage');
-            const addAddressModal = document.getElementById('addAddressModal');
-            const saveAddressBtn = document.getElementById('saveAddressBtn');
-            const deliveryAddressInput = document.getElementById('deliveryAddress');
-
-            if (saveAddressBtn) {
-                saveAddressBtn.addEventListener('click', function() {
-                    const city = document.getElementById('city').value;
-                    const district = document.getElementById('district').value;
-                    const ward = document.getElementById('ward').value;
-                    const street = document.getElementById('street').value;
-                    if (!city || !district || !ward || !street) {
-                        toastTitle.textContent = 'Lỗi';
-                        toastTitle.className = 'me-auto text-danger';
-                        toastMessage.textContent = 'Vui lòng điền đầy đủ thông tin địa chỉ';
-                        orderToast.show();
-                        return;
-                    }
-                    const fullAddress = `${street}, ${ward}, ${district}, ${city}`;
-                    if (deliveryAddressInput) {
-                        deliveryAddressInput.value = fullAddress;
-                    }
-                    const modal = bootstrap.Modal.getInstance(addAddressModal);
-                    modal.hide();
-                    toastTitle.textContent = 'Thành công';
-                    toastTitle.className = 'me-auto text-success';
-                    toastMessage.textContent = 'Đã thêm địa chỉ giao hàng mới';
-                    orderToast.show();
-                });
-            }
-
-            const orderBtn = document.getElementById('orderBtn');
-            if (orderBtn) {
-                orderBtn.addEventListener('click', function() {
-                    if (!deliveryAddressInput.value.trim()) {
-                        toastTitle.textContent = 'Lỗi';
-                        toastTitle.className = 'me-auto text-danger';
-                        toastMessage.textContent = 'Vui lòng chọn địa chỉ giao hàng';
-                        orderToast.show();
-                        return;
-                    }
-                    toastTitle.textContent = 'Thành công';
-                    toastTitle.className = 'me-auto text-success';
-                    toastMessage.innerHTML = `
-                        <p class="mb-1">Đặt hàng thành công!</p>
-                        <p class="mb-0">Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ gọi điện xác nhận trong ít phút.</p>
-                    `;
-                    orderToast.show();
-                    console.log('Đặt hàng với địa chỉ:', deliveryAddressInput.value);
-                });
-            }
         });
     </script>
-</th:block>
+</div>
 </body>
 </html>
