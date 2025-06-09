@@ -135,4 +135,25 @@ public class ShipperController {
 
         return "shipper/home";
     }
+
+    @GetMapping("/profile")
+    public String profile() {
+        return "redirect:/shipper/home";
+    }
+
+    @GetMapping("/detail/{shipperId}")
+    public String shipperDetail(@RequestParam("shipperId") Integer shipperId, Model model, HttpSession session) {
+        Object shipperObj = session.getAttribute("shipperId");
+        if (shipperObj == null) {
+            return "redirect:/shipper/enter";
+        }
+
+        Shipper shipper = shipperService.getShipperById(shipperId);
+        if (shipper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy shipper");
+        }
+
+        model.addAttribute("shipper", shipper);
+        return "shipper/home";
+    }
 }

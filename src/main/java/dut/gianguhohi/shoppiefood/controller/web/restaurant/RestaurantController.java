@@ -32,7 +32,7 @@ public class RestaurantController {
             return "redirect:/auth/login";
         }
 
-    Object restaurantIdObj = session.getAttribute("restaurantId");
+        Object restaurantIdObj = session.getAttribute("restaurantId");
         if (restaurantIdObj == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Hiện không ở trạng thái cửa hàng");
         }
