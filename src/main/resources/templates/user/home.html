@@ -92,6 +92,8 @@ function renderCategories(categories) {
 }
 
 function renderProducts(products) {
+    console.log("DEBUG");
+    console.log(products);
     const foodList = document.getElementById('foodList');
     foodList.innerHTML = '';
     if (!products.length) {
@@ -100,37 +102,22 @@ function renderProducts(products) {
     }
     products.forEach(product => {
         const categories = product.categories ? product.categories.join(', ') : '';
-        const rating = product.rating || 0;
-        const fullStars = Math.floor(rating);
-        const halfStar = rating - fullStars >= 0.5;
-        let starsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-            if (i <= fullStars) {
-                starsHtml += '<i class="fas fa-star text-warning"></i>';
-            } else if (i === fullStars + 1 && halfStar) {
-                starsHtml += '<i class="fas fa-star-half-alt text-warning"></i>';
-            } else {
-                starsHtml += '<i class="far fa-star text-warning"></i>';
-            }
-        }
         foodList.innerHTML += `
         <div class="col-md-4 mb-4">
-            <div class="card food-card" data-category="${categories}" data-price="${product.price}" data-popularity="${product.popularity || 0}" 
-                style="cursor:pointer;" onclick="window.location.href='/product/info/${product.productId}'">
+            <div class="card food-card" data-category="${categories}" data-price="${product.price}" data-popularity="${product.popularity || 0}">
                 <img src="${product.imageUrl || '/images/no-image.png'}" class="card-img-top food-image" alt="${product.name}">
                 <div class="restaurant-badge">${product.restaurantName || ''}</div>
                 <div class="card-body food-info">
                     <h5 class="card-title food-name">${product.name}</h5>
                     <p class="card-text">${product.description || ''}</p>
-                    <div class="rating d-flex align-items-center">
-                        <div class="stars me-2">${starsHtml}</div>
-                        <span class="ms-1 small text-muted">(${(rating || 0).toFixed(1)}/5, ${product.ratingNumber || 0} đánh giá)</span>
+                    <div class="rating">
+                        <div class="stars">${'★'.repeat(Math.round(product.rating || 0)).padEnd(5, '☆')}</div>
+                        <div class="count">(${product.ratingNumber || 0})</div>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div class="d-flex justify-content-between align-items-center">
                         <span class="price food-price">${product.price.toLocaleString('vi-VN')}đ</span>
                         <button class="btn btn-outline-primary btn-add-cart"
-                            onclick="event.stopPropagation(); addToCart(${product.productId}, '${product.name}', ${product.price}, '${product.imageUrl}', '${product.restaurantName}')">Đặt món</button>
-                        <a href="/product/info/${product.productId}" class="btn btn-outline-info ms-2" onclick="event.stopPropagation();">Chi tiết</a>
+                            onclick="addToCart(${product.productId}, '${product.name}', ${product.price}, '${product.imageUrl}', '${product.restaurantName}')">Đặt món</button>
                     </div>
                 </div>
             </div>

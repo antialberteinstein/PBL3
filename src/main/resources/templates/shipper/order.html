@@ -1,23 +1,788 @@
 <!DOCTYPE html>
-<html layout:decorate="~{shared/layout/base}">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
 <head>
+    <title>Đơn hàng cần giao - ShoppieFood</title>
+    <link rel="stylesheet" th:href="@{/css/shipper/order.css}">
 </head>
+<body>
 <div layout:fragment="content">
-    <div class="container user-main">
-        <!-- Danh sách đơn giao hàng mới -->
-        <div class="user-orders">
-            <div class="order-item">
-                <div class="order-info">
-                    <div class="order-name">Bún đậu mắm tôm</div>
-                    <div class="order-price">162,000 VNĐ</div>
+    <div class="container mt-4">
+        <!-- Header and Refresh Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Đơn hàng cần giao</h2>
+            <button id="refreshBtn" class="btn btn-outline-primary">
+                <i class="fas fa-sync-alt me-2"></i>Làm mới
+            </button>
+        </div>
+        
+        <!-- Status notification for active order -->
+        <div id="activeOrderAlert" class="alert alert-info mb-4 d-none">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-motorcycle me-2"></i>
+                    <span>Bạn đang có đơn hàng đang giao.</span>
                 </div>
-                <div class="order-actions">
-                    <button class="btn btn-warning">Xem thông tin</button>
-                    <button class="btn btn-primary">Nhận giao</button>
+                <button class="btn btn-info btn-sm" id="viewActiveOrderBtn">
+                    Xem đơn hàng
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" id="available-tab" data-bs-toggle="tab" href="#available">Đơn hàng khả dụng</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="history-tab" data-bs-toggle="tab" href="#history">Lịch sử</a>
+            </li>
+        </ul>
+
+        <!-- Tab content -->
+        <div class="tab-content">
+            <!-- Available Orders Tab -->
+            <div class="tab-pane fade show active" id="available">
+                <div id="ordersList" class="mb-4">
+                    <!-- Orders will be loaded here -->
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Đang tải đơn hàng...</p>
+                    </div>
                 </div>
             </div>
-            <!-- Có thể thêm nhiều đơn hàng khác -->
+
+            <!-- History Tab -->
+            <div class="tab-pane fade" id="history">
+                <div id="ordersHistory" class="mb-4">
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Đang tải lịch sử...</p>
+                    </div>
+                </div>
+
+                <!-- Pagination for history -->
+                <nav aria-label="Orders history pagination" class="my-4">
+                    <ul id="historyPagination" class="pagination justify-content-center">
+                        <!-- Pagination will be loaded here -->
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
+    
+    <!-- Order detail modal -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailModalLabel">Chi tiết đơn hàng #<span id="modalOrderId"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="orderDetailContent">
+                    <!-- Order details will be loaded here -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Đang tải chi tiết đơn hàng...</p>
+                    </div>
+                </div>
+                <div class="modal-footer" id="orderModalFooter">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success" id="takeOrderBtn">Nhận đơn hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active order modal -->
+    <div class="modal fade" id="activeOrderModal" tabindex="-1" aria-labelledby="activeOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="activeOrderModalLabel">Đơn hàng đang giao #<span id="activeOrderId"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="activeOrderContent">
+                    <!-- Active order details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success" id="markDeliveredBtn">Đánh dấu đã giao</button>
+                    <button type="button" class="btn btn-warning" id="cancelDeliveryBtn">Hủy giao hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="orderToast" class="toast align-items-center text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">
+                    Thao tác thành công!
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for the page -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial variables
+            const ordersList = document.getElementById('ordersList');
+            const ordersHistory = document.getElementById('ordersHistory');
+            const activeOrderAlert = document.getElementById('activeOrderAlert');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const historyTab = document.getElementById('history-tab');
+            const availableTab = document.getElementById('available-tab');
+            
+            // Modals
+            const orderDetailModal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+            const activeOrderModal = new bootstrap.Modal(document.getElementById('activeOrderModal'));
+            
+            // Modal buttons
+            const takeOrderBtn = document.getElementById('takeOrderBtn');
+            const markDeliveredBtn = document.getElementById('markDeliveredBtn');
+            const cancelDeliveryBtn = document.getElementById('cancelDeliveryBtn');
+            const viewActiveOrderBtn = document.getElementById('viewActiveOrderBtn');
+            
+            // Toast
+            const orderToast = new bootstrap.Toast(document.getElementById('orderToast'));
+            
+            // Current order ID for modal actions
+            let currentOrderId = null;
+            let activeOrder = null;
+            let historyPage = 1;
+            let historyTotalPages = 1;
+            
+            // Initialize the page
+            loadAvailableOrders();
+            checkActiveOrder();
+            
+            // Event listeners
+            refreshBtn.addEventListener('click', function() {
+                if (document.querySelector('#available-tab').classList.contains('active')) {
+                    loadAvailableOrders();
+                } else {
+                    loadOrderHistory(1);
+                }
+                checkActiveOrder();
+            });
+            
+            historyTab.addEventListener('click', function() {
+                loadOrderHistory(1);
+            });
+            
+            availableTab.addEventListener('click', function() {
+                loadAvailableOrders();
+            });
+            
+            takeOrderBtn.addEventListener('click', function() {
+                takeOrder(currentOrderId);
+            });
+            
+            markDeliveredBtn.addEventListener('click', function() {
+                markOrderAsDelivered(activeOrder.orderId);
+            });
+            
+            cancelDeliveryBtn.addEventListener('click', function() {
+                if (confirm('Bạn có chắc chắn muốn hủy giao hàng đơn này không?')) {
+                    const reason = prompt('Vui lòng nhập lý do hủy:', 'Không thể giao hàng');
+                    if (reason !== null) {
+                        untakeOrder(activeOrder.orderId, reason);
+                    }
+                }
+            });
+            
+            viewActiveOrderBtn.addEventListener('click', function() {
+                showActiveOrderDetails(activeOrder);
+            });
+            
+            // Function to check if shipper has active orders
+            function checkActiveOrder() {
+                fetch('/api/orders/shipper/active')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.success && data.orders && data.orders.length > 0) {
+                            // Find the first in-progress order
+                            const inProgressOrder = data.orders.find(order => order.status === 'IN_PROGRESS');
+                            if (inProgressOrder) {
+                                activeOrder = inProgressOrder;
+                                activeOrderAlert.classList.remove('d-none');
+                                document.querySelector('#activeOrderId').textContent = activeOrder.orderId;
+                            } else {
+                                activeOrderAlert.classList.add('d-none');
+                                activeOrder = null;
+                            }
+                        } else {
+                            activeOrderAlert.classList.add('d-none');
+                            activeOrder = null;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking active orders:', error);
+                    });
+            }
+            
+            // Function to load available orders
+            function loadAvailableOrders() {
+                ordersList.innerHTML = `
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Đang tải đơn hàng...</p>
+                    </div>
+                `;
+                
+                fetch('/api/orders/shipper/available')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.success && data.orders) {
+                            renderAvailableOrders(data.orders);
+                        } else {
+                            showNoOrders();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading available orders:', error);
+                        showErrorMessage();
+                    });
+            }
+            
+            // Function to load order history
+            function loadOrderHistory(page) {
+                ordersHistory.innerHTML = `
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Đang tải lịch sử đơn hàng...</p>
+                    </div>
+                `;
+                
+                const shipperId = /*[[${session.shipperId}]]*/ 1;
+                fetch(`/api/orders/shipper/${shipperId}/history?page=${page}&size=6`)
+                    .then(response => response.json())
+                    .then(data => {
+                        historyPage = data.page || 1;
+                        historyTotalPages = data.totalPages || 1;
+                        
+                        if (data.orders && data.orders.length > 0) {
+                            renderOrderHistory(data.orders);
+                            renderPagination(historyPage, historyTotalPages);
+                        } else {
+                            ordersHistory.innerHTML = `
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Bạn chưa có lịch sử giao hàng nào.
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading order history:', error);
+                        ordersHistory.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Không thể tải lịch sử giao hàng. Vui lòng thử lại sau.
+                            </div>
+                        `;
+                    });
+            }
+            
+            // Function to render pagination for history
+            function renderPagination(currentPage, totalPages) {
+                const paginationContainer = document.getElementById('historyPagination');
+                if (totalPages <= 1) {
+                    paginationContainer.innerHTML = '';
+                    return;
+                }
+                
+                let paginationHtml = '';
+                
+                // Previous button
+                paginationHtml += `
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                `;
+                
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+                
+                // Next button
+                paginationHtml += `
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                `;
+                
+                paginationContainer.innerHTML = paginationHtml;
+                
+                // Add event listeners to pagination links
+                paginationContainer.querySelectorAll('.page-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const page = parseInt(this.getAttribute('data-page'));
+                        loadOrderHistory(page);
+                    });
+                });
+            }
+            
+            // Function to render available orders
+            function renderAvailableOrders(orders) {
+                if (!orders.length) {
+                    showNoOrders();
+                    return;
+                }
+                
+                let ordersHtml = '<div class="row">';
+                
+                orders.forEach(order => {
+                    // Get status info
+                    const statusInfo = getOrderStatusInfo(order.status);
+                    
+                    ordersHtml += `
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header d-flex justify-content-between">
+                                    <span class="fw-bold">Đơn #${order.orderId}</span>
+                                    <span class="badge ${statusInfo.bgClass}">${statusInfo.text}</span>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">${order.branch.restaurant.restaurantName || 'N/A'}</h5>
+                                    <p class="card-text">
+                                        <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                        ${shortenAddress(order.branch.address)}
+                                    </p>
+                                    <p class="card-text">
+                                        <i class="fas fa-truck-loading me-2"></i>
+                                        Giao đến: ${shortenAddress(order.deliveryAddress)}
+                                    </p>
+                                    <p class="card-text">
+                                        <strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}
+                                    </p>
+                                    <div class="text-center mt-3">
+                                        <button class="btn btn-outline-primary view-order-btn" data-order-id="${order.orderId}">
+                                            Xem chi tiết
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    <small>Đặt lúc: ${formatDateTime(order.orderDate)}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                ordersHtml += '</div>';
+                ordersList.innerHTML = ordersHtml;
+                
+                // Add event listeners to view order buttons
+                document.querySelectorAll('.view-order-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-order-id');
+                        viewOrderDetail(orderId);
+                    });
+                });
+            }
+            
+            // Function to render order history
+            function renderOrderHistory(orders) {
+                let historyHtml = '<div class="table-responsive"><table class="table table-hover">';
+                historyHtml += `
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Nhà hàng</th>
+                            <th>Địa chỉ giao</th>
+                            <th>Thời gian</th>
+                            <th>Trạng thái</th>
+                            <th>Tổng tiền</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                orders.forEach(order => {
+                    const statusInfo = getOrderStatusInfo(order.status);
+                    
+                    historyHtml += `
+                        <tr>
+                            <td>#${order.orderId}</td>
+                            <td>${order.branch.restaurant.restaurantName || 'N/A'}</td>
+                            <td>${shortenAddress(order.deliveryAddress)}</td>
+                            <td>${formatDateTime(order.orderDate)}</td>
+                            <td><span class="badge ${statusInfo.bgClass}">${statusInfo.text}</span></td>
+                            <td>${formatCurrency(order.totalAmount)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary view-history-btn" data-order-id="${order.orderId}">
+                                    Chi tiết
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                historyHtml += '</tbody></table></div>';
+                ordersHistory.innerHTML = historyHtml;
+                
+                // Add event listeners
+                document.querySelectorAll('.view-history-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-order-id');
+                        viewOrderDetail(orderId);
+                    });
+                });
+            }
+            
+            // Function to show order detail
+            function viewOrderDetail(orderId) {
+                document.getElementById('modalOrderId').textContent = orderId;
+                currentOrderId = orderId;
+                
+                const orderDetailContent = document.getElementById('orderDetailContent');
+                orderDetailContent.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Đang tải chi tiết đơn hàng...</p>
+                    </div>
+                `;
+                
+                // Show/hide buttons based on order status
+                takeOrderBtn.style.display = 'none';
+                
+                fetch(`/api/orders/restaurant/detail/${orderId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.success && data.order) {
+                            const order = data.order;
+                            renderOrderDetail(order);
+                            
+                            // Show take button only for confirmed orders without a shipper
+                            if (order.status === 'CONFIRMED' && !order.shipper) {
+                                takeOrderBtn.style.display = 'block';
+                            } else {
+                                takeOrderBtn.style.display = 'none';
+                            }
+                        } else {
+                            orderDetailContent.innerHTML = `
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    Không thể tải chi tiết đơn hàng. ${data.message || ''}
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading order detail:', error);
+                        orderDetailContent.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Không thể tải chi tiết đơn hàng. Vui lòng thử lại sau.
+                            </div>
+                        `;
+                    });
+                
+                orderDetailModal.show();
+            }
+            
+            // Function to show active order details
+            function showActiveOrderDetails(order) {
+                if (!order) {
+                    showToast('Không có đơn hàng đang giao', 'danger');
+                    return;
+                }
+                
+                document.getElementById('activeOrderId').textContent = order.orderId;
+                
+                // Fetch full details
+                fetch(`/api/orders/restaurant/detail/${order.orderId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.success && data.order) {
+                            renderActiveOrderDetail(data.order);
+                            
+                            // Show/hide buttons based on status
+                            if (data.order.status === 'IN_PROGRESS') {
+                                markDeliveredBtn.style.display = 'block';
+                                cancelDeliveryBtn.style.display = 'block';
+                            } else {
+                                markDeliveredBtn.style.display = 'none';
+                                cancelDeliveryBtn.style.display = 'none';
+                            }
+                            
+                            activeOrderModal.show();
+                        } else {
+                            showToast(data.message || 'Không thể tải chi tiết đơn hàng', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading active order detail:', error);
+                        showToast('Không thể tải chi tiết đơn hàng', 'danger');
+                    });
+            }
+            
+            // Function to render order detail
+            function renderOrderDetail(order) {
+                const statusInfo = getOrderStatusInfo(order.status);
+                let itemsHtml = '';
+                
+                if (order.orderItems && order.orderItems.length) {
+                    order.orderItems.forEach(item => {
+                        itemsHtml += `
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>${item.product.name} x ${item.quantity}</span>
+                                <span>${formatCurrency(item.price * item.quantity)}</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                const orderDetailContent = document.getElementById('orderDetailContent');
+                orderDetailContent.innerHTML = `
+                    <div class="order-detail">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5>Thông tin đơn hàng</h5>
+                                <span class="badge ${statusInfo.bgClass}">${statusInfo.text}</span>
+                            </div>
+                            <p><strong>Mã đơn hàng:</strong> #${order.orderId}</p>
+                            <p><strong>Thời gian đặt:</strong> ${formatDateTime(order.orderDate)}</p>
+                            <p><strong>Nhà hàng:</strong> ${order.branch.restaurant.restaurantName}</p>
+                            <p><strong>Địa chỉ nhà hàng:</strong> ${order.branch.address}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Thông tin giao hàng</h5>
+                            <p><strong>Người nhận:</strong> ${order.customerName}</p>
+                            <p><strong>Địa chỉ giao hàng:</strong> ${order.deliveryAddress}</p>
+                            <p><strong>Ghi chú:</strong> ${order.note || 'Không có ghi chú'}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Danh sách sản phẩm</h5>
+                            <div class="order-items border-top border-bottom py-2">
+                                ${itemsHtml}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span>Phí vận chuyển:</span>
+                                <span>15,000đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <span class="fw-bold">Tổng tiền:</span>
+                                <span class="fw-bold text-danger">${formatCurrency(order.totalAmount)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Function to render active order detail
+            function renderActiveOrderDetail(order) {
+                // Similar to renderOrderDetail, but with delivery status
+                renderOrderDetail(order);
+                
+                // Add delivery progress
+                const orderDetailContent = document.getElementById('activeOrderContent');
+                const progress = `
+                    <div class="mt-4">
+                        <h5>Tiến độ giao hàng</h5>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                                 role="progressbar" style="width: 50%;" 
+                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                Đang giao hàng
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                orderDetailContent.innerHTML += progress;
+            }
+            
+            // Function to take an order
+            function takeOrder(orderId) {
+                if (!orderId) return;
+                
+                fetch(`/api/orders/shipper/take/${orderId}`, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Nhận đơn hàng thành công!', 'success');
+                            setTimeout(() => {
+                                orderDetailModal.hide();
+                                loadAvailableOrders();
+                                checkActiveOrder();
+                            }, 1000);
+                        } else {
+                            showToast(data.message || 'Nhận đơn hàng không thành công', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error taking order:', error);
+                        showToast('Nhận đơn hàng không thành công. Vui lòng thử lại sau.', 'danger');
+                    });
+            }
+            
+            // Function to untake an order (cancel delivery)
+            function untakeOrder(orderId, reason) {
+                if (!orderId) return;
+                
+                fetch(`/api/orders/shipper/untake/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Hủy giao hàng thành công!', 'success');
+                            setTimeout(() => {
+                                activeOrderModal.hide();
+                                loadAvailableOrders();
+                                checkActiveOrder();
+                            }, 1000);
+                        } else {
+                            showToast(data.message || 'Hủy giao hàng không thành công', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error untaking order:', error);
+                        showToast('Hủy giao hàng không thành công. Vui lòng thử lại sau.', 'danger');
+                    });
+            }
+            
+            // Function to mark order as delivered
+            function markOrderAsDelivered(orderId) {
+                if (!orderId) return;
+                
+                if (!confirm('Xác nhận đã giao hàng thành công?')) return;
+                
+                fetch(`/api/orders/shipper/delivered/${orderId}`, {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Xác nhận giao hàng thành công!', 'success');
+                            setTimeout(() => {
+                                activeOrderModal.hide();
+                                loadAvailableOrders();
+                                checkActiveOrder();
+                            }, 1000);
+                        } else {
+                            showToast(data.message || 'Xác nhận giao hàng không thành công', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error marking order as delivered:', error);
+                        showToast('Xác nhận giao hàng không thành công. Vui lòng thử lại sau.', 'danger');
+                    });
+            }
+            
+            // Function to show no orders message
+            function showNoOrders() {
+                ordersList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5>Không có đơn hàng nào khả dụng</h5>
+                        <p class="text-muted">Hiện tại chưa có đơn hàng nào cần giao. Vui lòng kiểm tra lại sau.</p>
+                    </div>
+                `;
+            }
+            
+            // Function to show error message
+            function showErrorMessage() {
+                ordersList.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Không thể tải danh sách đơn hàng. Vui lòng thử lại sau.
+                    </div>
+                `;
+            }
+            
+            // Function to show toast message
+            function showToast(message, type) {
+                const toastEl = document.getElementById('orderToast');
+                toastEl.classList.remove('bg-success', 'bg-danger');
+                toastEl.classList.add(type === 'success' ? 'bg-success' : 'bg-danger');
+                document.getElementById('toastMessage').textContent = message;
+                orderToast.show();
+            }
+            
+            // Helper function to format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(amount);
+            }
+            
+            // Helper function to format date and time
+            function formatDateTime(dateTimeStr) {
+                const date = new Date(dateTimeStr);
+                return new Intl.DateTimeFormat('vi-VN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }).format(date);
+            }
+            
+            // Helper function to get order status info
+            function getOrderStatusInfo(status) {
+                switch (status) {
+                    case 'PENDING':
+                        return { text: 'Chờ xác nhận', bgClass: 'bg-warning text-dark' };
+                    case 'CONFIRMED':
+                        return { text: 'Đã xác nhận', bgClass: 'bg-info text-dark' };
+                    case 'IN_PROGRESS':
+                        return { text: 'Đang giao', bgClass: 'bg-primary' };
+                    case 'DELIVERED':
+                        return { text: 'Đã giao', bgClass: 'bg-success' };
+                    case 'CANCELLED':
+                        return { text: 'Đã hủy', bgClass: 'bg-danger' };
+                    default:
+                        return { text: status, bgClass: 'bg-secondary' };
+                }
+            }
+            
+            // Helper function to shorten address
+            function shortenAddress(address) {
+                if (!address) return 'N/A';
+                return address.length > 35 ? address.substring(0, 32) + '...' : address;
+            }
+        });
+    </script>
 </div>
+</body>
 </html>
