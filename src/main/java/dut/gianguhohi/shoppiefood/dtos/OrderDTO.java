@@ -18,19 +18,34 @@ public class OrderDTO {
     private LocalDateTime timeStart;
     private LocalDateTime timeDelivered;
     private String status;
-    private long totalAmount;
+    private double totalAmount;
     private String pickupAddress;
     private String deliveryAddress;
+    private String note;
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 
     public OrderDTO() {}
 
     public OrderDTO(Order order) {
         this.orderId = order.getOrderId();
-        this.firstProductName = order.getOrderItems().isEmpty() ? null : order.getOrderItems().get(0).getProduct().getName();
-        this.firstProductImageUrl = order.getOrderItems().isEmpty() ? null : order.getOrderItems().get(0).getProduct().getImageUrl();
+        this.customerName = order.getCustomer() != null ? order.getCustomer().getName() : "Unknown";
+        this.totalAmount = order.getTotalAmount();
+        this.status = order.getStatus();
+        this.createdAt = order.getCreatedAt();
+        this.timeConfirmed = order.getTimeConfirmed();
+        this.timeStart = order.getTimeStart();
+        this.timeDelivered = order.getTimeDelivered();
+        this.deliveryAddress = order.getDeliveryAddress();
+        this.note = order.getNote();
         if (order.getCustomer() != null) {
             this.customerId = order.getCustomer().getUserId();
-            this.customerName = order.getCustomer().getName();
         }
         if (order.getShipper() != null) {
             this.shipperId = order.getShipper().getShipperId();
@@ -43,15 +58,6 @@ public class OrderDTO {
             }
             this.pickupAddress = order.getBranch().getAddress().getFullAddress();
         }
-        this.createdAt = order.getCreatedAt();
-        this.timeConfirmed = order.getTimeConfirmed();
-        this.timeStart = order.getTimeStart();
-        this.timeDelivered = order.getTimeDelivered();
-        this.status = order.getStatus();
-        this.totalAmount = order.getTotalAmount();
-        this.deliveryAddress = order.getDeliveryAddress();
-        
-
     }
 
     // Getters and setters
@@ -91,8 +97,8 @@ public class OrderDTO {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public long getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(long totalAmount) { this.totalAmount = totalAmount; }
+    public double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
 
     public String getPickupAddress() { return pickupAddress; }
 

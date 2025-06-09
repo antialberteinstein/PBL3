@@ -31,6 +31,9 @@ public class Branch {
     @Column(name = "end_time")
     private String endTime;
 
+    @Column(name = "default_branch")
+    private boolean defaultBranch;
+
     public Branch() {
     }
 
@@ -97,5 +100,13 @@ public class Branch {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean isDefaultBranch() {
+        return defaultBranch;
+    }
+
+    public void setDefaultBranch(boolean defaultBranch) {
+        this.defaultBranch = defaultBranch;
     }
 }

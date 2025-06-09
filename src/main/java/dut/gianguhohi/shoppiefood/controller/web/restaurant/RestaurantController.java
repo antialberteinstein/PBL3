@@ -177,4 +177,26 @@ public class RestaurantController {
         return "restaurant/order";
     }
 
+    @GetMapping("/order")
+    public String orderDefault(Model model, HttpSession session) {
+        // Đoạn code này sẽ redirect về /restaurant/order/active
+        return "redirect:/restaurant/order/active";
+    }
+
+    @GetMapping("/order/{status}")
+    public String order(@PathVariable String status, Model model, HttpSession session) {
+        // Kiểm tra quyền truy cập
+        Object restaurantIdObj = session.getAttribute("restaurantId");
+        if (restaurantIdObj == null) {
+            return "redirect:/restaurant/login";
+        }
+
+        int restaurantId = (Integer) restaurantIdObj;
+        Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+
+        model.addAttribute("restaurant", restaurant);
+        model.addAttribute("orderStatus", status);
+
+        return "restaurant/order";
+    }
 }

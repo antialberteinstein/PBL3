@@ -40,15 +40,32 @@ public class OrderRestaurantController {
     public ResponseEntity<?> getBranchActiveOrders(
             @PathVariable int branchId,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size,
+            HttpSession session) {
+        
+        // Kiểm tra quyền truy cập
+        Object restaurantIdObj = session.getAttribute("restaurantId");
+        if (restaurantIdObj == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn không có quyền truy cập");
+        }
+        
+        int restaurantId = (Integer) restaurantIdObj;
         Branch branch = branchService.readBranchById(branchId);
+        
+        if (branch == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi nhánh");
+        }
+        
+        if (branch.getRestaurant().getRestaurantId() != restaurantId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chi nhánh này không thuộc về nhà hàng của bạn");
+        }
 
         int pageIndex = Math.max(page - 1, 0);
         Page<Order> orderPage = orderService.getBranchActiveOrders(branch, pageIndex, size);
         List<OrderDTO> orderDTOs = orderPage.getContent().stream()
                 .map(OrderDTO::new)
                 .collect(Collectors.toList());
+        
         return ResponseEntity.ok().body(
             Map.of(
                 "orders", orderDTOs,

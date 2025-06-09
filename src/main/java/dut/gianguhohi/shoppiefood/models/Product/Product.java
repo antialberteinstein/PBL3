@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
+import dut.gianguhohi.shoppiefood.models.misc.Branch;
 import dut.gianguhohi.shoppiefood.models.Orders.OrderItem;
 import java.util.ArrayList;
 
@@ -178,5 +179,10 @@ public class Product {
 
     public void setRejectedReason(String rejectedReason) {
         this.rejectedReason = rejectedReason;
+    }
+
+    public Branch getBranch() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getBranch'");
     }
 }

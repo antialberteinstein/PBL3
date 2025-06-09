@@ -2,10 +2,14 @@ package dut.gianguhohi.shoppiefood.models.Orders;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import dut.gianguhohi.shoppiefood.models.Users.User;
+import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import dut.gianguhohi.shoppiefood.models.misc.Branch;
+import dut.gianguhohi.shoppiefood.utils.OrderStatusType;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -48,7 +52,7 @@ public class Order {
     private String status;
 
     @Column(name = "total_amount", nullable = false)
-    private long totalAmount;
+    private double totalAmount;
 
     @Column(name = "note")
     private String note;
@@ -65,13 +69,16 @@ public class Order {
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
 
+    @Column(name = "order_date")
+    private Date orderDate;
+
     public Order() {
         this.createdAt = LocalDateTime.now();
         this.orderItems = new ArrayList<>();
     }
 
     public Order(User customer, Shipper shipper, Branch branch,
-                String status, long totalAmount, String deliveryAddress) {
+                String status, double totalAmount, String deliveryAddress) {
         this();
         this.customer = customer;
         this.shipper = shipper;
@@ -130,17 +137,36 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
+    public void setStatus(OrderStatusType statusType) {
+    this.status = statusType.toString();
+}
 
-    public long getTotalAmount() {
+    public double getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(long totalAmount) {
+    public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    public List<OrderItem> getOrderItems() {
+public void setBranch(Branch branch) {
+    this.branch = branch;
+}
+
+public List<OrderItem> getOrderItems() {
         return orderItems;
+    }
+    
+    
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+        // Cập nhật reference trong từng OrderItem
+        if (orderItems != null) {
+            for (OrderItem item : orderItems) {
+                item.setOrder(this);
+            }
+        }
     }
 
     public void appendOrderItem(OrderItem orderItem) {
@@ -165,13 +191,9 @@ public class Order {
         this.shipper = shipper;
     }
 
-    public Branch getBranch() {
-        return branch;
-    }
-
-    public void setBranch(Branch branch) {
-        this.branch = branch;
-    }
+public Branch getBranch() {
+    return branch;
+}
 
     public LocalDateTime getTimeConfirmed() {
         return timeConfirmed;
@@ -210,9 +232,14 @@ public class Order {
     }
 
     public void setCancelledDate(Date date) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCancelledDate'");
+    if (date != null) {
+        this.cancelledDate = LocalDateTime.ofInstant(
+            date.toInstant(), ZoneId.systemDefault()
+        );
+    } else {
+        this.cancelledDate = null;
     }
+}
     public LocalDateTime getCancelledDate() {
         return cancelledDate;
     }
@@ -223,5 +250,12 @@ public class Order {
 }
     public void setCancelledDate(LocalDateTime cancelledDate) {
         this.cancelledDate = cancelledDate;
+    }
+    public Date getOrderDate() {
+    return this.orderDate;
+}
+
+    public void setOrderDate(Date date) {
+        this.orderDate = date;
     }
 }

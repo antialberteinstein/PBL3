@@ -227,5 +227,475 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </div>
+
+<!-- Modal giỏ hàng -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">Giỏ hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="emptyCart" class="text-center py-5">
+          <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+          <h5>Giỏ hàng của bạn đang trống</h5>
+          <p class="text-muted">Thêm món ăn vào giỏ hàng để đặt món</p>
+        </div>
+        <div id="cartContent" style="display: none;">
+          <div class="restaurant-info mb-3">
+            <h6 class="restaurant-name mb-1"></h6>
+          </div>
+          <div id="cartItems" class="mb-3"></div>
+          <div class="d-flex justify-content-between border-top pt-2">
+            <strong>Tổng cộng:</strong>
+            <span id="cartTotal" class="text-danger fw-bold"></span>
+          </div>
+          <hr>
+          <h6 class="mb-3">Địa chỉ giao hàng</h6>
+          <div id="addressList" class="mb-3">
+            <div class="text-center">
+              <div class="spinner-border spinner-border-sm" role="status"></div>
+              <span class="ms-2">Đang tải địa chỉ...</span>
+            </div>
+          </div>
+          <button id="addAddressBtn" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-plus"></i> Thêm địa chỉ mới
+          </button>
+          <div class="mt-3">
+            <label for="orderNote" class="form-label">Ghi chú:</label>
+            <textarea id="orderNote" class="form-control" rows="2" placeholder="Ghi chú cho nhà hàng..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button id="checkoutBtn" type="button" class="btn btn-primary" disabled>Đặt hàng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script cho xử lý giỏ hàng -->
+<script>
+// Thêm món vào giỏ hàng
+function addToCart(productId, productName, productPrice, productImage, restaurantName, restaurantId) {
+    console.log('Adding to cart:', { productId, productName, productPrice, restaurantName, restaurantId });
+    
+    // Ngăn chặn lan truyền sự kiện click
+    event.stopPropagation();
+    
+    // Lấy giỏ hàng từ localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || { 
+        items: [], 
+        restaurantId: null, 
+        restaurantName: null,
+        total: 0
+    };
+    
+    // Nếu đơn hàng đang có món từ nhà hàng khác
+    if (cart.items.length > 0 && cart.restaurantId !== restaurantId) {
+        if (!confirm('Bạn đang có món từ nhà hàng khác trong giỏ hàng. Xóa giỏ hàng và thêm món này?')) {
+            return;
+        }
+        // Xóa giỏ hàng cũ
+        cart = { 
+            items: [], 
+            restaurantId: null, 
+            restaurantName: null,
+            total: 0
+        };
+    }
+    
+    // Thêm món vào giỏ hàng
+    const existingItemIndex = cart.items.findIndex(item => item.productId === productId);
+    
+    if (existingItemIndex >= 0) {
+        // Nếu món đã có trong giỏ hàng, tăng số lượng
+        cart.items[existingItemIndex].quantity++;
+    } else {
+        // Nếu món chưa có trong giỏ hàng, thêm mới
+        cart.items.push({
+            productId,
+            name: productName,
+            price: productPrice,
+            image: productImage || '/images/no-image.png',
+            quantity: 1
+        });
+    }
+    
+    // Cập nhật thông tin nhà hàng
+    cart.restaurantId = restaurantId;
+    cart.restaurantName = restaurantName;
+    
+    // Tính lại tổng tiền
+    cart.total = cart.items.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+    }, 0);
+    
+    // Lưu giỏ hàng vào localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Hiển thị thông báo thành công
+    showToast('Đã thêm ' + productName + ' vào giỏ hàng');
+    
+    // Cập nhật UI giỏ hàng
+    updateCartUI();
+}
+
+// Hiển thị giỏ hàng
+function updateCartUI() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+    
+    // Cập nhật số lượng trên icon giỏ hàng
+    const cartBadge = document.querySelector('.cart-badge');
+    if (cartBadge) {
+        const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+        cartBadge.textContent = itemCount;
+        cartBadge.style.display = itemCount > 0 ? 'inline' : 'none';
+    }
+    
+    // Cập nhật nội dung modal giỏ hàng
+    const emptyCart = document.getElementById('emptyCart');
+    const cartContent = document.getElementById('cartContent');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    
+    if (cart.items.length === 0) {
+        if (emptyCart) emptyCart.style.display = 'block';
+        if (cartContent) cartContent.style.display = 'none';
+        if (checkoutBtn) checkoutBtn.disabled = true;
+        return;
+    }
+    
+    if (emptyCart) emptyCart.style.display = 'none';
+    if (cartContent) cartContent.style.display = 'block';
+    if (checkoutBtn) checkoutBtn.disabled = false;
+    
+    // Cập nhật thông tin nhà hàng
+    const restaurantNameEl = document.querySelector('.restaurant-name');
+    if (restaurantNameEl) {
+        restaurantNameEl.textContent = cart.restaurantName || 'Không xác định';
+    }
+    
+    // Cập nhật danh sách món
+    const cartItems = document.getElementById('cartItems');
+    if (cartItems) {
+        cartItems.innerHTML = '';
+        cart.items.forEach(item => {
+            const itemRow = document.createElement('div');
+            itemRow.className = 'd-flex justify-content-between align-items-center mb-2 p-2 border-bottom';
+            itemRow.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <img src="${item.image}" alt="${item.name}" class="me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                    <div>
+                        <div class="fw-bold">${item.name}</div>
+                        <div>${item.price.toLocaleString('vi-VN')}đ</div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="updateCartItem(${item.productId}, -1)">-</button>
+                    <span class="mx-2">${item.quantity}</span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="updateCartItem(${item.productId}, 1)">+</button>
+                    <button class="btn btn-sm btn-outline-danger ms-2" onclick="removeFromCart(${item.productId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            cartItems.appendChild(itemRow);
+        });
+    }
+    
+    // Cập nhật tổng tiền
+    const cartTotal = document.getElementById('cartTotal');
+    if (cartTotal) {
+        cartTotal.textContent = cart.total.toLocaleString('vi-VN') + 'đ';
+    }
+    
+    // Load địa chỉ nếu chưa load
+    loadUserAddresses();
+}
+
+// Cập nhật số lượng món trong giỏ hàng
+function updateCartItem(productId, change) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+    const itemIndex = cart.items.findIndex(item => item.productId === productId);
+    
+    if (itemIndex === -1) return;
+    
+    cart.items[itemIndex].quantity += change;
+    
+    if (cart.items[itemIndex].quantity <= 0) {
+        // Nếu số lượng về 0 hoặc âm, xóa món khỏi giỏ hàng
+        cart.items.splice(itemIndex, 1);
+    }
+    
+    // Tính lại tổng tiền
+    cart.total = cart.items.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+    }, 0);
+    
+    // Nếu giỏ hàng trống, xóa thông tin nhà hàng
+    if (cart.items.length === 0) {
+        cart.restaurantId = null;
+        cart.restaurantName = null;
+    }
+    
+    // Lưu giỏ hàng vào localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Cập nhật UI
+    updateCartUI();
+}
+
+// Xóa món khỏi giỏ hàng
+function removeFromCart(productId) {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+    const itemIndex = cart.items.findIndex(item => item.productId === productId);
+    
+    if (itemIndex === -1) return;
+    
+    // Xóa món khỏi giỏ hàng
+    cart.items.splice(itemIndex, 1);
+    
+    // Tính lại tổng tiền
+    cart.total = cart.items.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+    }, 0);
+    
+    // Nếu giỏ hàng trống, xóa thông tin nhà hàng
+    if (cart.items.length === 0) {
+        cart.restaurantId = null;
+        cart.restaurantName = null;
+    }
+    
+    // Lưu giỏ hàng vào localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Cập nhật UI
+    updateCartUI();
+}
+
+// Hiển thị toast thông báo
+function showToast(message) {
+    const toastContainer = document.querySelector('.toast-container');
+    const toast = document.createElement('div');
+    const id = 'toast-' + Date.now();
+    
+    toast.id = id;
+    toast.className = 'toast';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.innerHTML = `
+        <div class="toast-header">
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+    
+    if (!toastContainer) {
+        const container = document.createElement('div');
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '1100';
+        document.body.appendChild(container);
+        container.appendChild(toast);
+    } else {
+        toastContainer.appendChild(toast);
+    }
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+// Tải danh sách địa chỉ người dùng
+function loadUserAddresses() {
+    const addressList = document.getElementById('addressList');
+    if (!addressList) return;
+    
+    // Hiển thị loading
+    addressList.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border spinner-border-sm" role="status"></div>
+            <span class="ms-2">Đang tải địa chỉ...</span>
+        </div>
+    `;
+    
+    fetch('/api/user/addresses')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(addresses => {
+            if (!addresses || addresses.length === 0) {
+                addressList.innerHTML = `
+                    <div class="alert alert-warning">
+                        Bạn chưa có địa chỉ nào. Vui lòng thêm địa chỉ mới để đặt hàng.
+                    </div>
+                `;
+                return;
+            }
+            
+            addressList.innerHTML = '';
+            addresses.forEach((address, index) => {
+                const addressElement = document.createElement('div');
+                addressElement.className = 'form-check mb-2';
+                addressElement.innerHTML = `
+                    <input class="form-check-input" type="radio" name="deliveryAddress" id="address-${address.id}" 
+                           value="${address.id}" ${index === 0 ? 'checked' : ''}>
+                    <label class="form-check-label" for="address-${address.id}">
+                        <strong>${address.receiverName}</strong> - ${address.phoneNumber}
+                        <div class="small text-muted">${address.fullAddress}</div>
+                    </label>
+                `;
+                addressList.appendChild(addressElement);
+            });
+            
+            // Enable checkout button if addresses are available
+            document.getElementById('checkoutBtn').disabled = false;
+        })
+        .catch(error => {
+            console.error('Error loading addresses:', error);
+            addressList.innerHTML = `
+                <div class="alert alert-danger">
+                    Lỗi khi tải địa chỉ. Vui lòng thử lại sau.
+                </div>
+            `;
+        });
+}
+
+// Xử lý đặt hàng
+function checkout() {
+    // Lấy giỏ hàng
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    if (!cart || cart.items.length === 0) {
+        showToast('Giỏ hàng trống. Vui lòng thêm món ăn để đặt hàng.');
+        return;
+    }
+    
+    // Lấy địa chỉ đã chọn
+    const selectedAddressRadio = document.querySelector('input[name="deliveryAddress"]:checked');
+    if (!selectedAddressRadio) {
+        showToast('Vui lòng chọn địa chỉ giao hàng.');
+        return;
+    }
+    
+    const addressId = selectedAddressRadio.value;
+    const note = document.getElementById('orderNote').value;
+    
+    // Tạo dữ liệu đơn hàng
+    const orderData = {
+        restaurantId: cart.restaurantId,
+        addressId: parseInt(addressId),
+        note: note,
+        items: cart.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity
+        }))
+    };
+    
+    console.log('Sending order:', orderData);
+    
+    // Disable nút đặt hàng và hiển thị loading
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const originalBtnText = checkoutBtn.innerHTML;
+    checkoutBtn.disabled = true;
+    checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+    
+    // Gửi request đặt hàng
+    fetch('/api/orders/user/place', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || 'Lỗi khi đặt hàng');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Xóa giỏ hàng sau khi đặt hàng thành công
+            localStorage.removeItem('cart');
+            
+            // Đóng modal giỏ hàng
+            const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+            cartModal.hide();
+            
+            // Hiển thị thông báo thành công
+            showToast(`Đặt hàng thành công! Mã đơn hàng: ${data.orderId}`);
+            
+            // Cập nhật UI giỏ hàng
+            updateCartUI();
+            
+            // Chuyển đến trang chi tiết đơn hàng sau 2 giây
+            setTimeout(() => {
+                window.location.href = '/user/order';
+            }, 2000);
+        } else {
+            throw new Error(data.message || 'Đã có lỗi xảy ra');
+        }
+    })
+    .catch(error => {
+        console.error('Error placing order:', error);
+        showToast(`Lỗi: ${error.message}`);
+    })
+    .finally(() => {
+        // Khôi phục nút đặt hàng
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerHTML = originalBtnText;
+    });
+}
+
+// Khởi tạo khi trang được load
+document.addEventListener('DOMContentLoaded', function() {
+    // Cập nhật UI giỏ hàng
+    updateCartUI();
+    
+    // Thêm sự kiện cho nút đặt hàng
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', checkout);
+    }
+    
+    // Thêm nút giỏ hàng vào navbar nếu chưa có
+    const navbar = document.querySelector('.navbar-nav');
+    if (navbar) {
+        const cartBtn = document.createElement('li');
+        cartBtn.className = 'nav-item ms-2';
+        cartBtn.innerHTML = `
+            <button class="btn btn-outline-light position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                      style="display: none;">0</span>
+            </button>
+        `;
+        navbar.appendChild(cartBtn);
+        updateCartUI();
+    }
+    
+    // Thêm nút thêm địa chỉ mới
+    const addAddressBtn = document.getElementById('addAddressBtn');
+    if (addAddressBtn) {
+        addAddressBtn.addEventListener('click', function() {
+            // TODO: Open add address modal
+            alert('Chức năng thêm địa chỉ mới sẽ được triển khai sau');
+        });
+    }
+});
+</script>
 </body>
 </html>

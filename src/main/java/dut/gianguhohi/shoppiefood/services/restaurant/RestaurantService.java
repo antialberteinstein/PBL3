@@ -77,4 +77,8 @@ public class RestaurantService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mô tả nhà hàng không được vượt quá 500 ký tự");
         }
     }
+
+    public Restaurant getRestaurantById(int restaurantId) {
+        return restaurantRepository.findByRestaurantId(restaurantId);
+    }
 }

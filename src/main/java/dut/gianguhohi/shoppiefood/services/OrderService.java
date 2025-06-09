@@ -3,7 +3,9 @@ package dut.gianguhohi.shoppiefood.services;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.transaction.Transactional;
@@ -12,21 +14,34 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import dut.gianguhohi.shoppiefood.repositories.Orders.OrderItemRepository;
 import dut.gianguhohi.shoppiefood.repositories.Orders.OrderRepository;
 import dut.gianguhohi.shoppiefood.repositories.Users.ShipperRepository;
 import dut.gianguhohi.shoppiefood.repositories.Users.UserRepository;
 import dut.gianguhohi.shoppiefood.repositories.misc.BranchRepository;
 import dut.gianguhohi.shoppiefood.utils.OrderStatusType;
+import dut.gianguhohi.shoppiefood.dtos.OrderDTO;
 import dut.gianguhohi.shoppiefood.models.Orders.Order;
 import dut.gianguhohi.shoppiefood.models.Users.Restaurant;
 import dut.gianguhohi.shoppiefood.models.Users.Shipper;
 import dut.gianguhohi.shoppiefood.models.Users.User;
 import dut.gianguhohi.shoppiefood.models.misc.Branch;
+import dut.gianguhohi.shoppiefood.models.Product.Product;
+import dut.gianguhohi.shoppiefood.models.Orders.OrderItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import dut.gianguhohi.shoppiefood.models.misc.Address;
+import dut.gianguhohi.shoppiefood.repositories.misc.AddressRepository;
+import dut.gianguhohi.shoppiefood.repositories.Users.RestaurantRepository;
+import dut.gianguhohi.shoppiefood.repositories.Products.ProductRepository;
 
 @Transactional
 @Service
 public class OrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
     private OrderRepository orderRepository;
@@ -39,6 +54,20 @@ public class OrderService {
     
     @Autowired
     private ShipperRepository shipperRepository;
+    
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     // ==========================
     // == Order Query Methods  ==
@@ -139,36 +168,102 @@ public class OrderService {
     }
     
     /**
-     * Tạo đơn hàng mới
+     * Tạo đơn hàng mới từ user request
      */
-    public Order createOrder(int userId, int branchId, int addressId, Object items, String note) {
-        // Logic tạo đơn hàng sẽ được triển khai tại đây
-        // Bao gồm kiểm tra user, restaurant, address tồn tại
-        // Kiểm tra các món hàng hợp lệ
-        // Tính toán tổng tiền, v.v.
-        
+    @Transactional
+    public Order createOrder(int userId, int restaurantId, int addressId, Object items, String note) {
+        // Kiểm tra dữ liệu
         User user = userRepository.findByUserId(userId);
-        
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng");
         }
 
-        Branch branch = branchRepository.findByBranchId(branchId);
-        if (branch == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi nhánh");
+        // Tìm nhà hàng và chi nhánh
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy nhà hàng"));
+        
+        // Tìm chi nhánh mặc định của nhà hàng
+        Branch branch = branchRepository.findByRestaurantAndDefaultBranch(restaurant, true)
+            .orElseGet(() -> branchRepository.findFirstByRestaurant(restaurant)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi nhánh nhà hàng")));
+        
+        // Kiểm tra địa chỉ giao hàng
+        Address address = addressRepository.findById(addressId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy địa chỉ giao hàng"));
+        
+        // Kiểm tra xem địa chỉ có thuộc về người dùng không
+        boolean isUserAddress = addressRepository.existsByAddressIdAndUserId(addressId, userId);
+        // Hoặc dùng phương thức với @Query
+        // boolean isUserAddress = addressRepository.checkAddressBelongsToUser(addressId, userId);
+        
+        if (!isUserAddress) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Địa chỉ này không thuộc về bạn");
         }
-
-        // Tạo đơn hàng với trạng thái pending
+        
+        // Tạo đơn hàng mới
+        // Tạo đơn hàng mới
         Order order = new Order();
         order.setCustomer(user);
         order.setBranch(branch);
-        // Set các thông tin khác của đơn hàng
+        order.setNote(note != null ? note : "");
         order.setStatus(OrderStatusType.PENDING);
+        order.setDeliveryAddress(address.getFullAddress()); // Thêm dòng này
+        order.setOrderDate(new Date()); // Đảm bảo đặt ngày đặt hàng
         order.setCreatedAt(LocalDateTime.now());
-        order.setNote(note);
         
-        // Lưu đơn hàng
-        return orderRepository.save(order); 
+        // Lưu đơn hàng để lấy ID
+        order = orderRepository.save(order);
+        
+        // Xử lý các mục trong đơn hàng
+        double totalAmount = 0;
+        
+        try {
+            List<Map<String, Object>> orderItems = (List<Map<String, Object>>) items;
+            
+            for (Map<String, Object> item : orderItems) {
+                int productId = ((Number) item.get("productId")).intValue();
+                int quantity = ((Number) item.get("quantity")).intValue();
+                
+                Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm: " + productId));
+                
+                // Kiểm tra xem sản phẩm có thuộc về nhà hàng không
+                if (product.getBranch().getRestaurant().getRestaurantId() != restaurantId) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sản phẩm không thuộc về nhà hàng này");
+                }
+                
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(order);
+                orderItem.setProduct(product);
+                orderItem.setQuantity(quantity);
+                orderItem.setUnitPrice(product.getPrice());
+                
+                // Tính tổng tiền cho từng mục
+                double itemTotal = product.getPrice() * quantity;
+                totalAmount += itemTotal;
+                
+                orderItemRepository.save(orderItem);
+            }
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Định dạng dữ liệu sản phẩm không đúng: " + e.getMessage());
+        }
+        
+        // Cập nhật tổng tiền
+        order.setTotalAmount(totalAmount);
+        order = orderRepository.save(order);
+        
+        // Gửi thông báo qua WebSocket (nếu có)
+        try {
+            if (messagingTemplate != null) {
+                String destination = "/topic/restaurant/" + restaurantId + "/orders";
+                messagingTemplate.convertAndSend(destination, new OrderDTO(order));
+            }
+        } catch (Exception e) {
+            // Ghi log lỗi nhưng không làm ảnh hưởng đến việc tạo đơn hàng
+            logger.error("Không thể gửi thông báo WebSocket: " + e.getMessage());
+        }
+        
+        return order;
     }
     
     /**
@@ -390,4 +485,5 @@ public class OrderService {
     public List<Order> getDeliveredOrdersByShipper(Shipper shipper) {
         return orderRepository.findByShipperAndStatusOrderByTimeDeliveredDesc(shipper, OrderStatusType.DELIVERED);
     }
+
 }

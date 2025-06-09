@@ -1,5 +1,6 @@
 package dut.gianguhohi.shoppiefood.models.misc;
 
+import dut.gianguhohi.shoppiefood.models.Users.User;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,6 +10,10 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
     private int addressId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "address_line1")
     private String addressLine1;
@@ -78,5 +83,13 @@ public class Address {
 
     public String getFullAddress() {
         return addressLine2 + ", " + addressLine1 + ", " + ward + ", " + city;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
