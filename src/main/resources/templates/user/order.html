@@ -1,87 +1,422 @@
 <!DOCTYPE html>
-<html layout:decorate="~{shared/layout/base}">
-<head layout:title="Đơn hàng"></head>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout/base}">
+<head>
+    <title>Đơn hàng của tôi - Shoppie Food</title>
+    <link rel="stylesheet" th:href="@{/css/user/order.css}">
+</head>
+<body>
 <div layout:fragment="content">
-    <div class="container user-main">
-        <div class="user-orders">
-            <h2 class="order-title">ĐƠN HÀNG CỦA BẠN</h2>
-            <div id="orderList">
-                <!-- Render danh sách đơn hàng ở đây -->
-                <!-- Ví dụ mẫu -->
-                
-                
-               
-            </div>            
+    <div class="container mt-4">
+        <h3>Đơn hàng của tôi</h3>
+        
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link active" id="active-tab" data-bs-toggle="tab" href="#active">Đơn hàng hiện tại</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="history-tab" data-bs-toggle="tab" href="#history">Lịch sử đơn hàng</a>
+            </li>
+        </ul>
+        
+        <!-- Tab content -->
+        <div class="tab-content">
+            <!-- Active orders tab -->
+            <div class="tab-pane fade show active" id="active">
+                <div id="active-orders" class="row">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p>Đang tải đơn hàng...</p>
+                    </div>
+                </div>
+                <div id="no-active-orders" class="alert alert-info text-center d-none">
+                    Bạn không có đơn hàng nào đang xử lý.
+                </div>
+            </div>
+            
+            <!-- Order history tab -->
+            <div class="tab-pane fade" id="history">
+                <div id="history-orders" class="row">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p>Đang tải lịch sử đơn hàng...</p>
+                    </div>
+                </div>
+                <div id="no-history-orders" class="alert alert-info text-center d-none">
+                    Bạn chưa có đơn hàng nào trước đây.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order detail modal -->
+        <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="orderDetailModalLabel">Chi tiết đơn hàng #<span id="detail-order-id"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="order-detail-content">
+                        <!-- Order details will be loaded here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-danger d-none" id="cancel-order-btn">Hủy đơn hàng</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            // Lấy customerId từ session.user
-            const customerId = /*[[${session.user != null ? session.user.userId : 0}]]*/ 0;
-            if (!customerId) {
-                document.getElementById('orderList').innerHTML = '<div class="text-danger">Bạn cần đăng nhập để xem đơn hàng.</div>';
-                return;
-            }
-
-
-            // Gọi API lấy danh sách đơn hàng
-            fetch(`/api/orders/customer/${customerId}?page=1&size=20`)
-                .then(res => res.json())
-                .then(data => renderOrders(data.orders))
-                .catch((err) => {
-                    document.getElementById('orderList').innerHTML = '<div class="text-danger">Không thể tải danh sách đơn hàng.</div>';
-                    document.getElementById('orderList').innerHTML += `<div class="text-muted">Lỗi: ${err}</div>`;
-                });
-
-            // Hàm render danh sách đơn hàng
-            function renderOrders(orders) {
-                if (!orders || orders.length === 0) {
-                    document.getElementById('orderList').innerHTML = '<div class="text-muted">Bạn chưa có đơn hàng nào.</div>';
-                    return;
-                }
-                document.getElementById('orderList').innerHTML = orders.map(order => `
-                    <div class="order-item mb-3 p-3 border rounded">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="${order.firstProductImageUrl || '/images/no-image.png'}" alt="Ảnh món" style="width:64px;height:64px;object-fit:cover;border-radius:8px;">
-                            <div class="flex-grow-1">
-                                <div class="fw-bold">#${order.orderId} - ${order.firstProductName || 'Sản phẩm'}</div>
-                                <div>Nhà hàng: <span class="text-primary">${order.restaurantName || ''}</span></div>
-                                <div>Địa chỉ lấy: <span>${order.pickupAddress || ''}</span></div>
-                                <div>Địa chỉ giao: <span>${order.deliveryAddress || ''}</span></div>
-                                <div>Ngày đặt: <span>${order.createdAt ? order.createdAt.replace('T', ' ').substring(0, 16) : ''}</span></div>
-                                <div>Trạng thái: <span class="badge bg-info">${order.status}</span></div>
-                                <div>Tổng tiền: <span class="text-danger fw-bold">${order.totalAmount.toLocaleString('vi-VN')} VNĐ</span></div>
+            // Lấy userId từ session
+            const userId = [[${session.userId}]];
+            
+            // Tải đơn hàng hiện tại
+            loadOrders(userId, 'active');
+            
+            // Thêm sự kiện cho tab
+            document.getElementById('history-tab').addEventListener('click', function() {
+                loadOrders(userId, 'history');
+            });
+            
+            // Hàm tải đơn hàng
+            function loadOrders(userId, type) {
+                const container = document.getElementById(type + '-orders');
+                const noOrdersMessage = document.getElementById('no-' + type + '-orders');
+                
+                // Hiển thị loading
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p>Đang tải đơn hàng...</p>
+                    </div>
+                `;
+                
+                fetch(`/api/orders/user/${userId}/${type}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.orders && data.orders.length > 0) {
+                            container.innerHTML = '';
+                            noOrdersMessage.classList.add('d-none');
+                            
+                            data.orders.forEach(order => {
+                                container.appendChild(createOrderCard(order, type));
+                            });
+                        } else {
+                            container.innerHTML = '';
+                            noOrdersMessage.classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading orders:', error);
+                        container.innerHTML = `
+                            <div class="alert alert-danger w-100">
+                                Có lỗi xảy ra khi tải đơn hàng. Vui lòng thử lại sau.
                             </div>
-                            <div class="order-actions d-flex flex-column gap-2">
-                                <button class="btn btn-warning btn-sm" onclick="viewOrder(${order.orderId})">Xem thông tin</button>
-                                ${(order.status === 'pending' || order.status === 'confirmed') ? 
-                                    `<button class="btn btn-danger btn-sm" onclick="cancelOrder(${order.orderId})">Hủy đơn</button>` : ''}
+                        `;
+                    });
+            }
+            
+            // Hàm tạo thẻ đơn hàng
+            function createOrderCard(order, type) {
+                const card = document.createElement('div');
+                card.className = 'col-md-6 col-lg-4 mb-4';
+                
+                // Định dạng trạng thái đơn hàng
+                const statusClass = getStatusClass(order.status);
+                const statusText = getStatusText(order.status);
+                
+                // Định dạng ngày tháng
+                const orderDate = new Date(order.orderDate);
+                const formattedDate = orderDate.toLocaleDateString('vi-VN', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Tạo HTML cho card
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="order-id">Đơn #${order.orderId}</span>
+                            <span class="badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2"><i class="fas fa-store me-2"></i> ${order.restaurantName}</p>
+                            <p class="mb-2"><i class="fas fa-calendar-alt me-2"></i> ${formattedDate}</p>
+                            <p class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> ${order.deliveryAddress}</p>
+                            <p class="mb-3"><i class="fas fa-money-bill-wave me-2"></i> ${formatCurrency(order.totalAmount)}</p>
+                            
+                            <div class="text-center mt-3">
+                                <button class="btn btn-sm btn-primary view-detail-btn" data-order-id="${order.orderId}">
+                                    Xem chi tiết
+                                </button>
+                                ${order.status === 'PENDING' ? `
+                                    <button class="btn btn-sm btn-outline-danger ms-2 cancel-btn" data-order-id="${order.orderId}">
+                                        Hủy đơn hàng
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
-                `).join('');
-            }
-
-            // Hàm xem thông tin đơn hàng (bạn có thể mở modal hoặc chuyển trang)
-            window.viewOrder = function(orderId) {
-                alert('Xem thông tin đơn hàng #' + orderId);
-                // TODO: Hiển thị chi tiết đơn hàng
-            };
-
-            // Hàm hủy đơn hàng (gọi API hủy)
-            window.cancelOrder = function(orderId) {
-                if (!confirm('Bạn chắc chắn muốn hủy đơn hàng #' + orderId + '?')) return;
-                fetch(`/api/orders/${orderId}/cancel`, { method: 'POST' })
-                    .then(res => {
-                        if (res.ok) {
-                            alert('Đã hủy đơn hàng!');
-                            location.reload();
-                        } else {
-                            alert('Không thể hủy đơn hàng!');
-                        }
+                `;
+                
+                // Thêm sự kiện cho nút xem chi tiết
+                const viewDetailBtn = card.querySelector('.view-detail-btn');
+                viewDetailBtn.addEventListener('click', function() {
+                    showOrderDetail(order.orderId);
+                });
+                
+                // Thêm sự kiện cho nút hủy đơn
+                const cancelBtn = card.querySelector('.cancel-btn');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', function() {
+                        cancelOrder(order.orderId);
                     });
-            };
+                }
+                
+                return card;
+            }
+            
+            // Hàm lấy class cho badge trạng thái
+            function getStatusClass(status) {
+                switch(status) {
+                    case 'PENDING': return 'bg-warning text-dark';
+                    case 'CONFIRMED': return 'bg-info text-dark';
+                    case 'IN_PROGRESS': return 'bg-primary';
+                    case 'DELIVERED': return 'bg-success';
+                    case 'CANCELLED': return 'bg-danger';
+                    default: return 'bg-secondary';
+                }
+            }
+            
+            // Hàm lấy text cho trạng thái
+            function getStatusText(status) {
+                switch(status) {
+                    case 'PENDING': return 'Chờ xác nhận';
+                    case 'CONFIRMED': return 'Đã xác nhận';
+                    case 'IN_PROGRESS': return 'Đang giao';
+                    case 'DELIVERED': return 'Đã giao';
+                    case 'CANCELLED': return 'Đã hủy';
+                    default: return status;
+                }
+            }
+            
+            // Hàm định dạng tiền tệ
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(amount);
+            }
+            
+            // Hàm hiển thị chi tiết đơn hàng
+            function showOrderDetail(orderId) {
+                const detailContent = document.getElementById('order-detail-content');
+                const detailOrderId = document.getElementById('detail-order-id');
+                const cancelOrderBtn = document.getElementById('cancel-order-btn');
+                
+                detailOrderId.textContent = orderId;
+                detailContent.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                        <p>Đang tải chi tiết đơn hàng...</p>
+                    </div>
+                `;
+                
+                // Ẩn nút hủy đơn hàng trước
+                cancelOrderBtn.classList.add('d-none');
+                
+                // Hiển thị modal
+                const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+                modal.show();
+                
+                // Tải chi tiết đơn hàng
+                fetch(`/api/orders/detail/${orderId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const order = data.order;
+                            
+                            // Hiển thị nút hủy đơn nếu trạng thái là PENDING
+                            if (order.status === 'PENDING') {
+                                cancelOrderBtn.classList.remove('d-none');
+                                cancelOrderBtn.setAttribute('data-order-id', orderId);
+                            } else {
+                                cancelOrderBtn.classList.add('d-none');
+                            }
+                            
+                            // Render chi tiết đơn hàng
+                            detailContent.innerHTML = `
+                                <div class="order-detail">
+                                    <div class="status-timeline mb-4">
+                                        <!-- Status timeline -->
+                                        <div class="d-flex justify-content-between position-relative status-line">
+                                            <div class="status-point ${order.status !== 'CANCELLED' ? 'active' : ''}">
+                                                <div class="status-icon">
+                                                    <i class="fas fa-file-invoice"></i>
+                                                </div>
+                                                <div class="status-text">Đặt hàng</div>
+                                            </div>
+                                            <div class="status-point ${order.status === 'CONFIRMED' || order.status === 'IN_PROGRESS' || order.status === 'DELIVERED' ? 'active' : ''}">
+                                                <div class="status-icon">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </div>
+                                                <div class="status-text">Xác nhận</div>
+                                            </div>
+                                            <div class="status-point ${order.status === 'IN_PROGRESS' || order.status === 'DELIVERED' ? 'active' : ''}">
+                                                <div class="status-icon">
+                                                    <i class="fas fa-motorcycle"></i>
+                                                </div>
+                                                <div class="status-text">Giao hàng</div>
+                                            </div>
+                                            <div class="status-point ${order.status === 'DELIVERED' ? 'active' : ''}">
+                                                <div class="status-icon">
+                                                    <i class="fas fa-flag-checkered"></i>
+                                                </div>
+                                                <div class="status-text">Hoàn tất</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <h6>Thông tin đơn hàng</h6>
+                                            <p><strong>Mã đơn hàng:</strong> #${order.orderId}</p>
+                                            <p><strong>Ngày đặt:</strong> ${new Date(order.orderDate).toLocaleDateString('vi-VN', { 
+                                                day: '2-digit', 
+                                                month: '2-digit', 
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}</p>
+                                            <p><strong>Trạng thái:</strong> <span class="badge ${getStatusClass(order.status)}">${getStatusText(order.status)}</span></p>
+                                            ${order.cancelReason ? `<p><strong>Lý do hủy:</strong> ${order.cancelReason}</p>` : ''}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Thông tin giao hàng</h6>
+                                            <p><strong>Người nhận:</strong> ${order.customerName}</p>
+                                            <p><strong>Địa chỉ:</strong> ${order.deliveryAddress}</p>
+                                            <p><strong>Số điện thoại:</strong> ${order.customerPhone || 'Không có'}</p>
+                                            <p><strong>Ghi chú:</strong> ${order.note || 'Không có'}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <h6>Chi tiết sản phẩm</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sản phẩm</th>
+                                                    <th class="text-center">Số lượng</th>
+                                                    <th class="text-end">Đơn giá</th>
+                                                    <th class="text-end">Thành tiền</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${order.items.map(item => `
+                                                    <tr>
+                                                        <td>${item.productName}</td>
+                                                        <td class="text-center">${item.quantity}</td>
+                                                        <td class="text-end">${formatCurrency(item.price)}</td>
+                                                        <td class="text-end">${formatCurrency(item.price * item.quantity)}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="3" class="text-end"><strong>Tạm tính:</strong></td>
+                                                    <td class="text-end">${formatCurrency(order.subtotal)}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3" class="text-end"><strong>Phí vận chuyển:</strong></td>
+                                                    <td class="text-end">${formatCurrency(order.shippingFee)}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                                                    <td class="text-end"><strong>${formatCurrency(order.totalAmount)}</strong></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            detailContent.innerHTML = `
+                                <div class="alert alert-danger">
+                                    ${data.message || 'Không thể tải chi tiết đơn hàng'}
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading order detail:', error);
+                        detailContent.innerHTML = `
+                            <div class="alert alert-danger">
+                                Có lỗi xảy ra khi tải chi tiết đơn hàng. Vui lòng thử lại sau.
+                            </div>
+                        `;
+                    });
+            }
+            
+            // Hàm hủy đơn hàng
+            function cancelOrder(orderId) {
+                if (!confirm('Bạn có chắc muốn hủy đơn hàng này?')) {
+                    return;
+                }
+                
+                const reason = prompt('Lý do hủy đơn hàng:', 'Tôi muốn thay đổi đơn hàng');
+                
+                fetch(`/api/orders/user/cancel/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Hủy đơn hàng thành công!');
+                        // Reload đơn hàng
+                        loadOrders(userId, 'active');
+                        loadOrders(userId, 'history');
+                        // Đóng modal nếu đang mở
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('orderDetailModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
+                    } else {
+                        alert(`Lỗi: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error canceling order:', error);
+                    alert('Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại sau.');
+                });
+            }
+            
+            // Thêm sự kiện cho nút hủy đơn hàng trong modal
+            document.getElementById('cancel-order-btn').addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                cancelOrder(orderId);
+            });
         });
     </script>
 </div>
+</body>
 </html>

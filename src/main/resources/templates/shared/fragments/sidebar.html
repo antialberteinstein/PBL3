@@ -27,16 +27,21 @@
 
     <!-- Sidebar for Shipper -->
     <div th:if="${session.role == 'shipper'}"
-         class="user-info"
-         style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
-        <img class="avatar" src="/images/Avatar/shipper.png" alt="avatar" style="margin: 0 auto !important;">
-        <div class="user-name" style="text-align: center !important;">Shipper</div>
-        <div class="user-contact" style="text-align: center !important;">SĐT: 0123 456 789</div>
+        class="user-info"
+        style="display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important;">
+        <img class="avatar"
+            th:src="${userAvatarUrl != null} ? ${userAvatarUrl} : '/images/Avatar/shipper.png'"
+            alt="avatar"
+            style="margin: 0 auto !important;">
+        <div class="user-name" style="text-align: center !important;"
+            th:text="${session.userName ?: 'Shipper'}">Shipper</div>
+        <div class="user-contact" style="text-align: center !important;"
+            th:text="'SĐT: ' + (${userPhoneNumber} ?: 'Chưa cập nhật')">SĐT: 0123 456 789</div>
         <ul class="user-menu">
             <li><a href="/shipper/home"><i class="fas fa-home"></i> Trang chủ</a></li>
-            <li><a href="/shipper/profile"><i class="fas fa-user"></i> Thông tin tài khoản</a></li>
             <li><a href="/shipper/order/active"><i class="fas fa-bell"></i> Các đơn hàng mới</a></li>
             <li><a href="/shipper/orders/history"><i class="fas fa-history"></i> Lịch sử giao hàng</a></li>
+            <li><a href="/shipper/exit"><i class="fas fa-sign-out-alt"></i> Thoát</a></li>
             <li><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
         </ul>
     </div>
@@ -72,6 +77,11 @@
                     </a>
                 </li>
             </ul>
+        </div>
+        <div id="shipperEntryButton" class="mb-2 d-flex">
+            <a href="/shipper/enter" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-shipping-fast"></i> Shipper
+            </a>
         </div>
         <ul class="user-menu">
             <li><a href="/user/home"><i class="fas fa-home"></i> Trang chủ</a></li>

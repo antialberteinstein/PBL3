@@ -92,36 +92,63 @@ function renderCategories(categories) {
 }
 
 function renderProducts(products) {
-    console.log("DEBUG");
-    console.log(products);
     const foodList = document.getElementById('foodList');
-    foodList.innerHTML = '';
-    if (!products.length) {
+    
+    // Kiểm tra xem foodList có tồn tại không
+    if (!foodList) {
+        console.error('Element with ID "foodList" not found');
+        return;
+    }
+    
+    // Đặt loading indicator
+    foodList.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-3">Đang tải món ăn...</p></div>';
+    
+    // Console log để debug
+    console.log('Products data:', products);
+    
+    if (!products || !Array.isArray(products) || products.length === 0) {
         foodList.innerHTML = '<div class="col-12 text-center text-muted">Không tìm thấy món ăn phù hợp</div>';
         return;
     }
+    
+    foodList.innerHTML = '';
     products.forEach(product => {
+        // Tránh lỗi khi giá trị trong product là null
+        const productId = product.productId || 0;
+        const name = product.name || 'Không có tên';
+        const price = product.price || 0;
+        const imageUrl = product.imageUrl || '/images/no-image.png';
+        const restaurantName = (product.restaurantName || 'Không có tên nhà hàng').replace(/'/g, "\\'");
+        const restaurantId = product.restaurantId || 0;
+        const description = (product.description || '').replace(/'/g, "\\'");
+        const rating = product.rating || 0;
+        const ratingNumber = product.ratingNumber || 0;
         const categories = product.categories ? product.categories.join(', ') : '';
-        foodList.innerHTML += `
+        
+        const cardHtml = `
         <div class="col-md-4 mb-4">
-            <div class="card food-card" data-category="${categories}" data-price="${product.price}" data-popularity="${product.popularity || 0}">
-                <img src="${product.imageUrl || '/images/no-image.png'}" class="card-img-top food-image" alt="${product.name}">
-                <div class="restaurant-badge">${product.restaurantName || ''}</div>
+            <div class="card food-card" data-category="${categories}" data-price="${price}" data-popularity="${product.popularity || 0}">
+                <img src="${imageUrl}" class="card-img-top food-image" alt="${name}" onerror="this.src='/images/no-image.png'">
+                <div class="restaurant-badge">${restaurantName}</div>
                 <div class="card-body food-info">
-                    <h5 class="card-title food-name">${product.name}</h5>
-                    <p class="card-text">${product.description || ''}</p>
+                    <h5 class="card-title food-name">${name}</h5>
+                    <p class="card-text">${description}</p>
                     <div class="rating">
-                        <div class="stars">${'★'.repeat(Math.round(product.rating || 0)).padEnd(5, '☆')}</div>
-                        <div class="count">(${product.ratingNumber || 0})</div>
+                        <div class="stars">${'★'.repeat(Math.round(rating)).padEnd(5, '☆')}</div>
+                        <div class="count">(${ratingNumber})</div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="price food-price">${product.price.toLocaleString('vi-VN')}đ</span>
-                        <button class="btn btn-outline-primary btn-add-cart"
-                            onclick="addToCart(${product.productId}, '${product.name}', ${product.price}, '${product.imageUrl}', '${product.restaurantName}')">Đặt món</button>
+                        <span class="price food-price">${price.toLocaleString('vi-VN')}đ</span>
+                        <button class="btn btn-outline-primary btn-add-cart" 
+                            onclick="addToCart(${productId}, '${name.replace(/'/g, "\\'")}', ${price}, '${imageUrl}', '${restaurantName}', ${restaurantId})">
+                            Đặt món
+                        </button>
                     </div>
                 </div>
             </div>
         </div>`;
+        
+        foodList.insertAdjacentHTML('beforeend', cardHtml);
     });
 }
 
@@ -165,16 +192,350 @@ function getFilterParams() {
 }
 
 function fetchAndRenderProducts(params = {}) {
+    const foodList = document.getElementById('foodList');
+    if (foodList) {
+        // Hiển thị loading
+        foodList.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-3">Đang tải món ăn...</p></div>';
+    }
+    
     Object.keys(params).forEach(k => (params[k] == null || params[k] === '') && delete params[k]);
     const query = new URLSearchParams(params).toString();
+    
+    console.log('Fetching products with query:', query);
+    
     fetch('/api/products?' + query)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! Status: ${res.status}`);
+            }
+            return res.json();
+        })
         .then(data => {
-            renderProducts(data.content || []);
+            console.log('API response:', data);
+            // Kiểm tra cấu trúc dữ liệu
+            const products = data.content || data || [];
+            renderProducts(products);
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
+            if (foodList) {
+                foodList.innerHTML = `
+                    <div class="col-12 text-center">
+                        <div class="alert alert-danger">
+                            Có lỗi xảy ra khi tải danh sách món ăn. Vui lòng thử lại sau.
+                        </div>
+                        <button class="btn btn-primary" onclick="fetchAndRenderProducts()">
+                            <i class="fas fa-sync-alt"></i> Tải lại
+                        </button>
+                    </div>
+                `;
+            }
         });
 }
 
+function addToCart(productId, productName, productPrice, productImage, restaurantName, restaurantId) {
+    // Kiểm tra tham số đầu vào
+    console.log('Adding to cart:', { productId, productName, productPrice, restaurantName, restaurantId });
+    
+    if (!productId || !restaurantId) {
+        console.error('Missing required parameters for addToCart');
+        showToast('Có lỗi xảy ra khi thêm vào giỏ hàng');
+        return;
+    }
+    
+    // Lấy giỏ hàng từ localStorage hoặc khởi tạo mới
+    let cart = JSON.parse(localStorage.getItem('cart')) || {
+        items: [],
+        restaurantId: null,
+        restaurantName: null,
+        total: 0
+    };
+    
+    // Kiểm tra nếu đặt từ nhà hàng khác
+    if (cart.items.length > 0 && cart.restaurantId !== restaurantId) {
+        if (!confirm("Bạn đang có món ăn từ nhà hàng khác trong giỏ hàng. Xóa giỏ hàng hiện tại và thêm món này?")) {
+            return;
+        }
+        cart = {
+            items: [],
+            restaurantId: null,
+            restaurantName: null,
+            total: 0
+        };
+    }
+    
+    // Thêm sản phẩm vào giỏ hàng
+    const existingItem = cart.items.find(item => item.productId === productId);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.items.push({
+            productId,
+            name: productName,
+            price: productPrice,
+            image: productImage,
+            quantity: 1
+        });
+    }
+    
+    // Cập nhật thông tin nhà hàng và tổng tiền
+    cart.restaurantId = restaurantId;
+    cart.restaurantName = restaurantName;
+    cart.total = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
+    // Lưu giỏ hàng và cập nhật UI
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartBadge();
+    
+    // Hiển thị thông báo
+    showToast('Đã thêm sản phẩm vào giỏ hàng');
+}
+
+// Hiển thị giỏ hàng
+function showCart() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartTotalElement = document.getElementById('cart-total');
+    const emptyCartMessage = document.getElementById('empty-cart-message');
+    const cartContent = document.getElementById('cart-content');
+    
+    if (!cart.items || cart.items.length === 0) {
+        emptyCartMessage.classList.remove('d-none');
+        cartContent.classList.add('d-none');
+        return;
+    }
+    
+    emptyCartMessage.classList.add('d-none');
+    cartContent.classList.remove('d-none');
+    
+    cartItemsContainer.innerHTML = '';
+    cart.items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item d-flex justify-content-between align-items-center mb-3';
+        itemElement.innerHTML = `
+            <div class="d-flex align-items-center">
+                <img src="${item.image}" alt="${item.name}" class="cart-item-image me-2">
+                <div>
+                    <h6 class="mb-0">${item.name}</h6>
+                    <div class="price">${item.price.toLocaleString('vi-VN')}đ</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="quantity-control">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="updateCartItemQuantity(${item.productId}, -1)">-</button>
+                    <span class="mx-2">${item.quantity}</span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="updateCartItemQuantity(${item.productId}, 1)">+</button>
+                </div>
+                <button class="btn btn-sm btn-outline-danger ms-2" onclick="removeCartItem(${item.productId})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        cartItemsContainer.appendChild(itemElement);
+    });
+    
+    cartTotalElement.textContent = cart.total.toLocaleString('vi-VN') + 'đ';
+    loadUserAddresses();
+}
+
+// Cập nhật số lượng sản phẩm trong giỏ hàng
+function updateCartItemQuantity(productId, change) {
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    const item = cart.items.find(item => item.productId === productId);
+    
+    if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            // Xóa sản phẩm khỏi giỏ hàng nếu số lượng <= 0
+            cart.items = cart.items.filter(i => i.productId !== productId);
+        }
+        
+        // Cập nhật tổng tiền
+        cart.total = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        
+        // Lưu giỏ hàng và cập nhật UI
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartBadge();
+        showCart();
+    }
+}
+
+// Xóa sản phẩm khỏi giỏ hàng
+function removeCartItem(productId) {
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    cart.items = cart.items.filter(item => item.productId !== productId);
+    
+    // Cập nhật tổng tiền
+    cart.total = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
+    // Lưu giỏ hàng và cập nhật UI
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartBadge();
+    showCart();
+}
+
+// Cập nhật số lượng sản phẩm hiển thị trên biểu tượng giỏ hàng
+function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || { items: [] };
+    const totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const badge = document.getElementById('cart-badge');
+    
+    if (badge) {
+        if (totalItems > 0) {
+            badge.textContent = totalItems;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// Tải địa chỉ của người dùng
+function loadUserAddresses() {
+    const addressContainer = document.getElementById('address-list');
+    
+    // Hiển thị loading
+    addressContainer.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+            <p>Đang tải địa chỉ...</p>
+        </div>
+    `;
+    
+    fetch('/api/user/addresses')
+        .then(response => response.json())
+        .then(data => {
+            addressContainer.innerHTML = '';
+            
+            if (data.length === 0) {
+                addressContainer.innerHTML = `
+                    <div class="alert alert-warning">
+                        Bạn chưa có địa chỉ nào. Vui lòng thêm địa chỉ để tiếp tục.
+                    </div>
+                `;
+                return;
+            }
+            
+            data.forEach((address, index) => {
+                const addressItem = document.createElement('div');
+                addressItem.className = 'form-check mb-2';
+                addressItem.innerHTML = `
+                    <input class="form-check-input" type="radio" name="delivery-address" 
+                           id="address-${address.id}" value="${address.id}" ${index === 0 ? 'checked' : ''}>
+                    <label class="form-check-label" for="address-${address.id}">
+                        <strong>${address.receiverName}</strong> | ${address.phone}
+                        <div>${address.fullAddress}</div>
+                    </label>
+                `;
+                addressContainer.appendChild(addressItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading addresses:', error);
+            addressContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    Có lỗi xảy ra khi tải địa chỉ. Vui lòng thử lại sau.
+                </div>
+            `;
+        });
+}
+
+// Gửi đơn hàng đến server
+function checkout() {
+    // Lấy giỏ hàng từ localStorage
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    if (!cart || !cart.items || cart.items.length === 0) {
+        alert('Giỏ hàng của bạn đang trống');
+        return;
+    }
+    
+    // Lấy địa chỉ giao hàng từ modal
+    const selectedAddressId = document.querySelector('input[name="delivery-address"]:checked')?.value;
+    if (!selectedAddressId) {
+        alert('Vui lòng chọn địa chỉ giao hàng');
+        return;
+    }
+    
+    // Lấy ghi chú đơn hàng
+    const note = document.getElementById('order-note').value;
+    
+    // Hiển thị loading
+    document.getElementById('place-order-btn').disabled = true;
+    document.getElementById('place-order-btn').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+    
+    // Tạo dữ liệu đơn hàng
+    const orderData = {
+        restaurantId: cart.restaurantId,
+        addressId: parseInt(selectedAddressId),
+        note: note,
+        items: cart.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity
+        }))
+    };
+    
+    // Gửi request đặt hàng
+    fetch('/api/orders/user/place', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Khôi phục nút đặt hàng
+        document.getElementById('place-order-btn').disabled = false;
+        document.getElementById('place-order-btn').innerHTML = 'Xác nhận đặt hàng';
+        
+        if (data.success) {
+            // Xóa giỏ hàng sau khi đặt hàng thành công
+            localStorage.removeItem('cart');
+            updateCartBadge();
+            
+            // Đóng modal giỏ hàng
+            const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+            cartModal.hide();
+            
+            // Hiển thị modal thông báo thành công
+            const successModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+            document.getElementById('success-order-id').textContent = data.orderId;
+            successModal.show();
+        } else {
+            alert('Lỗi đặt hàng: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error placing order:', error);
+        alert('Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại sau.');
+        
+        // Khôi phục nút đặt hàng
+        document.getElementById('place-order-btn').disabled = false;
+        document.getElementById('place-order-btn').innerHTML = 'Xác nhận đặt hàng';
+    });
+}
+
+// Thêm vào đầu file script
 document.addEventListener('DOMContentLoaded', function() {
+    // Xóa cache nếu cần
+    if (localStorage.getItem('clear-cache') === 'true') {
+        console.log('Clearing cache...');
+        localStorage.removeItem('clear-cache');
+        
+        // Xóa các cache không cần thiết (giữ lại giỏ hàng)
+        const cart = localStorage.getItem('cart');
+        localStorage.clear();
+        if (cart) {
+            localStorage.setItem('cart', cart);
+        }
+        
+        // Reload trang sau khi xóa cache
+        window.location.reload(true);
+        return;
+    }
+    
     console.log("Page loaded, fetching products and categories");
     fetchAndRenderProducts();
     fetch('/api/categories')
@@ -211,8 +572,171 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.key === 'Enter') fetchAndRenderProducts(getFilterParams());
         });
     }
+
+    updateCartBadge();
+    
+    // Thêm sự kiện cho nút giỏ hàng
+    const cartBtn = document.getElementById('cart-btn');
+    if (cartBtn) {
+        cartBtn.addEventListener('click', function() {
+            showCart();
+        });
+    }
+    
+    // Thêm sự kiện cho nút đặt hàng
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', checkout);
+    }
 });
+
+// Thêm nút xóa cache vào trang (có thể xóa sau khi sửa xong)
+function addDebugButtons() {
+    const debugContainer = document.createElement('div');
+    debugContainer.style.position = 'fixed';
+    debugContainer.style.bottom = '20px';
+    debugContainer.style.left = '20px';
+    debugContainer.style.zIndex = '9999';
+    
+    const clearCacheBtn = document.createElement('button');
+    clearCacheBtn.className = 'btn btn-warning btn-sm';
+    clearCacheBtn.innerHTML = '<i class="fas fa-broom"></i> Xóa cache';
+    clearCacheBtn.onclick = function() {
+        localStorage.setItem('clear-cache', 'true');
+        window.location.reload(true);
+    };
+    
+    debugContainer.appendChild(clearCacheBtn);
+    document.body.appendChild(debugContainer);
+}
+
+// Gọi hàm thêm nút debug (có thể xóa sau khi sửa xong)
+document.addEventListener('DOMContentLoaded', function() {
+    addDebugButtons();
+    // Code khác...
+});
+
+// Hàm hiển thị thông báo đã thêm sản phẩm vào giỏ hàng
+function showToast(message) {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        // Tạo container cho toast nếu chưa có
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '1090';
+        document.body.appendChild(container);
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i> ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHtml);
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+    toast.show();
+    
+    // Xóa toast sau khi ẩn
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        this.remove();
+    });
+}
 </script>
 </div>
+
+<!-- Modal Giỏ hàng -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">Giỏ hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Giỏ hàng trống -->
+        <div id="empty-cart-message" class="text-center py-5">
+          <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+          <h5>Giỏ hàng của bạn đang trống</h5>
+          <p class="text-muted">Thêm món ăn vào giỏ hàng để đặt món</p>
+        </div>
+        
+        <!-- Nội dung giỏ hàng -->
+        <div id="cart-content" class="d-none">
+          <!-- Thông tin nhà hàng -->
+          <div class="restaurant-info mb-3">
+            <h6 class="restaurant-name mb-2"></h6>
+          </div>
+          
+          <!-- Danh sách món ăn -->
+          <div id="cart-items" class="mb-4">
+            <!-- Các món ăn sẽ được thêm ở đây -->
+          </div>
+          
+          <!-- Tổng cộng -->
+          <div class="cart-total d-flex justify-content-between border-top pt-3">
+            <strong>Tổng cộng:</strong>
+            <span id="cart-total" class="fw-bold"></span>
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Phần địa chỉ giao hàng -->
+          <h6>Địa chỉ giao hàng</h6>
+          <div id="address-list" class="mb-3">
+            <!-- Danh sách địa chỉ sẽ được thêm ở đây -->
+          </div>
+          <button class="btn btn-sm btn-outline-primary" id="add-address-btn">
+            <i class="fas fa-plus"></i> Thêm địa chỉ mới
+          </button>
+          
+          <!-- Ghi chú -->
+          <div class="mt-4">
+            <label for="order-note" class="form-label">Ghi chú:</label>
+            <textarea class="form-control" id="order-note" rows="2" placeholder="Nhập ghi chú cho đơn hàng (không bắt buộc)"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" id="place-order-btn">Xác nhận đặt hàng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal thông báo đặt hàng thành công -->
+<div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="orderSuccessModalLabel">Đặt hàng thành công!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+        <h4>Cảm ơn bạn đã đặt hàng!</h4>
+        <p>Mã đơn hàng của bạn là: <strong id="success-order-id"></strong></p>
+        <p>Nhà hàng sẽ sớm xác nhận đơn hàng của bạn.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <a href="/user/order" class="btn btn-primary">Xem đơn hàng</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1090"></div>
+<div th:replace="shared/fragments/address-popup :: address-form"></div>
 </body>
 </html>

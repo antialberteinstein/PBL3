@@ -1,212 +1,340 @@
-<!DOCTYPE html>Add commentMore actions
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{shared/layout/base}">
 <head>
     <title>Hồ Sơ Shipper</title>
     <link rel="stylesheet" th:href="@{/css/shipper/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/shipper/shipper.css}">
     <style>
-        /* Reset mạnh mẽ cho tất cả các container */
-        body, html {
-            overflow-x: hidden !important;
-            width: 100vw !important;
-            padding: 0 !important;
-            margin: 0 !important;
+        .shipper-main-content {
+            width: 100vw;
+            max-width: 100vw;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 40px;
         }
-        
-        /* Xóa tất cả kích thước cố định cho các container */
-        .content-wrapper, .main-content, [layout\:fragment="content"], .profile-container {
-            width: 100vw !important;
-            max-width: 100vw !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            box-sizing: border-box !important;
+        .profile-container {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+            margin: 0 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            position: relative;
         }
-        
-        /* Reset cho layout 2 cột, khắc phục vấn đề space */
-        .two-column-layout {
-            width: 100% !important;
-            display: flex !important;
-            margin: 0 !important;
-            padding: 0 !important;
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 2px solid #f5f5f5;
         }
-        
-        /* Loại bỏ các padding không cần thiết */
-        .column {
-            padding: 10px !important;
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        /* Đặt chiều rộng cố định cho sidebar nếu nó đang hiển thị */
-        #floatingSidebar.active {
-            width: 320px !important; 
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
         }
-
-        #floatingSidebar:not(.active) {
-            width: 0 !important;
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
-        
-        /* Ẩn overflow-x để không bị scroll ngang */
-        body {
-            overflow-x: hidden !important;
+        .profile-info {
+            text-align: center;
         }
-        
-        /* Thêm debug outline */
-        .two-column-layout { outline: 2px solid red; }
-        .info-column { outline: 2px solid blue; }
-        .feedback-column { outline: 2px solid green; }
+        .profile-info h1 {
+            margin: 0 0 8px 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: -0.5px;
+        }
+        .shipper-id {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 0 0 24px 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .section-title i {
+            color: #3498db;
+            font-size: 1.3rem;
+        }
+        .info-grid {
+            display: grid;
+            gap: 20px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .info-label {
+            color: #6c757d;
+            font-weight: 600;
+            flex-shrink: 0;
+            font-size: 0.95rem;
+        }
+        .info-value {
+            text-align: right;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+        .actions {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 32px;
+            border-top: 1px solid #e9ecef;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid;
+            cursor: pointer;
+        }
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+            background: transparent;
+        }
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(220, 53, 69, 0.4);
+        }
+        @media (max-width: 768px) {
+            .content-wrapper, .main-content, [layout\:fragment="content"] {
+                padding-top: 20px;
+            }
+            .profile-container {
+                margin: 0 15px;
+                padding: 24px;
+            }
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+            }
+            .profile-info h1 {
+                font-size: 1.8rem;
+            }
+            .shipper-id {
+                font-size: 1rem;
+            }
+            .info-section {
+                padding: 24px;
+            }
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 16px;
+            }
+            .info-value {
+                text-align: left;
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+            .profile-info h1 {
+                font-size: 1.6rem;
+            }
+            .section-title {
+                font-size: 1.2rem;
+            }
+            .info-section {
+                padding: 20px;
+            }
+            .btn {
+                padding: 14px 24px;
+                font-size: 0.9rem;
+            }
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .profile-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0.1;
+        }
     </style>
-    <link rel="stylesheet" th:href="@{/css/shipper/shipper.css}" />
 </head>
-
 <body>
-    
-    <div layout:fragment="content">
-        <div class="profile-container">
-            <!-- Header Section -->
-            <div class="header">
-                <div class="profile-avatar">👤</div>
-                <h1 class="shipper-name" id="shipperName">PHAN MINH HIẾU</h1>
-                <p class="shipper-id">ID: #SH102230345</p>
+<div layout:fragment="content">
+<div class="shipper-main-content">
+    <div class="profile-container fade-in">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="profile-avatar">
+                <span th:text="${shipper?.user?.avatarUrl != null && !#strings.isEmpty(shipper?.user?.avatarUrl) ? '' : '👤'}"></span>
+                <img th:if="${shipper?.user?.avatarUrl != null && !#strings.isEmpty(shipper?.user?.avatarUrl)}"
+                     th:src="@{${shipper?.user?.avatarUrl}}"
+                     th:alt="${shipper?.user?.name ?: 'avatar'}"
+                     loading="lazy">
             </div>
+            <div class="profile-info">
+                <h1 th:text="${shipper?.user?.name ?: 'Chưa cập nhật'}">PHAN MINH HIẾU</h1>
+                <p class="shipper-id" th:text="'ID: #SH' + (${shipper?.shipperId ?: 'xxxxx'})">ID: #SHxxxxx</p>
+            </div>
+        </header>
 
-            <!-- New layout: Horizontal split layout -->
-            <div class="two-column-layout">
-                <!-- Left column - Info Section -->
-                <div class="column info-column">
-                    <div class="info-section">
-                        <h2 class="section-title">
-                            <i class="fas fa-clipboard-list"></i>
-                            Thông Tin Cá Nhân
-                        </h2>
-                        
-                        <div class="info-item">
-                            <span class="info-label">Trạng thái:</span>
-                            <span class="status-badge" id="status">Đang hoạt động</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">Số điện thoại:</span>
-                            <span class="info-value">1234567890</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">Email:</span>
-                            <span class="info-value">hieuphan@gmail.com</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">Phương tiện:</span>
-                            <span class="info-value">Xe máy - 29A1-12345</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">Ngày tham gia:</span>
-                            <span class="info-value">15/03/2023</span>
-                        </div>
-                        
-
-                        <!-- Biểu đồ hiệu suất -->
-                        <div class="performance-chart">
-                            <h3 class="section-title">
-                                <i class="fas fa-chart-bar"></i>
-                                Hiệu Suất
-                            </h3>
-                            
-                            <div class="chart-bar">
-                                <div class="chart-label">Đúng giờ:</div>
-                                <div class="chart-progress">
-                                    <div class="chart-fill" style="width: 95%"></div>
-                                </div>
-                                <div class="chart-value">95%</div>
-                            </div>
-                            
-                            <div class="chart-bar">
-                                <div class="chart-label">Thành công:</div>
-                                <div class="chart-progress">
-                                    <div class="chart-fill" style="width: 98%"></div>
-                                </div>
-                                <div class="chart-value">98%</div>
-                            </div>
-                            
-                            <div class="chart-bar">
-                                <div class="chart-label">Hài lòng:</div>
-                                <div class="chart-progress">
-                                    <div class="chart-fill" style="width: 96%"></div>
-                                </div>
-                                <div class="chart-value">96%</div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Info Section -->
+        <section class="info-section fade-in">
+            <h2 class="section-title">
+                <i class="fas fa-user-circle" aria-hidden="true"></i>
+                Thông Tin Cá Nhân
+            </h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Số điện thoại:</span>
+                    <span class="info-value" th:text="${shipper?.user?.phoneNumber ?: 'Chưa cập nhật'}">0123456789</span>
                 </div>
-                
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value" th:text="${shipper?.user?.email ?: 'Chưa cập nhật'}">hieuphan@gmail.com</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Phương tiện:</span>
+                    <span class="info-value"
+                        th:text="|${shipper.vehicleType == 'motocycle' ? 'Xe máy' 
+                                        : shipper.vehicleType == 'car' ? 'Ô tô' 
+                                        : shipper.vehicleType == 'truck' ? 'Xe tải' 
+                                        : shipper.vehicleType != null ? shipper.vehicleType : 'Chưa cập nhật'} - ${shipper.plateNumber != null ? shipper.plateNumber : ''}|">
+                        Xe máy - 29A1-12345
+                    </span>
 
-    <!-- Fragment for script -->
-    <th:block layout:fragment="script">
-        <script>
-            // Dữ liệu mẫu cho feedback (mô phỏng dữ liệu từ backend)
-            const feedbackData = [
-                
-            ];
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Bằng lái:</span>
+                    <span class="info-value" th:text="${shipper?.driverLicense ?: 'Chưa cập nhật'}">123456789</span>
+                </div>
+            </div>
+        </section>
 
-            // Hàm tạo sao đánh giá
-            function createStars(rating) {
-                let stars = '';
-                for (let i = 1; i <= 5; i++) {
-                    stars += i <= rating ? '★' : '☆';
-                }
-                return stars;
-            }
+        <!-- Actions -->
+        <div class="actions fade-in">
+            <a class="btn btn-outline-danger" th:href="@{/shipper/exit}" role="button">
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                Thoát chế độ shipper
+            </a>
+        </div>
+    </div>
+</div>
+</div>
 
-            // Hàm render feedback
-            function renderFeedback() {
-                const feedbackList = document.getElementById('feedbackList');
-                
-                feedbackData.forEach(feedback => {
-                    const feedbackItem = document.createElement('div');
-                    feedbackItem.className = 'feedback-item';
-                    
-                    feedbackItem.innerHTML = `
-                        <div class="feedback-header">
-                            <div class="customer-info">
-                                <div class="customer-avatar">${feedback.customerAvatar}</div>
-                                <div>
-                                    <div class="customer-name">${feedback.customerName}</div>
-                                    <div class="feedback-date">${feedback.date}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="feedback-rating">
-                            <span class="stars">${createStars(feedback.rating)}</span>
-                            <span class="rating-number">(${feedback.rating}/5)</span>
-                        </div>
-                        <div class="feedback-text">"${feedback.comment}"</div>
-                    `;
-                    
-                    feedbackList.appendChild(feedbackItem);
-                });
-            }
-
-            // Khởi tạo trang
-            document.addEventListener('DOMContentLoaded', function() {
-                renderFeedback();
-                
-                // Mô phỏng cập nhật trạng thái real-time
-                setInterval(() => {
-                    const statusElement = document.getElementById('status');
-                    const isOnline = Math.random() > 0.3; // 70% chance online
-                    
-                    if (isOnline) {
-                        statusElement.textContent = 'Đang hoạt động';
-                        statusElement.className = 'status-badge';
-                    } else {
-                        statusElement.textContent = 'Không hoạt động';
-                        statusElement.className = 'status-badge offline';
+<th:block layout:fragment="script">
+<script>
+    // Enhanced fade-in animation observer
+    const observeElements = () => {
+        const elements = document.querySelectorAll('.fade-in');
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 150);
+                        observer.unobserve(entry.target);
                     }
-                }, 10000); // Cập nhật mỗi 10 giây
-            });
-        </script>
-    </th:block>
+                });
+            }, { threshold: 0.2 });
+            elements.forEach(el => observer.observe(el));
+        } else {
+            elements.forEach(el => el.classList.add('visible'));
+        }
+    };
+
+    // Initialize on DOM ready
+    const init = () => {
+        observeElements();
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        setTimeout(init, 100);
+    }
+</script>
+</th:block>
 </body>
 </html>
