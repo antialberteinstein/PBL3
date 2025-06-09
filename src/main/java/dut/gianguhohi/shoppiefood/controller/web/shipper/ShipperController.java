@@ -119,9 +119,41 @@ public class ShipperController {
     // ==========================
     @GetMapping("/home")
     public String home(HttpSession session, Model model) {
-        /* if (session.getAttribute("shipper") == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Shipper không tồn tại");
-        } */
+        Object shipperObj = session.getAttribute("shipperId");
+        if (shipperObj == null) {
+            return "redirect:/shipper/enter";
+        }
+
+        Integer shipperId = (Integer) shipperObj;
+        Shipper shipper = shipperService.getShipperById(shipperId);
+
+        if (shipper == null) {
+            return "redirect:/shipper/register";
+        }
+
+        model.addAttribute("shipper", shipper);
+
+        return "shipper/home";
+    }
+
+    @GetMapping("/profile")
+    public String profile() {
+        return "redirect:/shipper/home";
+    }
+
+    @GetMapping("/detail/{shipperId}")
+    public String shipperDetail(@RequestParam("shipperId") Integer shipperId, Model model, HttpSession session) {
+        Object shipperObj = session.getAttribute("shipperId");
+        if (shipperObj == null) {
+            return "redirect:/shipper/enter";
+        }
+
+        Shipper shipper = shipperService.getShipperById(shipperId);
+        if (shipper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy shipper");
+        }
+
+        model.addAttribute("shipper", shipper);
         return "shipper/home";
     }
 }

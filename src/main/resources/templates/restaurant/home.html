@@ -137,6 +137,13 @@
                                 <input type="text" class="form-control" id="productName" name="name" required>
                             </div>
                             <div class="mb-3">
+                                <label for="productCategories" class="form-label">Danh mục</label>
+                                <select class="form-control" id="productCategories" name="categories" multiple>
+                                    <!-- Options will be loaded by JS -->
+                                </select>
+                                <div class="form-text">Giữ Ctrl (hoặc Cmd trên Mac) để chọn nhiều danh mục.</div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="productDescription" class="form-label">Mô tả</label>
                                 <textarea class="form-control" id="productDescription" name="description" rows="2"></textarea>
                             </div>
@@ -281,6 +288,25 @@
                 toastTitle.className = 'me-auto text-success';
                 toastMessage.textContent = msg;
                 notificationToast.show();
+            }
+
+            // =========================
+            // 🏷️ CATEGORY LOGIC
+            // =========================
+            function loadCategories(selected = []) {
+                fetch(`/api/categories`)
+                    .then(res => res.json())
+                    .then(categories => {
+                        const select = document.getElementById('productCategories');
+                        select.innerHTML = '';
+                        categories.forEach(cat => {
+                            const option = document.createElement('option');
+                            option.value = cat.name;
+                            option.textContent = cat.name;
+                            if (selected.includes(cat.name)) option.selected = true;
+                            select.appendChild(option);
+                        });
+                    });
             }
 
             // =========================
@@ -633,6 +659,7 @@
             });
 
             document.getElementById('addProductBtn').addEventListener('click', function() {
+                loadCategories();
                 productForm.reset();
                 productForm.productId.value = '';
                 productImageUrlInput.value = '';
@@ -661,6 +688,8 @@
                             productForm.reset();
                             productForm.productId.value = product.productId;
                             productForm.name.value = product.name || '';
+                            const selectedCategories = (product.categories || []).map(c => c.name);
+                            loadCategories(selectedCategories);
                             productForm.description.value = product.description || '';
                             productForm.price.value = product.price || '';
                             productForm.remainingQuantity.value = product.remainingQuantity || '';
@@ -698,13 +727,14 @@
                 const method = isUpdate ? 'PUT' : 'POST';
 
                 function doSubmit(imageUrl) {
+                    const categories = Array.from(document.getElementById('productCategories').selectedOptions).map(opt => opt.value);
                     const data = {
                         name: productForm.name.value,
                         description: productForm.description.value,
                         price: Number(productForm.price.value),
                         remainingQuantity: Number(productForm.remainingQuantity.value),
-                        imageUrl: imageUrl || oldImageUrl || ''
-                        // Add categories if needed
+                        imageUrl: imageUrl || oldImageUrl || '',
+                        categories: categories // <-- send as array
                     };
 
                     fetch(url, {
